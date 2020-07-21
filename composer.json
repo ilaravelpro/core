@@ -1,0 +1,38 @@
+{
+    "name": "ilaravelpro/core",
+    "description": "iLaravel Core",
+    "type": "Laravel package",
+    "license": "MIT",
+    "authors": [
+        {
+            "name" : "iamirnet",
+            "email" : "me@iamir.net"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/app",
+            "iLaravel\\Core\\": "src/"
+        },
+        "files": [
+            "src/helpers/helpers.php"
+        ]
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "iLaravel\\Core\\Providers\\AppServiceProvider",
+                "iLaravel\\Core\\Providers\\RouteServiceProvider",
+                "iLaravel\\Core\\Providers\\AuthServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require": {
+        "laravel/socialite": "^4.1.4",
+        "doctrine/dbal": "^2.9.2",
+        "laravel/passport": "^7.4",
+        "intervention/image" : "^2.5"
+    }
+}
