@@ -8,7 +8,9 @@
     "authors": [
         {
             "name" : "iamirnet",
-            "email" : "me@iamir.net"
+            "email" : "me@iamir.net",
+            "homepage": "https://iamir.net",
+            "role": "Developer"
         }
     ],
     "autoload": {
