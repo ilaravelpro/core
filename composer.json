@@ -1,7 +1,6 @@
 {
     "name": "ilaravelpro/core",
     "description": "iLaravel Core",
-    "type": "Laravel package",
     "keywords": ["laravel","manage"],
     "homepage": "https://ilaravel.iamir.net",
     "license": "MIT",
