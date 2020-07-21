@@ -35,9 +35,9 @@ class AuthServiceProvider extends ServiceProvider
             return Gate::allows($irole,  $args);
         });
 
-        Gate::resource('users', 'iLaravel\Core\IApp\Http\Policies\UserPolicy');
-        Gate::resource('users.scopes', 'iLaravel\Core\IApp\Http\Policies\UserScopePolicy');
-        Gate::resource('roles', 'iLaravel\Core\IApp\Http\Policies\RolePolicy');
-        Gate::resource('roles.scopes', 'iLaravel\Core\IApp\Http\Policies\RoleScopePolicy');
+        Gate::resource('users', 'iLaravel\Core\iApp\Http\Policies\UserPolicy');
+        Gate::resource('users.scopes', 'iLaravel\Core\iApp\Http\Policies\UserScopePolicy');
+        Gate::resource('roles', 'iLaravel\Core\iApp\Http\Policies\RolePolicy');
+        Gate::resource('roles.scopes', 'iLaravel\Core\iApp\Http\Policies\RoleScopePolicy');
     }
 }

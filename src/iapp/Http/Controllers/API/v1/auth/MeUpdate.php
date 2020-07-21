@@ -1,7 +1,7 @@
 <?php
 
 
-namespace iLaravel\Core\IApp\Http\Controllers\API\v1\Auth;
+namespace iLaravel\Core\iApp\Http\Controllers\API\v1\Auth;
 
 use Illuminate\Support\Facades\Hash;
 

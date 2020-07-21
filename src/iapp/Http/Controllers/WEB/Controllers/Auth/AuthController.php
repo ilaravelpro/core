@@ -1,10 +1,10 @@
 <?php
 
-namespace iLaravel\Core\IApp\Http\Controllers\WEB\Controllers\Auth;
+namespace iLaravel\Core\iApp\Http\Controllers\WEB\Controllers\Auth;
 
-use iLaravel\Core\IApp\Http\Controllers\WEB\Controller;
+use iLaravel\Core\iApp\Http\Controllers\WEB\Controller;
 use Intervention\Image\Facades\Image;
-use iLaravel\Core\IApp\Http\Requests\iLaravel as Request;
+use iLaravel\Core\iApp\Http\Requests\iLaravel as Request;
 
 class AuthController extends Controller
 {

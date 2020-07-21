@@ -2,7 +2,7 @@
 
 namespace iLaravel\Core\Vendor\iRole;
 
-use iLaravel\Core\IApp\Role;
+use iLaravel\Core\iApp\Role;
 use Illuminate\Support\Facades\Gate;
 
 class iRoleCheck

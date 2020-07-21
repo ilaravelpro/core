@@ -1,6 +1,6 @@
 <?php
 
-namespace iLaravel\Core\IApp\Http\Controllers;
+namespace iLaravel\Core\iApp\Http\Controllers;
 
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;

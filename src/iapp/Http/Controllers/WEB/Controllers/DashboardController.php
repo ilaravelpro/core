@@ -1,8 +1,8 @@
 <?php
 
-namespace iLaravel\Core\IApp\Http\Controllers\WEB\Controllers;
+namespace iLaravel\Core\iApp\Http\Controllers\WEB\Controllers;
 
-use iLaravel\Core\IApp\Http\Controllers\WEB\Controller;
+use iLaravel\Core\iApp\Http\Controllers\WEB\Controller;
 
 class DashboardController extends Controller
 {

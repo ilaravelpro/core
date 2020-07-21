@@ -1,6 +1,6 @@
 <?php
 
-namespace iLaravel\Core\IApp\Http\Validators;
+namespace iLaravel\Core\iApp\Http\Validators;
 
 use Illuminate\Validation\Validator;
 

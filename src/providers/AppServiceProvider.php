@@ -21,6 +21,7 @@ class AppServiceProvider extends ServiceProvider
 {
     public function boot()
     {
+        $this->mergeConfigFrom(i_path('config/ilaravel.php'), 'ilaravel.main');
         $this->registerMacros();
         if ($this->app->request->is('api/*') || $this->app->request->ajax()) {
             if($this->app->request->is('api/*'))
@@ -29,7 +30,7 @@ class AppServiceProvider extends ServiceProvider
             }
             $this->app->bind(
                 \Illuminate\Contracts\Debug\ExceptionHandler::class,
-                substr($this->app::VERSION, 0, 1) == '7' ? \iLaravel\Core\IApp\Exceptions\ExceptionHandler7::class : \iLaravel\Core\IApp\Exceptions\ExceptionHandler::class
+                substr($this->app::VERSION, 0, 1) == '7' ? \iLaravel\Core\iApp\Exceptions\ExceptionHandler7::class : \iLaravel\Core\iApp\Exceptions\ExceptionHandler::class
             );
 
         }
@@ -39,15 +40,14 @@ class AppServiceProvider extends ServiceProvider
                 i_path('public') => public_path('/'),
                 i_path('resources') => resource_path('/'),
             ]);
-            $this->loadMigrationsFrom(i_path('database/migrations'));
+            if (iconfig('database.migrations.include', true)) $this->loadMigrationsFrom(i_path('database/migrations'));
         }
         $this->registerRoutes();
         View::addLocation(i_path('resources/views'));
 
         $this->app['validator']->resolver(function ($translator, $data, $rules, $messages) {
-            return new \iLaravel\Core\IApp\Http\Validators\iLaravel($translator, $data, $rules, $messages);
+            return new \iLaravel\Core\iApp\Http\Validators\iLaravel($translator, $data, $rules, $messages);
         });
-        $this->mergeConfigFrom(i_path('config/ilaravel.php'), 'iamir.ilaravel');
         Schema::defaultStringLength(191);
 
     }
@@ -61,9 +61,9 @@ class AppServiceProvider extends ServiceProvider
 
     public function registerRoutes() {
         $router = $this->app['router'];
-        $router->pushMiddlewareToGroup('api', \iLaravel\Core\IApp\Http\Middleware\iResponse::class);
-        $router->pushMiddlewareToGroup('web', \iLaravel\Core\IApp\Http\Middleware\iResponse::class);
-        $router->aliasMiddleware('auth', \iLaravel\Core\IApp\Http\Middleware\iAuthenticate::class);
+        $router->pushMiddlewareToGroup('api', \iLaravel\Core\iApp\Http\Middleware\iResponse::class);
+        $router->pushMiddlewareToGroup('web', \iLaravel\Core\iApp\Http\Middleware\iResponse::class);
+        $router->aliasMiddleware('auth', \iLaravel\Core\iApp\Http\Middleware\iAuthenticate::class);
     }
 
     public function registerMacros() {

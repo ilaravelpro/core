@@ -1,6 +1,6 @@
 <?php
 
-namespace iLaravel\Core\IApp\Http\Requests;
+namespace iLaravel\Core\iApp\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;

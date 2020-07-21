@@ -28,7 +28,7 @@ class RouteServiceProvider extends ServiceProvider
     public function webRoutes(Router $router)
     {
         $router->group([
-            'namespace' => '\iLaravel\Core\IApp\Http\Controllers\WEB\Controllers',
+            'namespace' => '\iLaravel\Core\iApp\Http\Controllers\WEB\Controllers',
             'prefix' => '',
             'middleware' => 'web'
         ], function ($router) {
@@ -39,7 +39,7 @@ class RouteServiceProvider extends ServiceProvider
     public function apiRoutes(Router $router)
     {
         $router->group([
-            'namespace' => '\iLaravel\Core\IApp\Http\Controllers\API',
+            'namespace' => '\iLaravel\Core\iApp\Http\Controllers\API',
             'prefix' => 'api',
             'middleware' => 'api'
         ], function ($router) {
@@ -50,7 +50,7 @@ class RouteServiceProvider extends ServiceProvider
     public function authRoutes(Router $router)
     {
         $router->group([
-            'namespace' => '\iLaravel\Core\IApp\Http\Controllers\WEB\Controllers\Auth',
+            'namespace' => '\iLaravel\Core\iApp\Http\Controllers\WEB\Controllers\Auth',
             'prefix' => 'auth',
             'middleware' => 'web'
         ], function ($router) {

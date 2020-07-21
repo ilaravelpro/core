@@ -1,11 +1,11 @@
 <?php
 
-namespace iLaravel\Core\IApp\Http\Controllers\WEB\Controllers\Auth;
+namespace iLaravel\Core\iApp\Http\Controllers\WEB\Controllers\Auth;
 
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 
-use iLaravel\Core\IApp\Http\Requests\iLaravel as Request;
-use iLaravel\Core\IApp\Http\Controllers\API\v1\UserController;
+use iLaravel\Core\iApp\Http\Requests\iLaravel as Request;
+use iLaravel\Core\iApp\Http\Controllers\API\v1\UserController;
 
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Hash;

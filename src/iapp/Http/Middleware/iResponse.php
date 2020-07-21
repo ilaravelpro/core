@@ -1,6 +1,6 @@
 <?php
 
-namespace iLaravel\Core\IApp\Http\Middleware;
+namespace iLaravel\Core\iApp\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\JsonResponse;

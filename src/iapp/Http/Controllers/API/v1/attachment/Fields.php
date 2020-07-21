@@ -1,8 +1,8 @@
 <?php
 
 
-namespace iLaravel\Core\IApp\Http\Controllers\API\v1\Attachment;
-use iLaravel\Core\IApp\Http\Requests\iLaravel as Request;
+namespace iLaravel\Core\iApp\Http\Controllers\API\v1\Attachment;
+use iLaravel\Core\iApp\Http\Requests\iLaravel as Request;
 
 trait Fields
 {

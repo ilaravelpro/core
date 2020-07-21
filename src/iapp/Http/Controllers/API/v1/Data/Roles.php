@@ -1,8 +1,8 @@
 <?php
 
-namespace iLaravel\Core\IApp\Http\Controllers\API\v1\Data;
+namespace iLaravel\Core\iApp\Http\Controllers\API\v1\Data;
 
-use iLaravel\Core\IApp\Http\Requests\iLaravel as Request;
+use iLaravel\Core\iApp\Http\Requests\iLaravel as Request;
 
 trait Roles
 {

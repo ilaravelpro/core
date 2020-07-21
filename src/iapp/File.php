@@ -1,9 +1,9 @@
 <?php
 
-namespace iLaravel\Core\IApp;
+namespace iLaravel\Core\iApp;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Http\UploadedFile;
-use iLaravel\Core\IApp\Http\Controllers\API\v1\AttachmentController;
+use iLaravel\Core\iApp\Http\Controllers\API\v1\AttachmentController;
 use Image;
 use DB;
 

@@ -8,7 +8,7 @@ function i_path($path = null)
 
 function iconfig($key = null, $default = null)
 {
-    $cilaravel =  config('iamir.ilaravel'.($key ? ".$key" : ''));
+    $cilaravel =  config('ilaravel.main'.($key ? ".$key" : ''));
     $iilaravel =  config('ilaravel'.($key ? ".$key" : ''));
     $ilaravel = $cilaravel === null ? $iilaravel : $cilaravel;
     if (is_array($cilaravel) || is_array($iilaravel)){

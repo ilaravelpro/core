@@ -1,8 +1,8 @@
 <?php
 
-namespace iLaravel\Core\IApp\Http\Controllers\API;
+namespace iLaravel\Core\iApp\Http\Controllers\API;
 
-use iLaravel\Core\IApp\Http\Controllers\iController;
+use iLaravel\Core\iApp\Http\Controllers\iController;
 
 class Controller extends iController
 {

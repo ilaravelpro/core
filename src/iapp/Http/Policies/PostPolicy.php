@@ -1,6 +1,6 @@
 <?php
 
-namespace iLaravel\Core\IApp\Http\Policies;
+namespace iLaravel\Core\iApp\Http\Policies;
 
 use iLaravel\Core\Vendor\iRole\iRolePolicy;
 

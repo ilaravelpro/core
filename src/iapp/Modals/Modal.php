@@ -1,6 +1,6 @@
 <?php
 
-namespace iLaravel\Core\IApp\Modals;
+namespace iLaravel\Core\iApp\Modals;
 
 trait Modal
 {

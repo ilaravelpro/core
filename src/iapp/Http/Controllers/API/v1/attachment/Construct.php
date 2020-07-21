@@ -1,7 +1,7 @@
 <?php
 
 
-namespace iLaravel\Core\IApp\Http\Controllers\API\v1\Attachment;
+namespace iLaravel\Core\iApp\Http\Controllers\API\v1\Attachment;
 
 
 trait Construct

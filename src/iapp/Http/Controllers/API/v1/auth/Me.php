@@ -1,10 +1,10 @@
 <?php
 
 
-namespace iLaravel\Core\IApp\Http\Controllers\API\v1\Auth;
+namespace iLaravel\Core\iApp\Http\Controllers\API\v1\Auth;
 
-use iLaravel\Core\IApp\Http\Controllers\API\Methods\Controller\Show;
-use iLaravel\Core\IApp\Http\Requests\iLaravel as Request;
+use iLaravel\Core\iApp\Http\Controllers\API\Methods\Controller\Show;
+use iLaravel\Core\iApp\Http\Requests\iLaravel as Request;
 use Illuminate\Auth\AuthenticationException;
 
 trait Me

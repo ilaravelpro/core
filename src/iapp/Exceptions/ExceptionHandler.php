@@ -1,6 +1,6 @@
 <?php
 
-namespace iLaravel\Core\IApp\Exceptions;
+namespace iLaravel\Core\iApp\Exceptions;
 
 use Exception;
 use Illuminate\Foundation\Exceptions\Handler;

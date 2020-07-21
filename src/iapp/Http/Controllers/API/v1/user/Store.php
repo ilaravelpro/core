@@ -1,9 +1,9 @@
 <?php
 
-namespace iLaravel\Core\IApp\Http\Controllers\API\v1\User;
-use iLaravel\Core\IApp\File;
+namespace iLaravel\Core\iApp\Http\Controllers\API\v1\User;
+use iLaravel\Core\iApp\File;
 
-use iLaravel\Core\IApp\Http\Requests\iLaravel as Request;
+use iLaravel\Core\iApp\Http\Requests\iLaravel as Request;
 use Illuminate\Support\Facades\Hash;
 
 trait Store

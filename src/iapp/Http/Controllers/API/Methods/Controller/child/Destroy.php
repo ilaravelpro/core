@@ -1,8 +1,8 @@
 <?php
 
-namespace iLaravel\Core\IApp\Http\Controllers\API\Methods\Controller\Child;
+namespace iLaravel\Core\iApp\Http\Controllers\API\Methods\Controller\Child;
 
-use iLaravel\Core\IApp\Http\Requests\iLaravel as Request;
+use iLaravel\Core\iApp\Http\Requests\iLaravel as Request;
 
 trait Destroy
 {

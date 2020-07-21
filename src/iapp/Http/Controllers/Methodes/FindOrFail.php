@@ -1,8 +1,8 @@
 <?php
 
-namespace iLaravel\Core\IApp\Http\Controllers\Methods;
+namespace iLaravel\Core\iApp\Http\Controllers\Methods;
 
-use iLaravel\Core\IApp\Http\Requests\iLaravel;
+use iLaravel\Core\iApp\Http\Requests\iLaravel;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 trait FindOrFail

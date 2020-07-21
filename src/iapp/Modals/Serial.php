@@ -1,5 +1,5 @@
 <?php
-namespace iLaravel\Core\IApp\Modals;
+namespace iLaravel\Core\iApp\Modals;
 
 use iLaravel\Core\Vendor\iSerial as Engine;
 

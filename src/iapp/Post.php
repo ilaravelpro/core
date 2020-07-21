@@ -1,6 +1,6 @@
 <?php
 
-namespace iLaravel\Core\IApp;
+namespace iLaravel\Core\iApp;
 
 class Post extends Modals\_Post{
 

@@ -1,8 +1,8 @@
 <?php
 
-namespace iLaravel\Core\IApp\Modals;
+namespace iLaravel\Core\iApp\Modals;
 
-use iLaravel\Core\IApp\File;
+use iLaravel\Core\iApp\File;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 

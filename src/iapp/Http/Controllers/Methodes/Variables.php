@@ -1,7 +1,7 @@
 <?php
 
 
-namespace iLaravel\Core\IApp\Http\Controllers\Methods;
+namespace iLaravel\Core\iApp\Http\Controllers\Methods;
 
 
 trait Variables

@@ -1,8 +1,8 @@
 <?php
 
-namespace iLaravel\Core\IApp\Http\Controllers\API\v1;
+namespace iLaravel\Core\iApp\Http\Controllers\API\v1;
 
-use iLaravel\Core\IApp\Http\Controllers\API\Controller;
+use iLaravel\Core\iApp\Http\Controllers\API\Controller;
 
 class DataController extends Controller
 {

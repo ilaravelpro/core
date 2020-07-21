@@ -3,15 +3,15 @@
 use Illuminate\Support\Str;
 
 function imodal($modal){
-    return class_exists("\\App\\$modal") ? "\\App\\$modal" : "\\iLaravel\\Core\\IApp\\$modal";
+    return class_exists("\\App\\$modal") ? "\\App\\$modal" : "\\iLaravel\\Core\\iApp\\$modal";
 }
 
 function iresource($resource){
-    return class_exists("\\App\\Http\\Resources\\$resource") ? "\\App\\Http\\Resources\\$resource" : "\\iLaravel\\Core\\IApp\\Http\\Resources\\$resource";
+    return class_exists("\\App\\Http\\Resources\\$resource") ? "\\App\\Http\\Resources\\$resource" : "\\iLaravel\\Core\\iApp\\Http\\Resources\\$resource";
 }
 
 function icontroller($controller){
-    return class_exists("\\App\\Http\\Controllers\\$controller") ? "\\App\\Http\\Controllers\\$controller" : "\\iLaravel\\Core\\IApp\\Http\\Controllers\\$controller";
+    return class_exists("\\App\\Http\\Controllers\\$controller") ? "\\App\\Http\\Controllers\\$controller" : "\\iLaravel\\Core\\iApp\\Http\\Controllers\\$controller";
 }
 
 function iwebcontroller($controller){

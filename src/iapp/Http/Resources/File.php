@@ -1,6 +1,6 @@
 <?php
 
-namespace iLaravel\Core\IApp\Http\Resources;
+namespace iLaravel\Core\iApp\Http\Resources;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class File extends JsonResource

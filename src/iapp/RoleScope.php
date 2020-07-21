@@ -1,6 +1,6 @@
 <?php
 
-namespace iLaravel\Core\IApp;
+namespace iLaravel\Core\iApp;
 
 use Illuminate\Database\Eloquent\Model as Eloquent;
 

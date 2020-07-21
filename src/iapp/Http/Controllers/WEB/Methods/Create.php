@@ -1,6 +1,6 @@
 <?php
 
-namespace iLaravel\Core\IApp\Http\Controllers\WEB\Methods;
+namespace iLaravel\Core\iApp\Http\Controllers\WEB\Methods;
 
 use Illuminate\Http\Request;
 

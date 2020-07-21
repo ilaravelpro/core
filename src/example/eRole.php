@@ -3,7 +3,7 @@
 namespace iLaravel\Core\Example;
 
 use App\User;
-use iLaravel\Core\IApp\Role;
+use iLaravel\Core\iApp\Role;
 
 class eRole
 {

@@ -1,8 +1,8 @@
 <?php
 
-namespace iLaravel\Core\IApp\Http\Controllers\WEB\Methods\Controller;
+namespace iLaravel\Core\iApp\Http\Controllers\WEB\Methods\Controller;
 
-use iLaravel\Core\IApp\Http\Requests\iLaravel as Request;
+use iLaravel\Core\iApp\Http\Requests\iLaravel as Request;
 
 trait Create
 {
