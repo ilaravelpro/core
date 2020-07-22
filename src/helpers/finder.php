@@ -2,16 +2,24 @@
 
 use Illuminate\Support\Str;
 
+function i_class_exists($patch, $class){
+    foreach (iconfig('plugins') as $plugin) {
+        if (class_exists("\\iLaravel\\$plugin\\$patch\\$class"))
+            return "\\iLaravel\\$plugin\\$patch\\$class";
+    }
+    return false;
+}
+
 function imodal($modal){
-    return class_exists("\\App\\$modal") ? "\\App\\$modal" : "\\iLaravel\\Core\\iApp\\$modal";
+    return i_class_exists("iApp", $modal) ?  : "\\App\\$modal";
 }
 
 function iresource($resource){
-    return class_exists("\\App\\Http\\Resources\\$resource") ? "\\App\\Http\\Resources\\$resource" : "\\iLaravel\\Core\\iApp\\Http\\Resources\\$resource";
+    return i_class_exists("iApp\\Http\\Resources", $resource) ?  : "\\App\\Http\\Resources\\$resource";
 }
 
 function icontroller($controller){
-    return class_exists("\\App\\Http\\Controllers\\$controller") ? "\\App\\Http\\Controllers\\$controller" : "\\iLaravel\\Core\\iApp\\Http\\Controllers\\$controller";
+    return i_class_exists("iApp\\Http\\Controllers", $controller) ? : "\\App\\Http\\Controllers\\$controller";
 }
 
 function iwebcontroller($controller){

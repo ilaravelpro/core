@@ -1,0 +1,8 @@
+<?php
+
+$plugins = [
+    'Core',
+    'iWindy',
+];
+
+?>

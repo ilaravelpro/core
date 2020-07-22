@@ -10,6 +10,7 @@ include 'countries.php';
 include 'resources.php';
 include 'routes.php';
 include 'preferences.php';
+include 'plugins.php';
 
 return [
     "auth" => $auth,
@@ -23,5 +24,6 @@ return [
     "resources" => $resources,
     "routes" => $routes,
     "preferences" => $preferences,
+    "plugins" => $plugins,
 ];
 ?>
