@@ -217,7 +217,6 @@ trait Metable
     {
         foreach ($this->metaData as $meta) {
             $meta->setTable($this->metaTable);
-
             if ($meta->isMarkedForDeletion()) {
                 $meta->delete();
                 continue;
@@ -381,6 +380,7 @@ trait Metable
     public function __set($key, $value)
     {
         // ignore the trait properties being set.
+
         if (Str::startsWith($key, 'meta') || $key == 'query') {
             $this->$key = $value;
 
@@ -408,7 +408,6 @@ trait Metable
 
         // if the key has a mutator execute it
         $mutator = Str::camel('set_'.$key.'_meta');
-
         if (method_exists($this, $mutator)) {
             $this->{$mutator}($value);
 

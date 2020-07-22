@@ -2,6 +2,8 @@
 
 namespace iLaravel\Core\iApp\Modals;
 
+use Illuminate\Support\Facades\DB;
+
 trait Modal
 {
     use Serial;
@@ -32,5 +34,12 @@ trait Modal
     public function getUpdatedAtAttribute($value)
     {
         return format_datetime($value, $this->datetime, 'updated_at');
+    }
+
+    public static function resetRecordsId()
+    {
+        DB::statement(DB::raw('ALTER TABLE '.(new self())->getTable().' AUTO_INCREMENT=0'));
+        DB::statement(DB::raw('set @reset:=0'));
+        return DB::statement(DB::raw('UPDATE '.(new self())->getTable().' SET id = @reset:= @reset + 1'));
     }
 }

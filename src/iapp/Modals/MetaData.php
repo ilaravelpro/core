@@ -6,12 +6,13 @@ namespace iLaravel\Core\iApp\Modals;
 use DateTime;
 use Illuminate\Database\Eloquent\Model;
 
-class MetaData
+class MetaData extends Model
 {
     /**
      * @var array
      */
-    protected $fillable = ['key', 'value'];
+    //protected $fillable = ['key', 'value'];
+    protected $guarded = [];
 
     /**
      * @var array
