@@ -6,6 +6,7 @@ include 'array.php';
 include 'debug.php';
 include 'phone.php';
 include 'finder.php';
+include 'measuring.php';
 
 function _t($trans)
 {
