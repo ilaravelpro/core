@@ -22,7 +22,7 @@ function _getBearingGeo($lonlat1, $lonlat2)
     $y = sin($a2 - $a1) * cos($p2);
     $x = cos($p1) * sin($p2) - sin($p1) * cos($p2) * cos($a2 - $a1);
     $result = (atan2($y, $x) * 180 / pi() + 360) / 360;
-    return round(($result - (int) $result) * 360);
+    return round(($result - (int) $result) * 360, 2);
 }
 
 function _toNM($number)
