@@ -51,3 +51,13 @@ function class_name($class_name, $plural = false, $lower = 0)
             return $class_name;
     }
 }
+
+function getClosestKey($search, $arr) {
+    $closest = null;
+    foreach ($arr as $key => $item) {
+        if ($closest === null || abs($search - $closest) > abs($item - $search)) {
+            $closest = $key;
+        }
+    }
+    return $closest;
+}
