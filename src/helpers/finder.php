@@ -52,7 +52,7 @@ function class_name($class_name, $plural = false, $lower = 0)
     }
 }
 
-function getClosestKey($search, $arr) {
+/*function getClosestKey($search, $arr) {
     $closest = null;
     foreach ($arr as $key => $item) {
         if ($closest === null || abs($search - $closest) > abs($item - $search)) {
@@ -60,4 +60,22 @@ function getClosestKey($search, $arr) {
         }
     }
     return $closest;
+}*/
+
+function getClosestKey($search, $arr) {
+    sort($arr);
+    $prev = -1;
+    if (array_search($search, $arr) !== false)
+        return array_search($search, $arr);
+    else{
+        foreach ($arr as $key => $item) {
+            if (($prev != -1) && ($search <= $item)){
+                return $search - $arr[$prev] < $item - $search ? $prev :  $key;
+            }
+            else
+                $prev = $key;
+        }
+
+    }
+    return $prev == -1 ? 0 : $prev;
 }
