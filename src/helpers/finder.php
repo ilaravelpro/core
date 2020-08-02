@@ -2,7 +2,8 @@
 
 use Illuminate\Support\Str;
 
-function i_class_exists($patch, $class){
+function i_class_exists($patch, $class)
+{
     foreach (iconfig('plugins') as $plugin) {
         if (class_exists("\\iLaravel\\$plugin\\$patch\\$class"))
             return "\\iLaravel\\$plugin\\$patch\\$class";
@@ -10,23 +11,28 @@ function i_class_exists($patch, $class){
     return false;
 }
 
-function imodal($modal){
-    return i_class_exists("iApp", $modal) ?  : "\\App\\$modal";
+function imodal($modal)
+{
+    return i_class_exists("iApp", $modal) ?: "\\App\\$modal";
 }
 
-function iresource($resource){
-    return i_class_exists("iApp\\Http\\Resources", $resource) ?  : "\\App\\Http\\Resources\\$resource";
+function iresource($resource)
+{
+    return i_class_exists("iApp\\Http\\Resources", $resource) ?: "\\App\\Http\\Resources\\$resource";
 }
 
-function icontroller($controller){
-    return i_class_exists("iApp\\Http\\Controllers", $controller) ? : "\\App\\Http\\Controllers\\$controller";
+function icontroller($controller)
+{
+    return i_class_exists("iApp\\Http\\Controllers", $controller) ?: "\\App\\Http\\Controllers\\$controller";
 }
 
-function iwebcontroller($controller){
+function iwebcontroller($controller)
+{
     return icontroller("WEB\\Controllers\\$controller");
 }
 
-function iapicontroller($controller, $v = 1){
+function iapicontroller($controller, $v = 1)
+{
     return $v ? icontroller("API\\v$v\\$controller") : icontroller("API\\$controller");
 }
 
@@ -62,20 +68,19 @@ function class_name($class_name, $plural = false, $lower = 0)
     return $closest;
 }*/
 
-function getClosestKey($search, $arr) {
-    sort($arr);
+function getClosestKey($search, $arr)
+{
+    asort($arr);
+    $keys = array_keys($arr);
+    $values = array_values($arr);
     $prev = -1;
-    if (array_search($search, $arr) !== false)
-        return array_search($search, $arr);
-    else{
-        foreach ($arr as $key => $item) {
-            if (($prev != -1) && ($search <= $item)){
-                return $search - $arr[$prev] < $item - $search ? $prev :  $key;
-            }
+    if (array_search($search, $values) !== false)
+        return $keys[array_search($search, $values)];
+    else
+        foreach ($values as $key => $item)
+            if (($prev != -1) && ($search <= $item))
+                return $keys[$search - $values[$prev] < $item - $search ? $prev : $key];
             else
                 $prev = $key;
-        }
-
-    }
-    return $prev == -1 ? 0 : $prev;
+    return $keys[$prev == -1 ? 0 : $prev];
 }
