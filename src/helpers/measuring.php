@@ -25,6 +25,16 @@ function _getBearingGeo($lonlat1, $lonlat2)
     return round(($result - (int) $result) * 360, 2);
 }
 
+function _uv2ddff($u, $v) {
+    $u2v2 = $u ^ 2 + $v ^ 2;
+    $wind['speed'] = sqrt($u2v2 < 0 ? $u2v2 * -1 : $u2v2);
+    $wind['wind_dir_trig_to'] = $wind['speed'] == 0 ? 0 : atan2($u / $wind['speed'], $v / $wind['speed']);
+    $wind['wind_dir_trig_to_degrees'] = $wind['wind_dir_trig_to'] * 180 / pi();
+    $wind['wind_dir_trig_from_degrees'] = $wind['wind_dir_trig_to_degrees'] + 180;
+    $wind['wind_dir_cardinal'] = 90 - $wind['wind_dir_trig_from_degrees'];
+    return $wind;
+}
+
 function _toNM($number)
 {
     return round($number * 0.000539956803, 2);
