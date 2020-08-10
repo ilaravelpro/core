@@ -13,17 +13,17 @@ function i_class_exists($patch, $class)
 
 function imodal($modal)
 {
-    return i_class_exists("iApp", $modal) ?: "\\App\\$modal";
+    return class_exists("\\App\\$modal") ? "\\App\\$modal" : i_class_exists("iApp", $modal);
 }
 
 function iresource($resource)
 {
-    return i_class_exists("iApp\\Http\\Resources", $resource) ?: "\\App\\Http\\Resources\\$resource";
+    return class_exists("\\App\\Http\\Resources\\$resource") ? "\\App\\Http\\Resources\\$resource" : i_class_exists("iApp\\Http\\Resources", $resource);
 }
 
 function icontroller($controller)
 {
-    return i_class_exists("iApp\\Http\\Controllers", $controller) ?: "\\App\\Http\\Controllers\\$controller";
+    return class_exists("\\App\\Http\\Controllers\\$controller") ? "\\App\\Http\\Controllers\\$controller" : i_class_exists("iApp\\Http\\Controllers", $controller);
 }
 
 function iwebcontroller($controller)
