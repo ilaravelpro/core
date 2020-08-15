@@ -23,8 +23,6 @@ class _User extends Authenticatable
     public static $s_start = 24300000;
     public static $s_end = 728999999;
 
-    public static $relScopes = [];
-
     protected $appends = ['fullname'];
 
     protected $hidden = [
@@ -64,18 +62,11 @@ class _User extends Authenticatable
         return $this->hasMany(imodal('UserScope'));
     }
 
-    public static function addRelScope($relScope) {
-        static::$relScopes[] = $relScope;
-    }
-
     public function scopeAll() {
         $role = imodal('Role');
         $role = $role::findByName($this->role);
         $roleScopes = $role ? $role->scopes : [];
         $scopes = $this->scopes->merge($roleScopes);
-        foreach (static::$relScopes as $relScope)
-            $scopes = $scopes->merge($relScope);
         return $scopes->where('can', 1)->pluck('scope')->toArray();
     }
-
 }
