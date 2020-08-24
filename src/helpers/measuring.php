@@ -22,7 +22,7 @@ function _getBearingGeo($lonlat1, $lonlat2, $precision = 2)
     $dLon = $lon2 - $lon1;
     $y = sin($dLon) * cos($lat2);
     $x = cos($lat1) * sin($lat2) - sin($lat1) * cos($lat2) * cos($dLon);
-    $result = (atan2($y, $x) * 180 / pi() + 360) / 360;
+    $result = (rad2deg(atan2($y, $x)) + 360) / 360;
     return round(($result - (int)$result) * 360, $precision);
 }
 
@@ -37,20 +37,22 @@ function _uv2ddff($u, $v)
 
 function windDir($u, $v)
 {
-    if ($u > 0) return ((180 / pi()) * atan($u / $v) + 180);
+    if ($u > 0) return ((180 / pi()) * atan($v ? $u / $v : $u) + 180);
     if ($u < 0 & $v < 0) return ((180 / pi()) * atan($u / $v) + 0);
     if ($u > 0 & $v < 0) return ((180 / pi()) * atan($u / $v) + 360);
 }
 
 function _find_second_point($start, $dist, $bearing, $precision = 4)
 {
-    $dx = $dist * sin(deg2rad($bearing));
-    $dy = $dist * cos(deg2rad($bearing));
-    $delta_longitude = $dx / (111320 * cos(deg2rad($start[1])));
-    $delta_latitude = $dy / 110540;
+    $radius = 6378.1;
+    $lon = deg2rad($start[0]);
+    $lat = deg2rad($start[1]);
+    $brng  = deg2rad($bearing);
+    $lat2 = asin(sin($lat) * cos($dist / $radius) + cos($lat) * sin($dist / $radius) * cos($brng));
+    $lon2 = $lon + atan2(sin($brng) * sin($dist / $radius) * cos($lat), cos($dist / $radius) - sin($lat) * sin($lat2));
     return [
-        round($start[0] + $delta_longitude, $precision),
-        round($start[1] + $delta_latitude, $precision),
+        round(rad2deg($lon2), $precision),
+        round(rad2deg($lat2), $precision),
     ];
 }
 

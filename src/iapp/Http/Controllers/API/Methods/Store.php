@@ -76,7 +76,7 @@ trait Store
             }
             foreach ($fields as $value) {
                 if ($request->has($value)) {
-                    $data[$value] = $request->$value;
+                    $data = _set_value($data, $value, $request->$value);
                 }
             }
         }

@@ -56,10 +56,11 @@ trait Update
             foreach ($fields as $value) {
                 if($request->has($value) && $model->$value != $request->$value)
                 {
-                    $changed[$value] = $request->$value;
-                    $original[$value] = $model->$value;
+                    $changed = _set_value($changed, $value, $request->$value);
+                    $original = _set_value($original, $value, $model->$value);
                 }
             }
+
         }
         if($callback)
         {

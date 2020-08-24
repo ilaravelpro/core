@@ -84,3 +84,13 @@ function getClosestKey($search, $arr)
                 $prev = $key;
     return $keys[$prev == -1 ? 0 : $prev];
 }
+
+function _set_value($data, $path, $value) {
+    $temp = &$data;
+    foreach(explode('.',$path) as $key) {
+        $temp = &$temp[$key];
+    }
+    $temp = $value;
+    unset($temp);
+    return $data;
+}
