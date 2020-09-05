@@ -20,7 +20,7 @@ class iLaravel extends FormRequest
         }
         $this->numberTypes($data);
         $this->mobileRule($data);
-        $this->serialRule($data);
+        //$this->serialRule($data);
         $this->replace($data);
         return $data;
 

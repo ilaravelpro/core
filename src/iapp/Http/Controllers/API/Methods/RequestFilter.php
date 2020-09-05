@@ -24,7 +24,7 @@ trait RequestFilter
             if (method_exists($this, 'query_filter_type'))
                 $this->query_filter_type($model, $filter, (object)['value' =>  $filter->value, 'type' => $ftype, 'symbol' => $fsymbol]);
             if (isset($filterOPT[0]) && !isset($filterOPT[0]['handel']))
-                switch ($filter->type) {
+                switch ($ftype) {
                     case 'all':
                         $request->validate(['filter.value' => ['string']]);
                         $this->searchQ(new Request(['q' => $filter->value]), $model, $parent);

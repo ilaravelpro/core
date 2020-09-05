@@ -1,7 +1,6 @@
 <?php
 Route::namespace('v1')->prefix('v1')->group(function() {
     Route::group(['middleware' => ['auth:api']], function () {
-
         Route::get('/me', 'AuthController@me')->name('api.auth.get');
         Route::post('/me', 'AuthController@me_update')->name('api.auth.update');
         Route::apiResource('users', 'UserController', ['as' => 'api']);
