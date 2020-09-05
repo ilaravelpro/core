@@ -6,7 +6,8 @@ use Illuminate\Support\Facades\DB;
 
 trait Modal
 {
-    use Serial;
+    use Serial,
+        Data;
 
     public $datetime = [
         'global' => 'Y-m-d H:i:s',

@@ -22,9 +22,9 @@ Route::namespace('v1')->prefix('v1')->group(function() {
         });
     });
     Route::prefix('auth')->group(function() {
-        Route::post('login', 'AuthController@login')->name('api.auth.login');
-        Route::post('logout', 'AuthController@logout')->name('api.auth.logout');
-        Route::post('register', 'AuthController@register')->name('api.auth.register');
+        if (iconfig('auth.login')) Route::post('login', 'AuthController@login')->name('api.auth.login');
+        if (iconfig('auth.logout')) Route::post('logout', 'AuthController@logout')->name('api.auth.logout');
+        if (iconfig('auth.register')) Route::post('register', 'AuthController@register')->name('api.auth.register');
     });
 
 });

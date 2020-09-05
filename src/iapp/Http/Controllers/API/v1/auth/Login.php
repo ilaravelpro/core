@@ -14,7 +14,7 @@ trait Login
             throw new AuthenticationException('login disabled');
         }
         $this->username_method($request);
-        if (!$this->model::where($this->username_method, $request->input($this->username_method))->first() && config('auth.enter.auto_register')) {
+        if (!$this->model::where($this->username_method, $request->input($this->username_method))->first() && iconfig('auth.auto_register')) {
             return $this->register($request);
         }
         if (auth()->attempt($this->attempt_rule($request))) {
