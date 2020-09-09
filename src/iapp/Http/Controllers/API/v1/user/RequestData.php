@@ -15,7 +15,7 @@ trait RequestData
             ]);
             $data['mobile'] = $request->mobile;
         }
-        if (in_array($action, ['store', 'update']) && isset($data['groups'])) {
+        /*if (in_array($action, ['store', 'update']) && isset($data['groups'])) {
             if (is_string($data['groups']))
                 $data['groups'] = explode(',', $data['groups']);
             $groups = iRole::allGroups();
@@ -31,7 +31,7 @@ trait RequestData
             ]);
         } elseif (in_array($action, ['store', 'update']) && !isset($data['groups'])) {
             $data['groups'] = null;
-        }
+        }*/
         if (in_array($action, ['store']))
             $data['creator_id'] = auth()->id();
     }

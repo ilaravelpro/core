@@ -10,8 +10,8 @@ trait SearchQ
     {
         $q = $request->q;
         $model->where(function ($query) use ($q) {
-            $query->where('guards.name', 'LIKE', "%$q%")
-                ->orWhere('guards.group', 'LIKE', "%$q%");
+            $query->where('roles.name', 'LIKE', "%$q%")
+                ->orWhere('roles.title', 'LIKE', "%$q%");
         });
     }
 }

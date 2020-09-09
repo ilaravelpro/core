@@ -27,8 +27,8 @@ trait Filters
                 'items' => config('bit.status', ['awaiting', 'active', 'disable'])
             ],
             [
-                'name' => 'type',
-                'title' => _t('type'),
+                'name' => 'role',
+                'title' => _t('role'),
                 'type' => 'select',
                 'items' => $types
             ],

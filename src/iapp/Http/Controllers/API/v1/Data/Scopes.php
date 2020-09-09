@@ -26,7 +26,8 @@ trait Scopes
         unset($configScopes['global']);
         foreach ($configScopes as $key => $section) {
             $positions[$key] = [
-                'title' => ucfirst($key)
+                'title' => ucfirst($key),
+                'name' => $key,
             ];
             foreach ($section as $skey => $scope) {
                 $scopes =  is_array($scope) ? $scope : [$scope];

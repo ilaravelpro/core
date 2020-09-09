@@ -3,6 +3,7 @@
 
 namespace iLaravel\Core\iApp\Http\Controllers\API\v1\Auth;
 
+use App\User;
 use iLaravel\Core\iApp\Http\Requests\iLaravel as Request;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Support\Facades\Hash;
