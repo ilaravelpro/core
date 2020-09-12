@@ -18,4 +18,14 @@ class Performance extends Modals\MetaData
             ->where('name', $name)
             ->first();
     }
+
+    public function setValueAttribute($value)
+    {
+        $this->renderSetValue($value);
+    }
+
+    public function getValueAttribute($value)
+    {
+        return $this->renderGetValue($value);
+    }
 }

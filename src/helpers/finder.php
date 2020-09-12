@@ -94,3 +94,21 @@ function _set_value($data, $path, $value) {
     unset($temp);
     return $data;
 }
+
+function _get_value(array $array, $parents, $glue = '.')
+{
+    if (!is_array($parents)) {
+        $parents = explode($glue, $parents);
+    }
+
+    $ref = &$array;
+
+    foreach ((array) $parents as $parent) {
+        if (is_array($ref) && array_key_exists($parent, $ref)) {
+            $ref = &$ref[$parent];
+        } else {
+            return null;
+        }
+    }
+    return $ref;
+}

@@ -18,6 +18,7 @@ class CreatePerformancesTable extends Migration
             $table->string('section')->nullable()->default('core');
             $table->string('name')->nullable();
             $table->string('value')->nullable();
+            $table->string('type')->nullable();
             $table->timestamps();
             //$table->unique(['section', 'name']);
         });

@@ -22,8 +22,22 @@ function iconfig($key = null, $default = null)
     return $ilaravel !== null ? $ilaravel : $default;
 }
 
-function ipreference($key = null, $default = null)
+function ipreference($key = null, $default = null, $type = 'auto')
 {
-    return $key ? iconfig('preferences.'.$key, $default) : iconfig('preferences', $default);
+    if ($key && in_array($type, ['auto', 'db'])){
+        $model = imodal('Performance');
+        $path = explode('.', $key);
+        $value = $model::findBySectionName($path[0], isset($path[1]) ? $path[1] : null);
+        if (count($path) > 2){
+            unset($path[0]);
+            unset($path[1]);
+            $value = _get_value($value->value, implode('.', $path));
+        }else
+            $value = $value->value;
+        $type = $value ? 'db' : $type;
+    }
+    if (in_array($type, ['auto', 'config']))
+        $value = $key ? iconfig('preferences.'.$key, $default) : iconfig('preferences', $default);
+    return $value;
 }
 
