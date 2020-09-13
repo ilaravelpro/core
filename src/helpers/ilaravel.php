@@ -25,7 +25,7 @@ function iconfig($key = null, $default = null)
 function ipreference($key = null, $default = null, $type = 'auto')
 {
     if ($key && in_array($type, ['auto', 'db'])){
-        $model = imodal('Performance');
+        $model = imodal('Preference');
         $path = explode('.', $key);
         $value = $model::findBySectionName($path[0], isset($path[1]) ? $path[1] : null);
         if (count($path) > 2){

@@ -20,7 +20,6 @@ trait UsernameMethod
             $type = 'email';
             $request->request->remove('username');
             $request->merge([$type => $username]);
-
         }
         $this->username_method = $type;
         return $type;

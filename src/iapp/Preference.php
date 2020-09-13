@@ -3,7 +3,7 @@
 namespace iLaravel\Core\iApp;
 
 
-class Performance extends Modals\MetaData
+class Preference extends Modals\MetaData
 {
     use Modals\Modal;
     public static $s_prefix = 'IP';

@@ -8,15 +8,9 @@ class iMobile {
         {
             return false;
         }
-        $country_codes = array_map(function ($country) {
-            return $country['code'];
-        }, iconfig('countries'));
-        $country_iso = array_map(function ($country) {
-            return $country['iso'];
-        }, iconfig('countries'));
-        $mobile_codes = array_map(function ($country) {
-            return strtolower($country['prefix']);
-        }, iconfig('countries'));
+        $country_codes = array_column(iconfig('countries'), 'code', 'iso');
+        $country_iso = array_column(iconfig('countries'), 'iso', 'iso');
+        $mobile_codes = array_column(iconfig('countries'), 'prefix', 'iso');
         $mobile_country = null;
         $country = isset($parameters[0]) ? $parameters[0] : '*';
         if (!$country == '*' && !in_array($country, $country_iso)) {
@@ -67,6 +61,6 @@ class iMobile {
                 }
             }
         }
-        return [$value, $mobile_country, $country_codes[$mobile_country]];
+        return ['number' => $value, 'code' => $country_codes[$mobile_country], 'iso' => $mobile_country];
     }
 }

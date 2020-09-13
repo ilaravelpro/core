@@ -3,6 +3,7 @@
 $plugins = [
     'Core',
     'iWindy',
+    'iSMS',
 ];
 
 ?>

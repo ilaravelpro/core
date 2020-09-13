@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreatePerformancesTable extends Migration
+class CreatePreferencesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreatePerformancesTable extends Migration
      */
     public function up()
     {
-        Schema::create('performances', function (Blueprint $table) {
+        Schema::create('preferences', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('section')->nullable()->default('core');
             $table->string('name')->nullable();
@@ -31,6 +31,6 @@ class CreatePerformancesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('performances');
+        Schema::dropIfExists('preferences');
     }
 }
