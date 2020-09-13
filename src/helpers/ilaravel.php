@@ -28,13 +28,15 @@ function ipreference($key = null, $default = null, $type = 'auto')
         $model = imodal('Preference');
         $path = explode('.', $key);
         $value = $model::findBySectionName($path[0], isset($path[1]) ? $path[1] : null);
-        if (count($path) > 2){
-            unset($path[0]);
-            unset($path[1]);
-            $value = _get_value($value->value, implode('.', $path));
-        }else
-            $value = $value->value;
-        $type = $value ? 'db' : $type;
+        if($value) {
+            if (count($path) > 2){
+                unset($path[0]);
+                unset($path[1]);
+                $value = _get_value($value->value, implode('.', $path));
+            }else
+                $value = $value->value;
+            $type = 'db';
+        }
     }
     if (in_array($type, ['auto', 'config']))
         $value = $key ? iconfig('preferences.'.$key, $default) : iconfig('preferences', $default);
