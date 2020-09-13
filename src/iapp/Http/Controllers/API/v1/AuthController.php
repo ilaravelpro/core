@@ -11,6 +11,7 @@ use iLaravel\Core\iApp\Http\Controllers\API\v1\Auth\Register;
 use iLaravel\Core\iApp\Http\Controllers\API\v1\Auth\UsernameMethod;
 
 use iLaravel\Core\iApp\Http\Controllers\API\Controller;
+use iLaravel\iAuth\iApp\Http\Controllers\API\v1\Auth\MeUpdate;
 use Illuminate\Http\Request;
 
 class AuthController extends Controller
@@ -29,6 +30,7 @@ class AuthController extends Controller
         Register,
         Logout,
         Me,
+        MeUpdate,
         AttemptRule,
         UsernameMethod;
 }

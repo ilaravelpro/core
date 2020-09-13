@@ -10,7 +10,7 @@ function iconfig($key = null, $default = null)
 {
     $cilaravel =  config('ilaravel.main'.($key ? ".$key" : ''));
     $iilaravel =  config('ilaravel'.($key ? ".$key" : ''));
-    $ilaravel = $cilaravel === null ? $iilaravel : $cilaravel;
+    $ilaravel = $iilaravel === null ? $cilaravel : $iilaravel;
     if (is_array($cilaravel) || is_array($iilaravel)){
         $ilaravel = array_merge((array) $iilaravel, (array)$cilaravel);
         $ilaravel =  array_replace_recursive($ilaravel,

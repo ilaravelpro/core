@@ -3,9 +3,7 @@
 
 namespace iLaravel\Core\iApp\Http\Controllers\API\v1\Auth;
 
-use iLaravel\Core\iApp\Http\Controllers\API\Methods\Controller\Show;
 use iLaravel\Core\iApp\Http\Requests\iLaravel as Request;
-use Illuminate\Auth\AuthenticationException;
 
 trait Me
 {
