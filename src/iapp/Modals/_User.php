@@ -69,4 +69,12 @@ class _User extends Authenticatable
         $scopes = $this->scopes->merge($roleScopes);
         return $scopes->where('can', 1)->pluck('scope')->toArray();
     }
+
+    public static function guest()
+    {
+        return new static([
+            'id' => 0,
+            'type' => 'guest'
+        ]);
+    }
 }
