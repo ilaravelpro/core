@@ -54,7 +54,7 @@ class _User extends Authenticatable
 
     public function getFullnameAttribute()
     {
-        $this->attributes['fullname'] = $this->attributes['name']." ".$this->attributes['family'];
+        $this->attributes['fullname'] = $this->name." ".$this->family;
         return $this->attributes['fullname'];
     }
 

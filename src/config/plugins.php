@@ -5,6 +5,7 @@ $plugins = [
     'iWindy',
     'iAuth',
     'iSMS',
+    'iLogs',
 ];
 
 ?>

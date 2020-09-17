@@ -9,9 +9,9 @@ trait Data
 {
     protected $dataTypes = ['boolean', 'integer', 'double', 'float', 'string', 'NULL'];
 
-    public function renderGetValue($value, $name = 'value') {
-        $name_type = $name === 'value' ? 'type' : "${name}_type";
-        $type = $this->$name_type ?: 'null';
+    public function getValueByType($value, $type = null) {
+        $type = $type ? : gettype($value);
+        if (is_json($value)) $type = 'array';
         switch ($type) {
             case 'array':
                 return json_decode($value, true);
@@ -33,6 +33,12 @@ trait Data
         }
 
         return $value;
+    }
+
+    public function renderGetValue($value, $name = 'value') {
+        $name_type = $name === 'value' ? 'type' : "${name}_type";
+        $type = $this->$name_type ?: 'null';
+        return $this->getValueByType($value, $type);
     }
 
     public function renderSetValue($value, $name = 'value') {

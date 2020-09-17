@@ -80,7 +80,7 @@ trait Index
             }
         }
 
-        //$default = $default ?: (isset($this->order_default) ? $this->order_default : [[$model->getModel()->getKeyName() => $model->getModel()->getTable() .'.' . $model->getModel()->getKeyName(), 'desc']]);
+        $default = $default ?: (isset($this->order_default) ? $this->order_default : [[$model->getModel()->getKeyName() => $model->getModel()->getTable() .'.' . $model->getModel()->getKeyName(), 'desc']]);
         $default_order = [];
         foreach ($default as $key => $value) {
             if (gettype(key($value)) == 'integer') {

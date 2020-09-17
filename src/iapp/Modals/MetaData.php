@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class MetaData extends Model
 {
+    use \iLaravel\Core\iApp\Modals\Data;
     protected $guarded = [];
 
 
