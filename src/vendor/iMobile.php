@@ -1,4 +1,11 @@
 <?php
+
+/**
+ * Author: Amir Hossein Jahani | iAmir.net
+ * Last modified: 9/13/20, 7:13 AM
+ * Copyright (c) 2020. Powered by iamir.net
+ */
+
 namespace iLaravel\Core\Vendor;
 
 class iMobile {

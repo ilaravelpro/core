@@ -1,5 +1,12 @@
 <?php
 
+
+/**
+ * Author: Amir Hossein Jahani | iAmir.net
+ * Last modified: 9/1/20, 7:24 AM
+ * Copyright (c) 2020. Powered by iamir.net
+ */
+
 function format_datetime($datetime, $format, $attr) {
     if (request('format'))
         if (is_array(request('format')) || is_json(request('format'))){

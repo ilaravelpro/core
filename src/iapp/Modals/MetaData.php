@@ -1,6 +1,13 @@
 <?php
 
 
+
+/**
+ * Author: Amir Hossein Jahani | iAmir.net
+ * Last modified: 9/17/20, 7:08 PM
+ * Copyright (c) 2020. Powered by iamir.net
+ */
+
 namespace iLaravel\Core\iApp\Modals;
 
 use Illuminate\Database\Eloquent\Model;

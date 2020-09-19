@@ -1,5 +1,12 @@
 <?php
 
+
+/**
+ * Author: Amir Hossein Jahani | iAmir.net
+ * Last modified: 9/1/20, 7:24 AM
+ * Copyright (c) 2020. Powered by iamir.net
+ */
+
 function _getDistanceGeo($c1, $c2, $opt_radius = 6371008.8)
 {
     $radius = $opt_radius;

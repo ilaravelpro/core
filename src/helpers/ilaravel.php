@@ -1,5 +1,12 @@
 <?php
 
+
+/**
+ * Author: Amir Hossein Jahani | iAmir.net
+ * Last modified: 9/13/20, 6:06 PM
+ * Copyright (c) 2020. Powered by iamir.net
+ */
+
 function i_path($path = null)
 {
     $path = trim($path, '/');

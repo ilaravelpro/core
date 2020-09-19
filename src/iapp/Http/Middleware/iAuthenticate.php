@@ -1,5 +1,12 @@
 <?php
 
+
+/**
+ * Author: Amir Hossein Jahani | iAmir.net
+ * Last modified: 9/16/20, 7:11 PM
+ * Copyright (c) 2020. Powered by iamir.net
+ */
+
 namespace iLaravel\Core\iApp\Http\Middleware;
 
 use Closure;
