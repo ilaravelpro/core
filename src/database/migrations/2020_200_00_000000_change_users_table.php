@@ -22,9 +22,9 @@ class ChangeUsersTable extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->dropColumn('email_verified_at');
+            $table->dropColumn('email');
             $table->string('password')->nullable()->change();
             $table->string('name')->nullable()->change();
-            $table->string('email')->nullable()->change();
 
 
             $table->unsignedBigInteger('avatar_id')->nullable()->after('id');
@@ -44,7 +44,6 @@ class ChangeUsersTable extends Migration
             $table->string('gender')->nullable()->after('family'); // ['male', 'female']
             $table->string('username')->unique()->nullable()->after('gender');
             $table->string('country')->nullable()->after('email');
-            $table->string('mobile')->nullable()->after('country');
             $table->string('lang')->nullable()->default('en')->after('mobile');
 
             $table->string('role')->default('user')->after('mobile'); // ['guest', 'user', 'admin']
@@ -74,7 +73,7 @@ class ChangeUsersTable extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->nullable(false)->change();
             $table->string('name')->nullable(false)->change();
-            $table->string('email')->nullable(false)->change();
+            $table->string('email');
        });
     }
 }
