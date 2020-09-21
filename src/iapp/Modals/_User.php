@@ -10,7 +10,7 @@
 namespace iLaravel\Core\iApp\Modals;
 
 use iLaravel\Core\iApp\File;
-use iLaravel\Core\iApp\Phone;
+use iLaravel\Core\iApp\UserMeta;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
@@ -20,6 +20,7 @@ use Laravel\Passport\HasApiTokens;
 class _User extends Authenticatable
 {
     use Modal;
+    use Metable;
     use Notifiable;
     use HasApiTokens;
 
@@ -30,6 +31,9 @@ class _User extends Authenticatable
     public static $s_prefix = 'IU';
     public static $s_start = 24300000;
     public static $s_end = 728999999;
+
+    public $metaClass = UserMeta::class;
+    public $metaTable = 'user_meta';
 
     protected $appends = ['fullname'];
 

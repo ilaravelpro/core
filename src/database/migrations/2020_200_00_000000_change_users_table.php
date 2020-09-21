@@ -47,8 +47,6 @@ class ChangeUsersTable extends Migration
             $table->string('lang')->nullable()->default('en')->after('mobile');
 
             $table->string('role')->default('user')->after('mobile'); // ['guest', 'user', 'admin']
-
-            $table->string('meta')->nullable()->after('remember_token');
             $table->string('log')->nullable()->after('meta');
             $table->string('status')->default('active')->after('log'); // ['waiting', 'active', 'block']
         });

@@ -9,7 +9,6 @@
 
 namespace iLaravel\Core\Vendor\iRole;
 
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class iRole
