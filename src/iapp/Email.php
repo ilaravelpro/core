@@ -21,6 +21,9 @@ class Email extends Eloquent
 
     protected $guarded = [];
 
+    protected $hidden = ['model', 'model_id'];
+    protected $appends = ['text'];
+
     public static function findByEmail($model, $model_id, $key, $name, $domain = null)
     {
         if (!$domain && Str::contains($name, '@'))
@@ -36,5 +39,18 @@ class Email extends Eloquent
         $get  = static::where('model', $model)->where('model_id', $id)->where('key', $key);
         if ($key) $get->where('key', $key);
         return $get->get();
+    }
+
+    public function getTextAttribute()
+    {
+        return $this->name.'@'.$this->domain;
+    }
+
+    public function item() {
+        if ($this->model){
+            $model = imodal($this->model);
+            return $model::find($this->model_id);
+        }
+        return null;
     }
 }

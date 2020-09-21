@@ -92,9 +92,10 @@ function getClosestKey($search, $arr)
     return $keys[$prev == -1 ? 0 : $prev];
 }
 
-function _set_value($data, $path, $value) {
+function _set_value($data, $path, $value)
+{
     $temp = &$data;
-    foreach(explode('.',$path) as $key) {
+    foreach (explode('.', $path) as $key) {
         $temp = &$temp[$key];
     }
     $temp = $value;
@@ -110,7 +111,7 @@ function _get_value(array $array, $parents, $glue = '.')
 
     $ref = &$array;
 
-    foreach ((array) $parents as $parent) {
+    foreach ((array)$parents as $parent) {
         if (is_array($ref) && array_key_exists($parent, $ref)) {
             $ref = &$ref[$parent];
         } else {
@@ -118,4 +119,21 @@ function _get_value(array $array, $parents, $glue = '.')
         }
     }
     return $ref;
+}
+
+function _has_key(array $array, $parents, $glue = '.')
+{
+    if (!is_array($parents)) {
+        $parents = explode($glue, $parents);
+    }
+
+    $ref = &$array;
+    foreach ((array)$parents as $parent) {
+        if (is_array($ref) && array_key_exists($parent, $ref)) {
+            $ref = &$ref[$parent];
+        } else {
+            return false;
+        }
+    }
+    return true;
 }

@@ -10,6 +10,7 @@
 namespace iLaravel\Core\iApp\Modals;
 
 use iLaravel\Core\iApp\File;
+use iLaravel\Core\iApp\Phone;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
@@ -39,6 +40,55 @@ class _User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+    public $with = ['mobile', 'email'];
+    protected static function boot()
+    {
+        parent::boot();
+        parent::saving(function (self $event) {
+            if (isset($event->mobile)){
+                $event->mobile = is_array($event->mobile) ? $event->mobile : $event->mobile->toArray();
+                list($country, $number) = [_get_value($event->mobile, 'country'), _get_value($event->mobile, 'number')];
+                if ($mobile = $event->mobile()->first()) {
+                    if (($has_country = _has_key($event->mobile, 'country') && $mobile->country != $country) || ($has_number = _has_key($event->mobile, 'number') && $mobile->number != $number)){
+                        if ($has_country) $mobile->country  = $country;
+                        if ($has_number) $mobile->number  = $number;
+                        $mobile->verified_at  = null;
+                        $mobile->save();
+                    }
+                }else{
+                    $event->mobile()->create([
+                        'model' => 'User',
+                        'model_id' => $event->id,
+                        'key' => 'mobile',
+                        'country' => $country,
+                        'number' => $number
+                    ]);
+                }
+                unset($event->mobile);
+            }
+            if (isset($event->email)){
+                $event->email = is_array($event->email) ? $event->email : $event->email->toArray();
+                list($name, $domain) = [_get_value($event->email, 'name'), _get_value($event->email, 'domain')];
+                if ($email = $event->email()->first()) {
+                    if (($has_name = _has_key($event->email, 'name') && $email->name != $name) || ($has_domain = _has_key($event->email, 'domain') && $email->domain != $domain)){
+                        if ($has_name) $email->name  = $name;
+                        if ($has_domain) $email->domain  = $domain;
+                        $email->verified_at  = null;
+                        $email->save();
+                    }
+                }else{
+                    $event->email()->create([
+                        'model' => 'User',
+                        'model_id' => $event->id,
+                        'key' => 'email',
+                        'name' => $name,
+                        'domain' => $domain
+                    ]);
+                }
+                unset($event->email);
+            }
+        });
+    }
 
     public function sendPasswordResetNotification($token)
     {
@@ -61,8 +111,7 @@ class _User extends Authenticatable
 
     public function getFullnameAttribute()
     {
-        $this->attributes['fullname'] = $this->name." ".$this->family;
-        return $this->attributes['fullname'];
+        return $this->name." ".$this->family;
     }
 
     public function scopes() {
@@ -83,5 +132,13 @@ class _User extends Authenticatable
             'id' => 0,
             'type' => 'guest'
         ]);
+    }
+
+    public function mobile() {
+        return $this->hasOne(imodal('Phone'), 'model_id')->where('model', 'User')->where('key', 'mobile');
+    }
+
+    public function email() {
+        return $this->hasOne(imodal('Email'), 'model_id')->where('model', 'User')->where('key', 'email');
     }
 }

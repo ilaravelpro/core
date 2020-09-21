@@ -26,7 +26,7 @@ class CreatePhonesTable extends Migration
             $table->string('model_id')->nullable();
             $table->string('key');
             $table->string('country');
-            $table->string('prefix');
+            $table->string('prefix')->nullable();
             $table->string('number');
             $table->string('type')->default('mobile')->nullable();
             $table->boolean('default')->default(0);

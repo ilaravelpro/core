@@ -39,16 +39,17 @@ trait Rules
                     'family' => 'nullable|string',
                     'username' => "nullable|max:16|regex:/^[a-z0-9_-]{3,16}$/",
                     'password' => 'nullable|min:6',
-                    'email' => "nullable|max:191|regex:/^[a-zA-Z0-9._-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/",
+                    'email.name' => "nullable|max:191|regex:/^[a-zA-Z0-9._-]*$/",
+                    'email.domain' => "nullable|max:191|regex:/^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.[a-zA-Z]{2,}$/",
                     'website' => "nullable|max:191|regex:/^(?!:\/\/)([a-zA-Z0-9-_]+\.)*[a-zA-Z0-9][a-zA-Z0-9-_]+\.[a-zA-Z]{2,11}?$/",
                     'status' => 'nullable|in:' . join(config('bit.status', ['awaiting', 'active', 'disable']), ','),
                     'role' => 'nullable|in:' . join(config('bit.types', ['admin', 'user']), ','),
                     //'mobile' => 'nullable|regex:\+(9[976]\d|8[987530]\d|6[987]\d|5[90]\d|42\d|3[875]\d|2[98654321]\d|9[8543210]|8[6421]|6[6543210]|5[87654321]|4[987654310]|3[9643210]|2[70]|7|1)\W*\d\W*\d\W*\d\W*\d\W*\d\W*\d\W*\d\W*\d\W*(\d{1,2})$',
-                    /*'mobile.country' => 'nullable|number',
-                    'mobile.number' => 'nullable|number',*/
+                    'mobile.country' => 'nullable|numeric',
+                    'mobile.number' => 'nullable|numeric',
                     'gender' => 'nullable|in:male,female',
                     'groups' => 'nullable',
-                    'mobile' => 'nullable',
+                    //'mobile' => 'nullable',
                     'avatar_file' => 'nullable|max:5120',
                 ];
                 if (!$request->password) {

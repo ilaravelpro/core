@@ -82,8 +82,8 @@ trait Store
                 }
             }
             foreach ($fields as $value) {
-                if ($request->has($value)) {
-                    $data = _set_value($data, $value, $request->$value);
+                if (_has_key($request->toArray(), $value)) {
+                    $data = _set_value($data, $value, _get_value($request->toArray(), $value));
                 }
             }
         }

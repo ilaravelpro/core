@@ -21,7 +21,10 @@ class Phone extends Eloquent
 
     protected $guarded = [];
 
-    public static function findByMobile($model, $id, $key, $mobile = null)
+    protected $hidden = ['model', 'model_id'];
+    protected $appends = ['text'];
+
+    public static function findByMobile($model, $id, $key, $mobile)
     {
         $mobile = iMobile::parse($mobile);
         return static::where('model', $model)->where('model_id', $id)->where('key', $key)->where('country', $mobile['code'])->where('number', $mobile['number'])->where('type', 'mobile')->first();
@@ -38,5 +41,18 @@ class Phone extends Eloquent
         if ($key) $get->where('key', $key);
         if ($type) $get->where('type', $type);
         return $get->get();
+    }
+
+    public function getTextAttribute()
+    {
+        return $this->country.$this->prefix.$this->number;
+    }
+
+    public function item() {
+        if ($this->model){
+            $model = imodal($this->model);
+            return $model::find($this->model_id);
+        }
+        return null;
     }
 }
