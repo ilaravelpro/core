@@ -17,6 +17,7 @@ class User extends Resource
         $data = insert_into_array($data, 'family', 'fullname', $this->fullname);
         $data = insert_into_array($data, 'fullname', 'avatar', File::collection($this->avatar));
         unset($data['avatar_id']);
+        unset($data['tokens']);
         return $data;
     }
 

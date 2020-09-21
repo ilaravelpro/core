@@ -24,10 +24,14 @@ class Phone extends Eloquent
     protected $hidden = ['model', 'model_id'];
     protected $appends = ['text'];
 
-    public static function findByMobile($model, $id, $key, $mobile)
+    public static function findByMobile($mobile, $model = null, $id = null, $key = null)
     {
         $mobile = iMobile::parse($mobile);
-        return static::where('model', $model)->where('model_id', $id)->where('key', $key)->where('country', $mobile['code'])->where('number', $mobile['number'])->where('type', 'mobile')->first();
+        $find  = static::where('country', $mobile['code'])->where('number', $mobile['number'])->where('type', 'mobile');
+        if ($model) $find->where('model', $model);
+        if ($id) $find->where('model_id', $id);
+        if ($key) $find->where('key', $key);
+        return $find->first();
     }
 
     public static function findByPhone($model, $id, $key, $country, $prefix, $number, $type = 'tel')

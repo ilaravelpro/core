@@ -47,7 +47,7 @@ class _User extends Authenticatable
         parent::saving(function (self $event) {
             if (isset($event->mobile)){
                 $event->mobile = is_array($event->mobile) ? $event->mobile : $event->mobile->toArray();
-                list($country, $number) = [_get_value($event->mobile, 'country'), _get_value($event->mobile, 'number')];
+                list($country, $number) = [(int) _get_value($event->mobile, 'country'), (int) _get_value($event->mobile, 'number')];
                 if ($mobile = $event->mobile()->first()) {
                     if (($has_country = _has_key($event->mobile, 'country') && $mobile->country != $country) || ($has_number = _has_key($event->mobile, 'number') && $mobile->number != $number)){
                         if ($has_country) $mobile->country  = $country;
@@ -140,5 +140,15 @@ class _User extends Authenticatable
 
     public function email() {
         return $this->hasOne(imodal('Email'), 'model_id')->where('model', 'User')->where('key', 'email');
+    }
+
+    public static function findTokenID($token) {
+        return (new \Lcobucci\JWT\Parser())->parse($token)->getHeader('jti');
+    }
+
+    public function revokeAllTokens() {
+        foreach($this->tokens as $token) {
+            $token->revoke();
+        }
     }
 }

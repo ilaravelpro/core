@@ -24,19 +24,20 @@ class Email extends Eloquent
     protected $hidden = ['model', 'model_id'];
     protected $appends = ['text'];
 
-    public static function findByEmail($model, $model_id, $key, $name, $domain = null)
+    public static function findByEmail($name, $domain = null, $model = null, $model_id = null, $key = null)
     {
         if (!$domain && Str::contains($name, '@'))
             list($name, $domain) = explode('@', $name);
         $static = static::class;
-        foreach (['model', 'model_id', 'key', 'name', 'domain'] as $index => $datum)
-            $static = $index == 'model' ? $static::where($index, $$datum) : $static->where($index, $$datum);
+        foreach (['name', 'domain', 'model', 'model_id', 'key', ] as $datum)
+            if ($$datum) $static = $datum == 'name' ? $static::where($datum, $$datum) : $static->where($datum, $$datum);
         return $static->first();
     }
 
-    public static function getByModel($model, $id, $key = null)
+    public static function getByModel($model, $id = null, $key = null)
     {
-        $get  = static::where('model', $model)->where('model_id', $id)->where('key', $key);
+        $get  = static::where('model', $model);
+        if ($id) $get->where('model_id', $id);
         if ($key) $get->where('key', $key);
         return $get->get();
     }
