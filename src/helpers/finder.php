@@ -137,3 +137,25 @@ function _has_key(array $array, $parents, $glue = '.')
     }
     return true;
 }
+
+function _save_child($kid, $items, $model, $set = [], $unset = [], $callback = null)
+{
+    $deletes = $kid->pluck('id')->toArray();
+    $unseted = [];
+    foreach ($items as $value) {
+        foreach ($unset as $item){
+            if (isset($value[$item])) $unseted[$item] = $value[$item];
+            unset($value[$item]);
+        }
+        if (isset($value['id'])) {
+            $deletes = array_diff($deletes, [$model::id($value['id'])]);
+            $record = $model::findBySerial($value['id']);
+            unset($value['id']);
+            $record->update($value);
+        } else
+            $record = $kid->create(array_merge($value, $set));
+        if (is_callable($callback))
+            $callback($record, $unseted);
+    }
+    $model::destroy($deletes);
+}

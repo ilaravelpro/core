@@ -10,15 +10,8 @@
 namespace iLaravel\Core\iApp\Http\Controllers\API\v1;
 
 use iLaravel\Core\iApp\Http\Controllers\API\Methods\Controller\Show;
-use iLaravel\Core\iApp\Http\Controllers\API\v1\Auth\AttemptRule;
-use iLaravel\Core\iApp\Http\Controllers\API\v1\Auth\Login;
-use iLaravel\Core\iApp\Http\Controllers\API\v1\Auth\Logout;
-use iLaravel\Core\iApp\Http\Controllers\API\v1\Auth\Me;
-use iLaravel\Core\iApp\Http\Controllers\API\v1\Auth\Register;
-use iLaravel\Core\iApp\Http\Controllers\API\v1\Auth\UsernameMethod;
 
 use iLaravel\Core\iApp\Http\Controllers\API\Controller;
-use iLaravel\iAuth\iApp\Http\Controllers\API\v1\Auth\MeUpdate;
 use Illuminate\Http\Request;
 
 class AuthController extends Controller
@@ -33,11 +26,11 @@ class AuthController extends Controller
     }
     use Show;
 
-    use Login,
-        Register,
-        Logout,
-        Me,
-        MeUpdate,
-        AttemptRule,
-        UsernameMethod;
+    use Auth\Login,
+        Auth\Register,
+        Auth\Logout,
+        Auth\Me,
+        Auth\MeUpdate,
+        Auth\AttemptRule,
+        Auth\UsernameMethod;
 }
