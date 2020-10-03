@@ -13,11 +13,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class Resource extends JsonResource
 {
-    public function __construct($resource)
-    {
-        parent::__construct($resource ? : []);
-    }
-
     public function toArray($request)
     {
         $role = auth()->check() ? auth()->user()->role : 'guest';
