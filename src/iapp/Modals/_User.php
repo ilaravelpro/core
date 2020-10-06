@@ -11,6 +11,7 @@ namespace iLaravel\Core\iApp\Modals;
 
 use iLaravel\Core\iApp\File;
 use iLaravel\Core\iApp\UserMeta;
+use iLaravel\Core\Vendor\iMobile;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
@@ -34,6 +35,7 @@ class _User extends Authenticatable
 
     public $metaClass = UserMeta::class;
     public $metaTable = 'user_meta';
+    public $metaExplodes = ['email', 'mobile'];
 
     protected $appends = ['fullname'];
 
@@ -48,8 +50,12 @@ class _User extends Authenticatable
     protected static function boot()
     {
         parent::boot();
-        parent::saving(function (self $event) {
+        parent::saved(function (self $event) {
             if (isset($event->mobile)){
+                if (is_string($event->mobile)){
+                    $event->mobile = iMobile::parse($event->mobile);
+                    $event->mobile['country'] = $event->mobile['code'];
+                }
                 $event->mobile = is_array($event->mobile) ? $event->mobile : $event->mobile->toArray();
                 list($country, $number) = [(int) _get_value($event->mobile, 'country'), (int) _get_value($event->mobile, 'number')];
                 if ($mobile = $event->mobile()->first()) {
@@ -69,10 +75,11 @@ class _User extends Authenticatable
                     ]);
                 }
                 unset($event->mobile);
+
             }
             if (isset($event->email)){
-                $event->email = is_array($event->email) ? $event->email : $event->email->toArray();
-                list($name, $domain) = [_get_value($event->email, 'name'), _get_value($event->email, 'domain')];
+                if (!is_string($event->email)) $event->email = is_array($event->email) ? $event->email : $event->email->toArray();
+                list($name, $domain) = is_string($event->email) ? explode('@', $event->email) : [_get_value($event->email, 'name'), _get_value($event->email, 'domain')];
                 if ($email = $event->email()->first()) {
                     if (($has_name = _has_key($event->email, 'name') && $email->name != $name) || ($has_domain = _has_key($event->email, 'domain') && $email->domain != $domain)){
                         if ($has_name) $email->name  = $name;

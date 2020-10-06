@@ -387,8 +387,7 @@ trait Metable
     public function __set($key, $value)
     {
         // ignore the trait properties being set.
-
-        if (Str::startsWith($key, 'meta') || $key == 'query') {
+        if (in_array($key, $this->metaExplodes) || Str::startsWith($key, 'meta') || $key == 'query') {
             $this->$key = $value;
 
             return;
@@ -448,7 +447,7 @@ trait Metable
     public function __isset($key)
     {
         // trait properties.
-        if (Str::startsWith($key, 'meta') || $key == 'query') {
+        if (in_array($key, $this->metaExplodes) || Str::startsWith($key, 'meta') || $key == 'query') {
             return isset($this->{$key});
         }
 
