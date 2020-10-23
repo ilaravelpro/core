@@ -106,7 +106,7 @@ trait Update
         }
         else
         {
-            $this->statusMessage = "unchanged";
+            $this->statusMessage = "changed";
         }
         return $result;
     }
