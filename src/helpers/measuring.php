@@ -73,3 +73,14 @@ function _NMtoM($number)
     return round($number * 1852, 2);
 }
 
+function even(array $numbers) {
+    return array_filter($numbers, function ($number) {
+        return $number % 2 == 0;
+    });
+}
+
+function odd(array $numbers) {
+    return array_filter($numbers, function ($number) {
+        return !($number % 2 == 0);
+    });
+}

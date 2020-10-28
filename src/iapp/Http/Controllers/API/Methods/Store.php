@@ -36,7 +36,6 @@ trait Store
             $args[] = $this->store_data($request, $parent, ...$args);
             $model = call_user_func_array($callback, $args);
         } else {
-
             $model = $this->model::create($this->store_data($request, $parent, ...$args));
         }
 

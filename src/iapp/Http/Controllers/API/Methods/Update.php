@@ -61,7 +61,7 @@ trait Update
             $changed = [];
             $original = [];
             foreach ($fields as $value) {
-                if(_has_key($request->toArray(), $value) && _get_value($model->toArray(), $value) != _get_value($request->toArray(), $value))
+                if(_has_key($request->toArray(), $value) && (_get_value($request->toArray(), $value) !== null || _get_value($model->toArray(), $value) != _get_value($request->toArray(), $value)))
                 {
                     $changed = _set_value($changed, $value, _get_value($request->toArray(), $value));
                     $original = _set_value($original, $value, _get_value($model->toArray(), $value));
