@@ -39,6 +39,7 @@ trait Rules
                     'family' => 'nullable|string',
                     'username' => "nullable|max:16|regex:/^[a-z0-9_-]{3,16}$/",
                     'password' => 'nullable|min:6',
+                    'email' => "nullable|max:191|email",
                     'email.name' => "nullable|max:191|regex:/^[a-zA-Z0-9._-]*$/",
                     'email.domain' => "nullable|max:191|regex:/^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.[a-zA-Z]{2,}$/",
                     'website' => "nullable|max:191|regex:/^(?!:\/\/)([a-zA-Z0-9-_]+\.)*[a-zA-Z0-9][a-zA-Z0-9-_]+\.[a-zA-Z]{2,11}?$/",

@@ -36,6 +36,8 @@ class _User extends Authenticatable
     public $metaClass = UserMeta::class;
     public $metaTable = 'user_meta';
     public $metaExplodes = ['email', 'mobile'];
+    public $_mobile = [];
+    public $_email = [];
 
     protected $appends = ['fullname'];
 
@@ -50,16 +52,28 @@ class _User extends Authenticatable
     protected static function boot()
     {
         parent::boot();
+        parent::saving(function (self $event) {
+            if (isset($event->attributes['mobile'])){
+                $event->_mobile = $event->attributes['mobile'];
+                unset($event->mobile);
+                unset($event->attributes['mobile']);
+            }
+            if (isset($event->attributes['email'])){
+                $event->_email = $event->attributes['email'];
+                unset($event->email);
+                unset($event->attributes['email']);
+            }
+        });
         parent::saved(function (self $event) {
-            if (isset($event->mobile)){
-                if (is_string($event->mobile)){
-                    $event->mobile = iMobile::parse($event->mobile);
-                    $event->mobile['country'] = $event->mobile['code'];
+            if (isset($event->_mobile) && count($event->_mobile)){
+                if (is_string($event->_mobile)){
+                    $event->_mobile = iMobile::parse($event->_mobile);
+                    $event->_mobile['country'] = $event->_mobile['code'];
                 }
-                $event->mobile = is_array($event->mobile) ? $event->mobile : $event->mobile->toArray();
-                list($country, $number) = [(int) _get_value($event->mobile, 'country'), (int) _get_value($event->mobile, 'number')];
+                $event->_mobile = is_array($event->_mobile) ? $event->_mobile : $event->mobile->toArray();
+                list($country, $number) = [(int) _get_value($event->_mobile, 'country'), (int) _get_value($event->_mobile, 'number')];
                 if ($mobile = $event->mobile()->first()) {
-                    if (($has_country = _has_key($event->mobile, 'country') && $mobile->country != $country) || ($has_number = _has_key($event->mobile, 'number') && $mobile->number != $number)){
+                    if (($has_country = _has_key($event->_mobile, 'country') && $mobile->country != $country) || ($has_number = _has_key($event->_mobile, 'number') && $mobile->number != $number)){
                         if ($has_country) $mobile->country  = $country;
                         if ($has_number) $mobile->number  = $number;
                         $mobile->verified_at  = null;
@@ -74,14 +88,14 @@ class _User extends Authenticatable
                         'number' => $number
                     ]);
                 }
-                unset($event->mobile);
+                $event->_mobile = [];
 
             }
-            if (isset($event->email)){
-                if (!is_string($event->email)) $event->email = is_array($event->email) ? $event->email : $event->email->toArray();
-                list($name, $domain) = is_string($event->email) ? explode('@', $event->email) : [_get_value($event->email, 'name'), _get_value($event->email, 'domain')];
+            if (isset($event->_email) && (is_string($event->_email) || (is_array($event->_email) && count($event->_email)))){
+                if (!is_string($event->_email)) $event->_email = is_array($event->_email) ? $event->_email : $event->email->toArray();
+                list($name, $domain) = is_string($event->_email) ? explode('@', $event->_email) : [_get_value($event->_email, 'name'), _get_value($event->_email, 'domain')];
                 if ($email = $event->email()->first()) {
-                    if (($has_name = _has_key($event->email, 'name') && $email->name != $name) || ($has_domain = _has_key($event->email, 'domain') && $email->domain != $domain)){
+                    if (($has_name = $name && $email->name != $name) || ($has_domain = $domain && $email->domain != $domain)){
                         if ($has_name) $email->name  = $name;
                         if ($has_domain) $email->domain  = $domain;
                         $email->verified_at  = null;
@@ -96,7 +110,7 @@ class _User extends Authenticatable
                         'domain' => $domain
                     ]);
                 }
-                unset($event->email);
+                $event->_email = [];
             }
         });
     }
