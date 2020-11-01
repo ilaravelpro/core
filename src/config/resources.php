@@ -20,7 +20,7 @@ $resources = [
                 'role'
             ],
             'user' => [
-                'role',
+
             ]
         ]
     ],
