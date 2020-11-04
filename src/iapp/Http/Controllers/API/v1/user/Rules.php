@@ -18,7 +18,7 @@ trait Rules
     {
         $rules = [];
         switch ($action) {
-            case 'profile':
+            case 'account':
                 $rules = [
                     'avatar' => 'nullable|mimes:jpeg,jpg,png,gif|max:5120|dimensions:ratio=1',
                     'name' => 'nullable|string',

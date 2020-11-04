@@ -44,7 +44,8 @@ class ChangeUsersTable extends Migration
             $table->string('gender')->nullable()->after('family'); // ['male', 'female']
             $table->string('username')->unique()->nullable()->after('gender');
             $table->string('country')->nullable()->after('email');
-            $table->string('lang')->nullable()->default('en')->after('mobile');
+            $table->string('website')->nullable()->after('country');
+            $table->string('lang')->nullable()->default('en')->after('website');
 
             $table->string('role')->default('user')->after('mobile'); // ['guest', 'user', 'admin']
             $table->string('log')->nullable()->after('meta');
