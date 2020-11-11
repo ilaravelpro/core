@@ -9,6 +9,7 @@
 
 namespace iLaravel\Core\iApp\Http\Requests;
 
+use iLaravel\Core\Vendor\iMobile;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
 use App\User;
@@ -53,7 +54,7 @@ class iLaravel extends FormRequest
         foreach ($this->parseRules() as $key => $value) {
             foreach ($value as $k => $v) {
                 if ($k == 'mobile' && isset($data[$key])) {
-                    list($mobile, $country, $code) = \Maravel\Lib\iMobile::parse($data[$key]);
+                    list($mobile, $country, $code) = iMobile::parse($data[$key]);
                     $data[$key] = $mobile ? "$code$mobile" : $data[$key];
                 }
             }

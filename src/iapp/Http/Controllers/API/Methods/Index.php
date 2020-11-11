@@ -59,7 +59,6 @@ trait Index
             $model = $this->model::select('*');
             $parent = null;
         }
-
         list($filters, $current_filter, $operators) = [null, null, iconfig('database.operators')];
         if (method_exists($this, 'filters')) {
             list($filters, $current_filter) = $this->filters($request, $model, $parent, $operators);

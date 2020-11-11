@@ -28,10 +28,21 @@ class _Post extends Eloquent
         'meta' => 'array',
         'published_at' => 'datetime',
     ];
+    protected static function boot()
+    {
+        parent::boot();
+        parent::deleted(function (self $event) {
+            if ($event->type == 'attachment') {
+                foreach ($event->attachments as $file) {
+                    if (file_exists($file->slug)) {unlink($file->slug); $file->delete();}
+                }
+            }
+        });
+    }
 
     public function attachments()
     {
-        return $this->hasMany(\App\File::class);
+        return $this->hasMany(imodal('File'));
     }
 
     public function creator()

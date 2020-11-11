@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 trait RequestFilter
 {
     public function requestFilter(Request $request, $model, $parent, $filters, $operators){
+        $filter = (object) [];
         if ($request->has('filter')){
             $filter = is_array($request->filter) ? (object)$request->filter : (object) json_decode($request->filter);
             $ftype = isset($filter->type) && in_array($filter->type, array_column($filters, 'name')) ? $filter->type : 'all';
@@ -39,11 +40,12 @@ trait RequestFilter
                         break;
                     default:
                         $request->validate([
-                            'filter.value' => explode('|', $this->rules($request, 'store', null, $filter->type)),
+                            'filter.value' => explode('|', (isset($filterOPT[0]['rule']) ? $filterOPT[0]['rule'] : $this->rules($request, 'store', null, $filter->type))),
                         ]);
                         $model->where($ftype, $fsymbol , $filter->value);
                         break;
                 }
         }
+        return [_get_value((array)$filter, 'type'), _get_value((array)$filter, 'value')];
     }
 }
