@@ -15,10 +15,26 @@ class iLaravel extends Validator
 {
     public function validateSerial($attribute, $value, $parameters, $validator)
     {
+        if (is_array($value)){
+            $all_numeric = true;
+            foreach ($value as $key) {
+                if (!(is_numeric($key))) {
+                    $all_numeric = false;
+                    break;
+                }
+            }
+            return $all_numeric;
+        }
         if(!is_null($value))
             return is_integer($value);
         return true;
     }
+
+    public function validateExistsSerial($attribute, $value, $parameters, $validator)
+    {
+        return $this->validateSerial(...func_get_args());
+    }
+
     public function validateMobile($attribute, $value, $parameters, $validator)
     {
         list($mobile, $country, $code) = \iLaravel\Core\Vendor\iMobile::parse($value, $parameters);

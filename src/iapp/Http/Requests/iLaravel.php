@@ -65,13 +65,13 @@ class iLaravel extends FormRequest
     {
         foreach ($this->parseRules() as $key => $value) {
             foreach ($value as $k => $v) {
-                if ($k == 'serial' && isset($data[$key]) && $data[$key]) {
-                    $model = '\App\\' . ucfirst($v);
+                $valid = explode(':',$k);
+                if ($valid[0] == 'serial' && isset($data[$key]) && $data[$key]) {
+                    $model = isset($valid[1]) ? imodal($valid[1]) : imodal(ucfirst($v));
                     if (!class_exists($model)) {
                         list($table) = explode(',', $v);
                         $table = Str::camel($table);
-                        $model = '\App\\' . ucfirst(Str::singular($table));
-
+                        $model = isset($valid[1]) ? imodal($valid[1]) : imodal(ucfirst(Str::singular($table)));
                     }
                     if (is_array($data[$key])) {
                         $data[$key] = array_unique($data[$key]);
@@ -81,10 +81,10 @@ class iLaravel extends FormRequest
                     } else {
                         $data[$key] = $model::encode_id($data[$key]);
                     }
-                } elseif ($k == 'exists_serial' && isset($data[$key]) && $data[$key]) {
+                } elseif ($valid[0] == 'exists_serial' && isset($data[$key]) && $data[$key]) {
                     list($table) = explode(',', $v);
                     $table = Str::camel($table);
-                    $model = '\App\\' . ucfirst(Str::singular($table));
+                    $model = isset($valid[1]) ? imodal($valid[1]) : imodal(ucfirst(Str::singular($table)));
                     if (is_array($data[$key])) {
                         $data[$key] = array_unique($data[$key]);
                         foreach ($data[$key] as $dk => $dv) {

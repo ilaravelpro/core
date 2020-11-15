@@ -14,13 +14,13 @@ use Illuminate\Support\Facades\DB;
 
 trait Users
 {
-    public function users(Request $request, $role)
+    public function users(Request $request, $role = null)
     {
         $modal = imodal('User');
         if (!isset($request->client) && in_array(auth()->user()->role , ipreference('admins'))){
             $users = DB::table('users')
                 ->select(DB::raw('id as value'), DB::raw('name as text,family'))
-                ->where('users.role', '=', $role)
+                ->where('users.role', 'like', "%$role%")
                 ->get()
                 ->toArray();
         }else
@@ -28,7 +28,7 @@ trait Users
                 ->select(DB::raw('id as value'), DB::raw('name as text,family'))
                 ->join('client_user', 'users.id', '=', 'client_user.user_id')
                 ->where('client_user.client_id', '=', \App\Client::id($request->client))
-                ->where('users.role', '=', $role)
+                ->where('users.role', 'like', "%$role%")
                 ->get()
                 ->toArray();
         $users = array_map(function ($val) use ($modal) {

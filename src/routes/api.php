@@ -21,7 +21,7 @@ Route::namespace('v1')->prefix('v1')->group(function() {
         Route::prefix('data')->group(function() {
             Route::get('roles', 'DataController@roles');
             Route::get('statuses/{type?}', 'DataController@status');
-            Route::get('users/{role}', 'DataController@users');
+            Route::get('users/{role?}', 'DataController@users');
             Route::get('scopes/{type}/{parent}', 'DataController@scopes');
         });
         Route::get('/rules', function (){

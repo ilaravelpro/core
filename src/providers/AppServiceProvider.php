@@ -19,6 +19,7 @@ use Illuminate\Routing\Router;
 use Illuminate\Routing\ResourceRegistrar;
 use Illuminate\Routing\PendingResourceRegistration;
 
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
@@ -55,6 +56,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app['validator']->resolver(function ($translator, $data, $rules, $messages) {
             return new \iLaravel\Core\iApp\Http\Validators\iLaravel($translator, $data, $rules, $messages);
         });
+        Validator::extendImplicit('serial_has', 'iLaravel\Core\iApp\Http\Validators\SerialHas@validate');
         Schema::defaultStringLength(191);
 
     }
