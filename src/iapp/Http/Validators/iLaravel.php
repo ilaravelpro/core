@@ -9,13 +9,44 @@
 
 namespace iLaravel\Core\iApp\Http\Validators;
 
+use Illuminate\Support\Str;
 use Illuminate\Validation\Validator;
 
 class iLaravel extends Validator
 {
     public function validateSerial($attribute, $value, $parameters, $validator)
     {
-        if (is_array($value)){
+        if (!isset($parameters[0])) return true;
+        $model = imodal(ucfirst($parameters[0]));
+        if (is_array($value)) {
+            $value = array_unique($value);
+            foreach ($value as $dk => $dv) {
+                $value[$dk] = $model::encode_id($dv);
+            }
+        } else {
+            $value = $model::encode_id($value);
+        }
+        return $this->checkSerial($attribute, $value, $parameters, $validator);
+    }
+
+    public function validateExistsSerial($attribute, $value, $parameters, $validator)
+    {
+        if (!isset($parameters[0])) return true;
+        $model = imodal(ucfirst($parameters[0]));
+        if (is_array($value)) {
+            $value = array_unique($value);
+            foreach ($value as $dk => $dv) {
+                $value[$dk] = $model::encode_id($dv);
+            }
+        } else {
+            $value = $model::encode_id($value);
+        }
+        return $this->checkSerial($attribute, $value, $parameters, $validator);
+    }
+
+    public function checkSerial($attribute, $value, $parameters, $validator)
+    {
+        if (is_array($value)) {
             $all_numeric = true;
             foreach ($value as $key) {
                 if (!(is_numeric($key))) {
@@ -25,21 +56,15 @@ class iLaravel extends Validator
             }
             return $all_numeric;
         }
-        if(!is_null($value))
+        if (!is_null($value))
             return is_integer($value);
         return true;
-    }
-
-    public function validateExistsSerial($attribute, $value, $parameters, $validator)
-    {
-        return $this->validateSerial(...func_get_args());
     }
 
     public function validateMobile($attribute, $value, $parameters, $validator)
     {
         list($mobile, $country, $code) = \iLaravel\Core\Vendor\iMobile::parse($value, $parameters);
-        if(!$mobile)
-        {
+        if (!$mobile) {
             return false;
         }
         return true;
@@ -50,8 +75,7 @@ class iLaravel extends Validator
         array_push($parameters, $attribute);
         $one_of = false;
         foreach ($parameters as $key => $value) {
-            if(isset($this->data[$value]) && $this->data[$value])
-            {
+            if (isset($this->data[$value]) && $this->data[$value]) {
                 $one_of = true;
                 break;
             }
