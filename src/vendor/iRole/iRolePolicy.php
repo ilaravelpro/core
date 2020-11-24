@@ -66,18 +66,35 @@ class iRolePolicy extends iRole
     {
         if (isset($this->parent) && is_string($item))
             $item = $this->parentModel::findBySerial($item);
+        elseif(is_string($item)) {
+            $item = $this->model::findBySerial($item);
+        }
         if (!$action) $action = $child;
+        $anyByUser = function ($context, $sub, $user, $item, $child = null, $action = null, $args = null) {
+            if ($can = static::has("$context->prefix.$action.$sub") && (
+                    (isset($item->creator_id) && $item->creator_id == $user->id) ||
+                    (isset($item->user_id) && $item->user_id == $user->id) ||
+                    (isset($item->{auth()->user()->role . "_id"}) && $item->{auth()->user()->role . "_id"} == $user->id)
+                )) return $can;
+            return false;
+        };
         foreach (iconfig("scopes.$this->prefix.$action") as $any) {
-            if (function_exists('i_role_policy_single_switch'))
-                return i_role_policy_single_switch($any, $user, $item, $child = null, $action = null, ...$args);
-            else
-                switch ($any) {
-                    case 'any':
-                        if ($can = static::has("$this->prefix.$action.$any")) return $can;
-                    case 'anyByUser':
-                    default:
-                        if ($can = static::has("$this->prefix.$action.$any") && isset($item->creator_id) && $item->creator_id == $user->id) return $can;
-                }
+            if (static::has("$this->prefix.$action.$any")){
+                if (function_exists('i_role_policy_single_switch'))
+                    return i_role_policy_single_switch($this, $anyByUser, $any, $user, $item, $child, $action, $args);
+                else
+                    switch ($any) {
+                        case 'any':
+                            if ($can = static::has("$this->prefix.$action.$any")) return $can;
+                            break;
+                        case 'anyByUser':
+                        default:
+                            if (function_exists('i_role_policy_single_switch_default'))
+                                return i_role_policy_single_switch_default($this, $anyByUser, $any, $user, $item, $child, $action, $args);
+                            else return $anyByUser($this, $any, $user, $item, $child, $action, $args);
+                            break;
+                    }
+            }
         }
         return false;
     }
