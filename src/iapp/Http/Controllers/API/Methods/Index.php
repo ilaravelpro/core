@@ -79,7 +79,7 @@ trait Index
                     return $query;
                 });
             };
-            $subs = array_filter(iconfig('scopes.' . $action . '.view', []), function ($sub) use ($action) {
+            $subs = array_filter(iconfig('scopes.' . $action . '.items.view', []), function ($sub) use ($action) {
                 return iRole::has("$action.view.$sub");
             });
             foreach ($subs as $sub) {
