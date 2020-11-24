@@ -18,7 +18,7 @@ class iRolePolicy extends iRole
     public function __construct()
     {
         parent::__construct();
-        if (!$this->prefix){
+        if (!$this->prefix) {
             $as = explode('.', str_replace('api.', '', request()->route()->getAction('as')));
             $this->prefix = $as[0];
         }
@@ -34,11 +34,11 @@ class iRolePolicy extends iRole
 
     public function viewAny($user, $parent = null)
     {
-        if (isset($this->parent)){
-            return $this->view($user,null, $this->parentModel::findBySerial($parent));
-        }else
-            foreach (iconfig('scopes.'.$this->prefix.'.view') as $view)
-                return static::has($view);
+        if (isset($this->parent)) {
+            return $this->view($user, null, $this->parentModel::findBySerial($parent));
+        } else
+            foreach (iconfig('scopes.' . $this->prefix . '.view') as $view)
+                if ($can = static::has($this->prefix . '.view.' . $view)) return $can;
         return false;
     }
 
@@ -49,7 +49,7 @@ class iRolePolicy extends iRole
 
     public function create($user, $item = null)
     {
-        return static::has($this->prefix.'.create');
+        return static::has($this->prefix . '.create');
     }
 
     public function update($user, $item)
@@ -62,19 +62,22 @@ class iRolePolicy extends iRole
         return $this->single(...array_merge(func_get_args(), ['destroy']));
     }
 
-    public function single($user, $item,  $child = null, $action = null, ...$args)
+    public function single($user, $item, $child = null, $action = null, ...$args)
     {
         if (isset($this->parent) && is_string($item))
             $item = $this->parentModel::findBySerial($item);
         if (!$action) $action = $child;
         foreach (iconfig("scopes.$this->prefix.$action") as $any) {
-            switch ($any) {
-                case 'any':
-                    return static::has("$this->prefix.$action.$any");
-                case 'anyByUser':
-                default:
-                    return static::has("$this->prefix.$action.$any") && isset($item->creator_id) && $item->creator_id == $user->id;
-            }
+            if (function_exists('i_role_policy_single_switch'))
+                return i_role_policy_single_switch($any, $user, $item, $child = null, $action = null, ...$args);
+            else
+                switch ($any) {
+                    case 'any':
+                        if ($can = static::has("$this->prefix.$action.$any")) return $can;
+                    case 'anyByUser':
+                    default:
+                        if ($can = static::has("$this->prefix.$action.$any") && isset($item->creator_id) && $item->creator_id == $user->id) return $can;
+                }
         }
         return false;
     }

@@ -25,7 +25,7 @@ Route::namespace('v1')->prefix('v1')->group(function() {
             Route::get('scopes/{type}/{parent}', 'DataController@scopes');
         });
         Route::get('/rules', function (){
-            return ['data' => \iLaravel\Core\Vendor\iRole\iRoleCheck::getRules()];
+            return ['data' => \iLaravel\Core\Vendor\iRole\iRoleCheck::getRulesUnique()];
         });
     });
     Route::prefix('auth')->group(function() {

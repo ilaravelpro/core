@@ -12,6 +12,7 @@ namespace iLaravel\Core\iApp\Modals;
 use iLaravel\Core\iApp\File;
 use iLaravel\Core\iApp\UserMeta;
 use iLaravel\Core\Vendor\iMobile;
+use iLaravel\Core\Vendor\iRole\iRole;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
@@ -144,11 +145,20 @@ class _User extends Authenticatable
     }
 
     public function scopeAll() {
+        if (in_array($this->role, ipreference('admins'))) return iRole::scopes(collect(), imodal('RoleScope'), 1)->pluck('can','scope')->toArray();
         $role = imodal('Role');
         $role = $role::findByName($this->role);
-        $roleScopes = $role ? $role->scopes : [];
+        $roleScopes = $role ? iRole::scopes($role->scopes, imodal('RoleScope')) : [];
         $scopes = $this->scopes->merge($roleScopes);
-        return $scopes->where('can', 1)->pluck('scope')->toArray();
+        return $scopes->pluck('can','scope')->toArray();
+    }
+
+    public function scopeAllUnique() {
+        $scopes = [];
+        $subs = array_reverse(ipreference('scopeSubs'), true);
+        foreach ($this->scopeAll() as $scope => $can)
+            if (!isset($scopes[$scopeNew = trim(str_replace($subs, '', $scope), '.')]) || $can) $scopes[$scopeNew] = $can;
+        return $scopes;
     }
 
     public static function guest()

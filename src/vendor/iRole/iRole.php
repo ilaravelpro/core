@@ -36,7 +36,7 @@ class iRole
         return static::user(auth()->user())->has($access, ...$args);
     }
 
-    public static function scopes($scopes = null , $model = null)
+    public static function scopes($scopes = null , $model = null, $canDef = 0)
     {
         $configScopes = iconfig('scopes', []);
         if ($model) {
@@ -46,20 +46,20 @@ class iRole
                 foreach ($role as $index => $sec) {
                     if (is_array($sec)) {
                         foreach ($sec as $keyd => $valued) {
-                            if (!$scopes->where('scope', $valued)->first()) {
+                            if (!$scopes->where('scope', "$rkey.$index.$valued")->first()) {
                                 $item = new $model;
                                 $item->id = $id;
                                 $item->scope = "$rkey.$index.$valued";
-                                $item->can = 0;
+                                $item->can = $canDef;
                                 $scopes->add($item);
                                 $id--;
                             }
                         }
-                    } else if (!$scopes->where('scope', $sec)->first()) {
+                    } else if (!$scopes->where('scope', "$rkey.$sec")->first()) {
                         $item = new $model;
                         $item->id = null;
                         $item->scope = "$rkey.$sec";
-                        $item->can = 0;
+                        $item->can = $canDef;
                         $scopes->add($item);
                         $id--;
                     }

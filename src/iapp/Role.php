@@ -24,11 +24,19 @@ class Role extends Eloquent
 
     public function scopes()
     {
-        return $this->hasMany(RoleScope::class);
+        return $this->hasMany(imodal('RoleScope'));
     }
 
     public static function findByName($name)
     {
         return static::where('name', $name)->first();
+    }
+
+    public static function admin($name = 'admin') {
+        return new static([
+            'id' => 0,
+            'name' => $name,
+            'title' => ucfirst($name),
+        ]);
     }
 }

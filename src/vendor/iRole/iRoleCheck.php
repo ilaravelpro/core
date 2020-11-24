@@ -52,7 +52,7 @@ class iRoleCheck
                             break;
                         }
                     } else {
-                        if (in_array($ovalue, $scopes)) {
+                        if (isset($scopes[$ovalue]) && $scopes[$ovalue]) {
                             $check = true;
                             break;
                         }
@@ -66,7 +66,7 @@ class iRoleCheck
                 if (!$this->inGroup(substr($value, 1))) {
                     return false;
                 }
-            } elseif (!in_array($value, $scopes)) {
+            } elseif (isset($scopes[$value]) && !$scopes[$value]) {
                 return false;
             }
         }
@@ -110,5 +110,10 @@ class iRoleCheck
     public static function getRules()
     {
         return auth()->user()->scopeAll();
+    }
+
+    public static function getRulesUnique()
+    {
+        return auth()->user()->scopeAllUnique();
     }
 }
