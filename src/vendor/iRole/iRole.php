@@ -43,7 +43,7 @@ class iRole
             unset($configScopes['global']);
             $id = -1;
             foreach ($configScopes as $rkey => $role) {
-                foreach ($role as $index => $sec) {
+                foreach ($role['items'] as $index => $sec) {
                     if (is_array($sec)) {
                         foreach ($sec as $keyd => $valued) {
                             if (!$scopes->where('scope', "$rkey.$index.$valued")->first()) {

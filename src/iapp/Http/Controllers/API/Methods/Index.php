@@ -79,12 +79,12 @@ trait Index
                     return $query;
                 });
             };
-            $subs = array_filter(ipreference('scopeSubs'), function ($sub) use ($action) {
+            $subs = array_filter(iconfig('scopes.' . $action . '.view', []), function ($sub) use ($action) {
                 return iRole::has("$action.view.$sub");
             });
             foreach ($subs as $sub) {
                 if (function_exists('i_query_index_switch'))
-                    $model = i_query_index_switch($sub, $model, $request, $anyByUser);
+                    $model = i_query_index_switch($sub, $model,$action , $request, $anyByUser);
                 elseif ($sub == 'anyByUser') {
                     $model = $anyByUser($model);
                 }

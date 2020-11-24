@@ -10,11 +10,20 @@ include 'preferences.php';
 $scopes = [];
 
 $scopes['global'] = [
-    'view' => $preferences['scopeSubs'],
-    'create',
-    'edit' => $preferences['scopeSubs'],
-    'destroy' => $preferences['scopeSubs']
+    'title' => 'Global',
+    'items' => [
+        'view' => $preferences['scopeSubs'],
+        'create',
+        'edit' => $preferences['scopeSubs'],
+        'destroy' => $preferences['scopeSubs']
+    ]
 ];
 
-$scopes['users'] = $scopes['global'];
-$scopes['roles'] = $scopes['global'];
+$scopes['users'] = [
+    'title' => 'Users',
+    'items' => $scopes['global']['items']
+];
+$scopes['roles'] = [
+    'title' => 'Roles',
+    'items' => $scopes['global']['items']
+];

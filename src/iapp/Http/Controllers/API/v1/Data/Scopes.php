@@ -33,10 +33,10 @@ trait Scopes
         unset($configScopes['global']);
         foreach ($configScopes as $key => $section) {
             $positions[$key] = [
-                'title' => ucfirst($key),
+                'title' => $section['title'],
                 'name' => $key,
             ];
-            foreach ($section as $skey => $scope) {
+            foreach ($section['items'] as $skey => $scope) {
                 $scopes =  is_array($scope) ? $scope : [$scope];
                 foreach ($scopes as $jscope) {
                     $smodel = $model::where(['role_id' => $parent->id, 'scope' => "$key.".(is_string($skey) ? "$skey.": '')  .$jscope])->first();
