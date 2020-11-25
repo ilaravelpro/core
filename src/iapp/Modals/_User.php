@@ -155,7 +155,7 @@ class _User extends Authenticatable
 
     public function scopeAllUnique() {
         $scopes = [];
-        $subs = array_reverse(ipreference('scopeSubs'), true);
+        $subs = array_reverse(array_unique(ipreference('scopeSubs')), true);
         foreach ($this->scopeAll() as $scope => $can)
             if (!isset($scopes[$scopeNew = trim(str_replace($subs, '', $scope), '.')]) || $can) $scopes[$scopeNew] = $can;
         return $scopes;

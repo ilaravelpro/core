@@ -55,9 +55,9 @@ class iRole
                                 $id--;
                             }
                         }
-                    } else if (!$scopes->where('scope', "$rkey.$sec")->first()) {
+                    } elseif (!$scopes->where('scope', "$rkey.$sec")->first()) {
                         $item = new $model;
-                        $item->id = null;
+                        $item->id = $id;
                         $item->scope = "$rkey.$sec";
                         $item->can = $canDef;
                         $scopes->add($item);
