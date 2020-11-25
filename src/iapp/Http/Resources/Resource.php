@@ -37,18 +37,20 @@ class Resource extends JsonResource
                 $data[$item] = (new self($this->$item))->toArray($request);
             }
         }
-        if (!$this->route_action){
-            $this->route_action = $request->route()->getAction('as');
-            $aAaction = explode('.', $this->route_action);
-            array_pop($aAaction);
-            $this->route_action = str_replace('api.', '', join('.', $aAaction));
+        if (isset($data['id'])) {
+            if (!$this->route_action){
+                $this->route_action = $request->route()->getAction('as');
+                $aAaction = explode('.', $this->route_action);
+                array_pop($aAaction);
+                $this->route_action = str_replace('api.', '', join('.', $aAaction));
+            }
+            $actions = [];
+            foreach (iconfig('scopes.' . $this->route_action . '.items', []) as $index => $item) {
+                $item = str_replace(['edit', 'destroy'], ['update', 'delete'], is_integer($index) ? $item : $index);
+                $actions[$item] = Gate::allows($this->route_action.".".$item, [$this->serial]);
+            }
+            $data['actions'] = $actions;
         }
-        $actions = [];
-        foreach (iconfig('scopes.' . $this->route_action . '.items', []) as $index => $item) {
-            $item = str_replace(['edit', 'destroy'], ['update', 'delete'], is_integer($index) ? $item : $index);
-            $actions[$item] = Gate::allows($this->route_action.".".$item, [$data['id']]);
-        }
-        $data['actions'] = $actions;
         return $data;
     }
 }
