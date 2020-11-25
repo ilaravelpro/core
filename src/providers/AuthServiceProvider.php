@@ -32,9 +32,9 @@ class AuthServiceProvider extends ServiceProvider
         Passport::refreshTokensExpireIn(now()->addDays(30));
         Passport::personalAccessTokensExpireIn(now()->addMonths(6));
 
-        Gate::define('irole', function ($user, $request, $irole, ...$args) {
-            return Gate::allows($irole,  $args);
-        });
+        /*Gate::define('irole', function ($user, $request, $irole, ...$args) {
+            return Gate::allows($irole,  ...$args);
+        });*/
 
         Gate::resource('users', 'iLaravel\Core\iApp\Http\Policies\UserPolicy');
         Gate::resource('users.scopes', 'iLaravel\Core\iApp\Http\Policies\UserScopePolicy');

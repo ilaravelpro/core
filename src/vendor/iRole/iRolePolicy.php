@@ -42,32 +42,39 @@ class iRolePolicy extends iRole
         return false;
     }
 
-    public function view($user, $item)
+    public function view($user, $item, ...$args)
     {
         return $this->single(...array_merge(func_get_args(), ['view']));
     }
 
-    public function create($user, $item = null)
+    public function create($user, $item = null, ...$args)
     {
         return static::has($this->prefix . '.create');
     }
 
-    public function update($user, $item)
+    public function update($user, $item, ...$args)
     {
         return $this->single(...array_merge(func_get_args(), ['edit']));
     }
 
-    public function delete($user, $item)
+    public function delete($user, $item, ...$args)
     {
         return $this->single(...array_merge(func_get_args(), ['destroy']));
     }
 
     public function single($user, $item, $child = null, $action = null, ...$args)
     {
-        if (isset($this->parent) && is_string($item))
-            $item = $this->parentModel::findBySerial($item);
-        elseif(is_string($item)) {
-            $item = $this->model::findBySerial($item);
+        if (method_exists($this, 'handelModal')){
+            list($item, $child) = $this->handelModal($item, $child);
+        }else{
+            if (isset($this->parent) && is_string($item))
+                $item = $this->parentModel::findBySerial($item);
+            if(is_string($item)) {
+                $item = $this->model::findBySerial($item);
+            }
+            if(is_string($child) && $this->model::id($child)) {
+                $child = $this->model::findBySerial($child);
+            }
         }
         if (!$action) $action = $child;
         $anyByUser = function ($context, $sub, $user, $item, $child = null, $action = null, $args = null) {
