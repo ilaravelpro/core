@@ -49,7 +49,7 @@ class Resource extends JsonResource
                 $item = str_replace(['edit', 'destroy'], ['update', 'delete'], is_integer($index) ? $item : $index);
                 $actions[$item] = Gate::allows($this->route_action.".".$item, [$this->serial]);
             }
-            $data['actions'] = $actions;
+            if (count($actions))$data['actions'] = $actions;
         }
         return $data;
     }

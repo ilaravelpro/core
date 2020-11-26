@@ -56,8 +56,9 @@ trait Rules
                 if (!$request->password) {
                     unset($rules['password']);
                 }
-                if ($arg == null || (isset($arg->email) && $arg->email != $request->email)) $rules['email'] .= '|unique:users,email';
-                if ($arg == null || (isset($arg->mobile) && $arg->mobile != $request->mobile)) $rules['mobile'] .= '|unique:users,mobile';
+                /*if ($arg == null || (isset($arg->email) && $arg->email != $request->email)) $rules['email'] .= '|unique:users,email';
+                if ($arg == null || (isset($arg->mobile) && $arg->mobile != $request->mobile)) $rules['mobile'] .= '|unique:users,mobile';*/
+                if ($arg == null || (isset($arg->username) && $arg->username != $request->username)) $rules['username'] .= '|unique:users,username';
                 if ($arg == null || (isset($arg->website) && $arg->website != $request->website)) $rules['website'] .= '|unique:users,website';
                 break;
         }

@@ -16,13 +16,15 @@ use Illuminate\Http\Request;
 
 class AuthController extends Controller
 {
-    public $username_method;
+    public $resource, $emailModel, $phoneModel, $username_method;
 
     public function __construct(Request $request)
     {
         parent::__construct($request);
         $this->model = imodal('User');
         $this->resourceClass = iresource('User');
+        $this->emailModel = imodal('Email');
+        $this->phoneModel = imodal('Phone');
     }
     use Show;
 
@@ -32,5 +34,6 @@ class AuthController extends Controller
         Auth\Me,
         Auth\MeUpdate,
         Auth\AttemptRule,
-        Auth\UsernameMethod;
+        Auth\UsernameMethod,
+        Auth\FindUser;
 }

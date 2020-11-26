@@ -4,7 +4,7 @@
 
 /**
  * Author: Amir Hossein Jahani | iAmir.net
- * Last modified: 9/13/20, 7:25 AM
+ * Last modified: 9/16/20, 12:41 PM
  * Copyright (c) 2020. Powered by iamir.net
  */
 
@@ -19,7 +19,11 @@ trait UsernameMethod
         if ($this->username_method) return $this->username_method;
         $username = $request->input('username');
         $type = 'username';
-        if (ctype_digit($username)) {
+        if ($this->model::id($username)) {
+            $type = 'id';
+            $request->request->remove('username');;
+            $request->merge([$type => $this->model::id($username)]);
+        } elseif (ctype_digit($username)) {
             $type = 'mobile';
             $request->request->remove('username');;
             $request->merge([$type => $username]);

@@ -18,24 +18,14 @@ trait Register
 {
     public function register(Request $request)
     {
-        $this->username_method($request);
-        $user = User::where($this->username_method, $request->input($this->username_method))->first();
-        if ($user) {
-            return $this->response("user duplicated", null, 401);
-        }
-        $register = new User;
+        $user = $this->findUser($request);
+        if ($user) return $this->response("user duplicated", null, 401);
+        $register = new $this->model;
         $register->password = Hash::make($request->input('password'));
         $register->{$this->username_method} = $request->input($this->username_method);
-
-        if (config('auth.enter.auto_verify')) {
-            $register->status = 'active';
-        }
         $register->role = 'user';
+        $register->auth_type = 'register';
         $register->save();
-        if (config('auth.enter.auto_verify')) {
-            return $this->login($request);
-        }
-        $this->statusMessage = 'registred';
-        return $this->show($request, $this->findOrFail($register->serial ?: $register->id));
+        return $register;
     }
 }

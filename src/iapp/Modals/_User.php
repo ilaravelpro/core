@@ -97,8 +97,8 @@ class _User extends Authenticatable
                 list($name, $domain) = is_string($event->_email) ? explode('@', $event->_email) : [_get_value($event->_email, 'name'), _get_value($event->_email, 'domain')];
                 if ($email = $event->email()->first()) {
                     if (($has_name = $name && $email->name != $name) || ($has_domain = $domain && $email->domain != $domain)){
-                        if ($has_name) $email->name  = $name;
-                        if ($has_domain) $email->domain  = $domain;
+                        if (isset($has_name) && $has_name) $email->name  = $name;
+                        if (isset($has_domain) && $has_domain) $email->domain  = $domain;
                         $email->verified_at  = null;
                         $email->save();
                     }
