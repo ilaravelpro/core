@@ -14,6 +14,7 @@ $plugins = [
     'iSMS',
     'iLogs',
     'iLocation',
+    'ICAO',
 ];
 
 ?>

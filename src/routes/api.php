@@ -28,10 +28,10 @@ Route::namespace('v1')->prefix('v1')->group(function () {
             $rules = \iLaravel\Core\Vendor\iRole\iRoleCheck::getRulesUnique();
             return ['data' => function_exists('i_get_rules_items') ? i_get_rules_items($rules) : $rules];
         });
+        if (iconfig('auth.logout')) Route::post('auth/logout', 'AuthController@logout')->name('api.auth.logout');
     });
     Route::prefix('auth')->group(function () {
         if (iconfig('auth.login')) Route::post('login', 'AuthController@login')->name('api.auth.login');
-        if (iconfig('auth.logout')) Route::post('logout', 'AuthController@logout')->name('api.auth.logout');
         if (iconfig('auth.register')) Route::post('register', 'AuthController@register')->name('api.auth.register');
     });
 
