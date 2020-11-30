@@ -61,10 +61,12 @@ trait Index
             list($filters, $current_filter) = $this->filters($request, $model, $parent, $operators);
         }
         if (auth()->check() && !in_array(auth()->user()->role, ipreference('admins')) && !$parent) {
-            $action = $request->route()->getAction('as');
-            $aAaction = explode('.', $action);
-            array_pop($aAaction);
-            $action = str_replace('api.', '', join('.', $aAaction));
+            if (!isset($this->action)) {
+                $this->action = $request->route()->getAction('as');
+                $aAaction = explode('.', $this->action);
+                array_pop($aAaction);
+                $this->action = str_replace('api.', '', join('.', $aAaction));
+            }
             $anyByUser = function ($model) {
                 return $model->where(function ($query) use ($model) {
                     $idName = null;
@@ -79,12 +81,12 @@ trait Index
                     return $query;
                 });
             };
-            $subs = array_filter(iconfig('scopes.' . $action . '.items.view', []), function ($sub) use ($action) {
-                return iRole::has("$action.view.$sub");
+            $subs = array_filter(iconfig('scopes.' . $this->action . '.items.view', []), function ($sub) {
+                return iRole::has("$this->action.view.$sub");
             });
             foreach ($subs as $sub) {
                 if (function_exists('i_query_index_switch'))
-                    $model = i_query_index_switch($sub, $model,$action , $request, $anyByUser);
+                    $model = i_query_index_switch($sub, $model,$this->action , $request, $anyByUser);
                 elseif ($sub == 'anyByUser') {
                     $model = $anyByUser($model);
                 }
