@@ -37,7 +37,7 @@ class Resource extends JsonResource
                 $data[$item] = (new self($this->$item))->toArray($request);
             }
         }
-        if (isset($data['id'])) {
+        if (isset($data['id']) && method_exists($request, 'route')) {
             if (!$this->route_action){
                 $this->route_action = $request->route()->getAction('as');
                 $aAaction = explode('.', $this->route_action);
