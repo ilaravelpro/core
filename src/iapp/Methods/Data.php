@@ -4,11 +4,11 @@
 
 /**
  * Author: Amir Hossein Jahani | iAmir.net
- * Last modified: 9/17/20, 9:21 PM
+ * Last modified: 12/5/20, 9:26 AM
  * Copyright (c) 2020. Powered by iamir.net
  */
 
-namespace iLaravel\Core\iApp\Modals;
+namespace iLaravel\Core\iApp\Methods;
 
 use DateTime;
 

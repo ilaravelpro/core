@@ -17,6 +17,7 @@ $plugins = [
     'iAWC',
     'ICAO',
     'iOpenAip',
+    'iPost',
 ];
 
 ?>

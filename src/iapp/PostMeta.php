@@ -9,7 +9,7 @@
 
 namespace iLaravel\Core\iApp;
 
-class Email extends Modals\_Email
+class PostMeta extends Modals\_PostMeta
 {
 
 }

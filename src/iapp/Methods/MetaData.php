@@ -4,17 +4,17 @@
 
 /**
  * Author: Amir Hossein Jahani | iAmir.net
- * Last modified: 9/17/20, 7:08 PM
+ * Last modified: 12/5/20, 9:26 AM
  * Copyright (c) 2020. Powered by iamir.net
  */
 
-namespace iLaravel\Core\iApp\Modals;
+namespace iLaravel\Core\iApp\Methods;
 
 use Illuminate\Database\Eloquent\Model;
 
 class MetaData extends Model
 {
-    use \iLaravel\Core\iApp\Modals\Data;
+    use \iLaravel\Core\iApp\Methods\Data;
     protected $guarded = [];
 
 

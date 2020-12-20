@@ -9,16 +9,8 @@
 
 namespace iLaravel\Core\iApp;
 
-use iLaravel\Core\iApp\Modals\MetaData;
 
-class UserMeta extends MetaData
+class UserMeta extends Modals\_UserMeta
 {
-    use Modals\Modal;
-    public static $s_prefix = 'IUM';
-    public static $s_start = 24300000;
-    public static $s_end = 728999999;
 
-    protected $table = 'user_meta';
-
-    protected $guarded = [];
 }

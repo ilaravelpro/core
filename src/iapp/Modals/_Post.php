@@ -9,17 +9,19 @@
 
 namespace iLaravel\Core\iApp\Modals;
 
+use iLaravel\Core\iApp\PostMeta;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 
 class _Post extends Eloquent
 {
     use Modal;
+    use \iLaravel\Core\iApp\Methods\Metable;
 
     protected $guarded = [
         'id'
     ];
 
-    public static $s_prefix = 'BP';
+    public static $s_prefix = 'IP';
     public static $s_start = 729000000;
     public static $s_end = 21869999999;
 
@@ -28,6 +30,9 @@ class _Post extends Eloquent
         'meta' => 'array',
         'published_at' => 'datetime',
     ];
+
+    public $metaClass = PostMeta::class;
+    public $metaTable = 'post_meta';
     protected static function boot()
     {
         parent::boot();

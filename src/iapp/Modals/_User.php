@@ -22,7 +22,7 @@ use Laravel\Passport\HasApiTokens;
 class _User extends Authenticatable
 {
     use Modal;
-    use Metable;
+    use \iLaravel\Core\iApp\Methods\Metable;
     use Notifiable;
     use HasApiTokens;
 

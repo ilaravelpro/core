@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\DB;
 
 trait Modal
 {
-    use Serial,
+    use \iLaravel\Core\iApp\Methods\Serial,
         Data;
 
     public $datetime = [

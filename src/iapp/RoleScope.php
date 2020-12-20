@@ -9,14 +9,8 @@
 
 namespace iLaravel\Core\iApp;
 
-use Illuminate\Database\Eloquent\Model as Eloquent;
 
-class RoleScope extends Eloquent
+class RoleScope extends Modals\_RoleScope
 {
-    use Modals\Modal;
-    public static $s_prefix = 'IRS';
-    public static $s_start = 900;
-    public static $s_end = 26999;
 
-    protected $guarded = [];
 }

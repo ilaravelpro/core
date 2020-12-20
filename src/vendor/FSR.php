@@ -3,11 +3,11 @@
 
 /**
  * Author: Amir Hossein Jahani | iAmir.net
- * Last modified: 9/1/20, 7:24 AM
+ * Last modified: 12/5/20, 9:26 AM
  * Copyright (c) 2020. Powered by iamir.net
  */
 
-namespace iLaravel\Core\iApp;
+namespace iLaravel\Core\Vendor;
 
 // File size readble
 class FSR {
