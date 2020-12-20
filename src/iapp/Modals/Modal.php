@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\DB;
 trait Modal
 {
     use \iLaravel\Core\iApp\Methods\Serial,
-        Data;
+        \iLaravel\Core\iApp\Methods\Data;
 
     public $datetime = [
         'global' => 'Y-m-d H:i:s',
