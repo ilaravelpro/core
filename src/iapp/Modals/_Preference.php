@@ -10,7 +10,7 @@
 namespace iLaravel\Core\iApp\Modals;
 
 
-class _Preference extends MetaData
+class _Preference extends \iLaravel\Core\iApp\Methods\MetaData
 {
     use Modal;
     public static $s_prefix = 'IP';
