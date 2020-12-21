@@ -18,7 +18,7 @@ trait Filters
         $user = auth()->user();
         $types = imodal('Role');
         $types = $types::select('title as text, name as value')->get()->toArray();
-        $types = [
+        $types[] = [
             'text' => 'Admin',
             'value' => 'admin'
         ];
