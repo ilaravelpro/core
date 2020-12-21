@@ -27,6 +27,5 @@ class UserController extends Controller
         User\Except,
         User\Rules,
         User\RequestData,
-        User\Filters,
-        User\SearchQ;
+        User\Filters;
 }

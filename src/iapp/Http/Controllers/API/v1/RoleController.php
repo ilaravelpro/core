@@ -27,7 +27,6 @@ class RoleController extends Controller
         Update,
         Destroy,
         Role\Rules,
-        Role\Filters,
-        Role\SearchQ;
+        Role\Filters;
 
 }

@@ -27,5 +27,6 @@ class iController extends BaseController
         Methods\Fillable,
         Methods\Fail,
         Methods\FindArgs,
+        Methods\SearchQ,
         Methods\Call;
 }

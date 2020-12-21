@@ -55,7 +55,6 @@ trait Modal
 
     public static function getTableColumns()
     {
-        dd((new self)->getTable());
-        return \DB::getSchemaBuilder()->getColumnListing((new self)->getTable());
+        return \DB::getSchemaBuilder()->getColumnListing(with(new static)->getTable());
     }
 }

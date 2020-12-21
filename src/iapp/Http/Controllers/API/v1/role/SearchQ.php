@@ -15,12 +15,14 @@ trait SearchQ
 {
     public function searchQ($request, $model, $parent)
     {
+        parent::searchQ(...func_get_args());
         $q = $request->q;
-        dd($this->model::getTableColumns());
         $model->where(function ($query) use ($q) {
             $query->where('roles.name', 'LIKE', "%$q%")
                 ->orWhere('roles.title', 'LIKE', "%$q%");
         });
 
     }
+
+
 }
