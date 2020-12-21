@@ -24,14 +24,16 @@ trait Modal
 
     ];
 
-    public static function statusList(){
-        $status = iconfig('status.'.(new self())->getTable());
-        return $status ? : iconfig('status.global');
+    public static function statusList()
+    {
+        $status = iconfig('status.' . (new self())->getTable());
+        return $status ?: iconfig('status.global');
     }
 
-    public static function typeList(){
-        $types = iconfig('types.'.(new self())->getTable());
-        return $types ? : iconfig('types.global');
+    public static function typeList()
+    {
+        $types = iconfig('types.' . (new self())->getTable());
+        return $types ?: iconfig('types.global');
     }
 
     public function getCreatedAtAttribute($value)
@@ -46,8 +48,14 @@ trait Modal
 
     public static function resetRecordsId()
     {
-        DB::statement(DB::raw('ALTER TABLE '.(new self())->getTable().' AUTO_INCREMENT=0'));
+        DB::statement(DB::raw('ALTER TABLE ' . (new self())->getTable() . ' AUTO_INCREMENT=0'));
         DB::statement(DB::raw('set @reset:=0'));
-        return DB::statement(DB::raw('UPDATE '.(new self())->getTable().' SET id = @reset:= @reset + 1'));
+        return DB::statement(DB::raw('UPDATE ' . (new self())->getTable() . ' SET id = @reset:= @reset + 1'));
+    }
+
+    public static function getTableColumns()
+    {
+        dd((new self)->getTable());
+        return \DB::getSchemaBuilder()->getColumnListing((new self)->getTable());
     }
 }

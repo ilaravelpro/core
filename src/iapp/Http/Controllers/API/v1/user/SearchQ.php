@@ -16,6 +16,7 @@ trait SearchQ
     public function searchQ($request, $model, $parent)
     {
         $q = $request->q;
+        dd($this->model::getTableColumns());
         $model->where(function ($query) use ($q) {
             $query->where('users.name', 'LIKE', "%$q%")
                 ->orWhere('users.family', 'LIKE', "%$q%")

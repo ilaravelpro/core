@@ -15,13 +15,11 @@ trait Filters
 {
     public function filters($request, $model, $parent = null, $operators = [])
     {
-        $user = auth()->user();
         $types = imodal('Role');
-        $types = $types::select('title as text', 'name as value')->get()->toArray();
-        $types[] = [
+        $types = array_merge([
             'text' => 'Admin',
             'value' => 'admin'
-        ];
+        ], $types::select('title as text', 'name as value')->get()->toArray());
         $filters = [
             [
                 'name' => 'all',
