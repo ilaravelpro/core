@@ -48,9 +48,11 @@ trait Modal
 
     public static function resetRecordsId()
     {
-        DB::statement(DB::raw('ALTER TABLE ' . (new self())->getTable() . ' AUTO_INCREMENT=0'));
+        DB::statement(DB::raw('ALTER TABLE ' . (new self())->getTable() . ' AUTO_INCREMENT=1'));
         DB::statement(DB::raw('set @reset:=0'));
-        return DB::statement(DB::raw('UPDATE ' . (new self())->getTable() . ' SET id = @reset:= @reset + 1'));
+        $check = DB::statement(DB::raw('UPDATE ' . (new self())->getTable() . ' SET id = @reset:= @reset + 1'));
+        DB::statement(DB::raw('ALTER TABLE ' . (new self())->getTable() . ' AUTO_INCREMENT=' .(static::all()->count() + 1)));
+        return $check;
     }
 
     public static function getTableColumns()
