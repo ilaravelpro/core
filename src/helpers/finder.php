@@ -103,8 +103,10 @@ function _set_value($data, $path, $value)
     return $data;
 }
 
-function _get_value(array $array, $parents, $glue = '.')
+function _get_value($array, $parents,$default = null, $glue = '.')
 {
+    if (is_object($array))
+        $array = (array) $array;
     if (!is_array($parents)) {
         $parents = explode($glue, $parents);
     }
@@ -115,7 +117,7 @@ function _get_value(array $array, $parents, $glue = '.')
         if (is_array($ref) && array_key_exists($parent, $ref)) {
             $ref = &$ref[$parent];
         } else {
-            return null;
+            return $default;
         }
     }
     return $ref;

@@ -42,3 +42,10 @@ function is_json($string) {
     json_decode($string);
     return (json_last_error() == JSON_ERROR_NONE);
 }
+
+function remove_empty($array) {
+    if (is_object($array)) $array = (array) $array;
+    return array_filter($array, function ($item) {
+        return is_array($item) || is_object($item) ? count((array) $item) : strlen($item);
+    });
+}
