@@ -43,9 +43,9 @@ function is_json($string) {
     return (json_last_error() == JSON_ERROR_NONE);
 }
 
-function remove_empty($array) {
+function remove_empty($array, $max = null) {
     if (is_object($array)) $array = (array) $array;
-    return array_filter($array, function ($item) {
-        return is_array($item) || is_object($item) ? count((array) $item) : strlen($item);
-    });
+    return array_filter($array, function ($item, $key) use ($max) {
+        return is_array($item) || is_object($item) ? count((array) $item) : strlen($item) && ($max ? $key <= $max: true);
+    }, ARRAY_FILTER_USE_BOTH );
 }
