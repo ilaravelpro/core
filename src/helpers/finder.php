@@ -140,6 +140,24 @@ function _has_key(array $array, $parents, $glue = '.')
     return true;
 }
 
+
+function _unset_key(array $array, $parents, $glue = '.')
+{
+    if (!is_array($parents)) {
+        $parents = explode($glue, $parents);
+    }
+
+    $ref = &$array;
+    foreach ((array)$parents as $parent) {
+        if (is_array($ref) && array_key_exists($parent, $ref)) {
+            unset($ref[$parent]);
+        } else {
+            return false;
+        }
+    }
+    return $ref;
+}
+
 function _save_child($kid, $items, $model, $set = [], $unset = [], $callback = null)
 {
     $deletes = $kid->pluck('id')->toArray();
