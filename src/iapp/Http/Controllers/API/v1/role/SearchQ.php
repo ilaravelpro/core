@@ -21,8 +21,5 @@ trait SearchQ
             $query->where('roles.name', 'LIKE', "%$q%")
                 ->orWhere('roles.title', 'LIKE', "%$q%");
         });
-
     }
-
-
 }
