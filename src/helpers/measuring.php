@@ -37,8 +37,7 @@ function _uv2ddff($u, $v)
 {
     $u2v2 = $u ^ 2 + $v ^ 2;
     $wind['speed'] = sqrt($u2v2 < 0 ? $u2v2 * -1 : $u2v2);
-    //$wind['dir'] = 270 - (atan2($v, $u) * (180 / pi()));
-    $wind['dir'] = windDir($u, $v);
+    $wind['dir'] =  atan2($v, $u) * (180 / pi());
     return $wind;
 }
 

@@ -18,10 +18,10 @@ trait Data
 
     public function getValueByType($value, $type = null) {
         $type = $type ? : gettype($value);
-        if (is_json($value)) $type = 'array';
+        //if (is_json($value)) $type = 'array';
         switch ($type) {
             case 'array':
-                return json_decode($value, true);
+                //return json_decode($value, true);
             case 'object':
                 return json_decode($value);
             case 'datetime':
@@ -51,7 +51,6 @@ trait Data
     public function renderSetValue($value, $name = 'value') {
         $name_type = $name === 'value' ? 'type' : "${name}_type";
         $type = gettype($value);
-
         if (is_array($value)) {
             $this->$name_type = 'array';
             $this->attributes[$name] = json_encode($value);
