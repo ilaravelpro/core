@@ -10,15 +10,16 @@
 
 namespace iLaravel\Core\iApp\Http\Controllers\API\v1\Auth;
 
+use iLaravel\Core\iApp\Http\Requests\iLaravel as Request;
 use Illuminate\Support\Facades\Hash;
 
 trait MeUpdate
 {
-    public function me_update(\Illuminate\Http\Request $request)
+    public function me_update(Request $request)
     {
         $user = $this->model::find(auth()->id());
         if ($request->password) {
-            $request->replace(['password' => Hash::make($request->password)]);
+            $request->merge(['password' => Hash::make($request->password)]);
         }
         $update = [
             'name' => (string)$request->name,
@@ -28,18 +29,18 @@ trait MeUpdate
         ];
         if (isset($request->password))
             $update['password'] = $request->password;
-        $avatar = $request->file('avatar');
-        $request->files->remove('avatar');
+        $avatar = $request->file('avatar_file');
+        $request->files->remove('avatar_file');
         if ($avatar) {
-            $attachment = File::upload($request, 'avatar');
+            $attachment = File::upload($request, 'avatar_file');
             if ($attachment) {
                 $update['avatar_id'] = $attachment->id;
-                $this->statusMessage = $this->class_name() . " changed";
             }
             File::imageSize($attachment, 500);
             File::imageSize($attachment, 250);
             File::imageSize($attachment, 150);
         }
+        $this->statusMessage = "Profile changed";
         $user->update($update);
         return $user;
     }
