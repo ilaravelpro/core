@@ -12,6 +12,7 @@ namespace iLaravel\Core\iApp\Http\Controllers\API\v1\Auth;
 
 use iLaravel\Core\iApp\Http\Requests\iLaravel as Request;
 use Illuminate\Support\Facades\Hash;
+use iLaravel\Core\iApp\File;
 
 trait MeUpdate
 {
@@ -30,7 +31,8 @@ trait MeUpdate
         if (isset($request->password))
             $update['password'] = $request->password;
         $avatar = $request->file('avatar_file');
-        $request->files->remove('avatar_file');
+        \request()->files->remove('avatar_file');
+        \request()->request->remove('avatar_file');
         if ($avatar) {
             $attachment = File::upload($request, 'avatar_file');
             if ($attachment) {

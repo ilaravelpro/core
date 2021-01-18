@@ -118,7 +118,7 @@ class _User extends Authenticatable
 
     public function sendPasswordResetNotification($token)
     {
-        dispatch(new \Majazeh\Dashboard\Jobs\SendEmail('emails.recovery', ['email' => $this->email, 'token' => $token, 'title' => _t('change.password.verify.code')]));
+        dispatch(new \iLaravel\Jobs\SendEmail('emails.recovery', ['email' => $this->email, 'token' => $token, 'title' => _t('change.password.verify.code')]));
     }
 
     public function getGroupsAttribute()

@@ -17,11 +17,11 @@ use Illuminate\Support\Facades\Hash;
 
 trait Store
 {
-    public function store(Request $request)
+    public function store($request)
     {
         \DB::beginTransaction();
         $request->request->remove('file');
-        $post_record = $this->_store($request);
+        $post_record = $this->_store(new Request($request->all()));
         $slug = "/attachments/$post_record->serial". ($post_record->title ? '_'. $post_record->title : '');
         $post_record->resource->slug = $slug;
         $post_record->resource->url = asset($slug);

@@ -35,14 +35,13 @@ class _File extends Eloquent
         return $attachment;
     }
 
-    public static function move(Post $post, UploadedFile $temp, $disk = null, $data = [])
+    public static function move(\iLaravel\Core\iApp\Post $post, UploadedFile $temp, $disk = null, $data = [])
     {
         return static::specialMove([
             'post' => $post,
             'temp' => $temp,
             'disk' => $disk,
             'data' => $data,
-
         ]);
     }
 
