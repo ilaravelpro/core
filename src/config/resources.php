@@ -12,6 +12,9 @@ $resources = [
 
     ],
     'users' => [
+        'data' => [
+            'text' => 'fullname'
+        ],
         'hidden' => [
             'global' => [
                 'avatar_id'
@@ -30,6 +33,11 @@ $resources = [
                 'user_id',
             ]
         ]
+    ],
+    'roles' => [
+        'data' => [
+            'text' => 'title'
+        ],
     ],
     'role_scopes' => [
         'hidden' => [

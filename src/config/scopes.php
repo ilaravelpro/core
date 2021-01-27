@@ -15,7 +15,8 @@ $scopes['global'] = [
         'view' => $preferences['scopeSubs'],
         'create',
         'edit' => $preferences['scopeSubs'],
-        'destroy' => $preferences['scopeSubs']
+        'destroy' => $preferences['scopeSubs'],
+        'data' => $preferences['scopeSubs'],
     ]
 ];
 

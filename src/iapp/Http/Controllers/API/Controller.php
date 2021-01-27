@@ -17,6 +17,7 @@ class Controller extends iController
 
     use Methods\Construct,
         Methods\Index,
+        Methods\Data,
         Methods\Show,
         Methods\Store,
         Methods\Update,

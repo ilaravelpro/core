@@ -19,6 +19,7 @@ use Illuminate\Routing\Router;
 use Illuminate\Routing\ResourceRegistrar;
 use Illuminate\Routing\PendingResourceRegistration;
 
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Cache;
@@ -63,6 +64,7 @@ class AppServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->booting(function () {
+            $this->app->bind('Illuminate\Routing\ResourceRegistrar', '\iLaravel\Core\iApp\Http\Registrars\ResourceRegistrar');
             $loader = AliasLoader::getInstance();
             $loader->alias('iRole', \iLaravel\Core\Vendor\iRole\iRole::class);
         });
@@ -109,6 +111,7 @@ class AppServiceProvider extends ServiceProvider
                 $options
             );
         });
+
 
         Request::macro('webAccess', function(){
             return $this->headers->get('Web-Access') ? true : false;

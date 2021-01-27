@@ -42,6 +42,16 @@ class iRolePolicy extends iRole
         return false;
     }
 
+    public function data($user, $parent = null)
+    {
+        if (isset($this->parent)) {
+            return $this->view($user, null, $this->parentModel::findBySerial($parent));
+        } else
+            foreach (iconfig('scopes.' . $this->prefix . '.items.data') as $view)
+                if ($can = static::has($this->prefix . '.data.' . $view)) return $can;
+        return false;
+    }
+
     public function view($user, $item, ...$args)
     {
         return $this->single(...array_merge(func_get_args(), ['view']));
