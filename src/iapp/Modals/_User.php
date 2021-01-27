@@ -114,6 +114,10 @@ class _User extends Authenticatable
                 $event->_email = [];
             }
         });
+        static::deleted(function (self $event) {
+            $event->mobile()->delete();
+            $event->email()->delete();
+        });
     }
 
     public function sendPasswordResetNotification($token)

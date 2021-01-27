@@ -85,7 +85,7 @@ class iRolePolicy extends iRole
                 )) return $can;
             return false;
         };
-        foreach (iconfig("scopes.$this->prefix.items.$action") as $any) {
+        foreach (iconfig("scopes.$this->prefix.items.$action", []) as $any) {
             if (static::has("$this->prefix.$action.$any")){
                 if (function_exists('i_role_policy_single_switch'))
                     return i_role_policy_single_switch($this, $anyByUser, $any, $user, $item, $child, $action, $args);

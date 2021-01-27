@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Gate;
 class Resource extends JsonResource
 {
     public $route_action = null;
+    public $route_src = null;
 
     public function toArray($request)
     {
@@ -38,16 +39,18 @@ class Resource extends JsonResource
             }
         }
         if (isset($data['id']) && method_exists($request, 'route')) {
-            if (!$this->route_action){
-                $this->route_action = $request->route()->getAction('as');
-                $aAaction = explode('.', $this->route_action);
+            if (!$this->route_src){
+                $this->route_src = $request->route()->getAction('as');
+                $aAaction = explode('.', $this->route_src);
+                $this->route_action = end($aAaction);
                 array_pop($aAaction);
-                $this->route_action = str_replace('api.', '', join('.', $aAaction));
+                $this->route_src = str_replace('api.', '', join('.', $aAaction));
+
             }
             $actions = [];
-            foreach (iconfig('scopes.' . $this->route_action . '.items', []) as $index => $item) {
+            foreach (iconfig('scopes.' . $this->route_src . '.items', []) as $index => $item) {
                 $item = str_replace(['edit', 'destroy'], ['update', 'delete'], is_integer($index) ? $item : $index);
-                $actions[$item] = Gate::allows($this->route_action.".".$item, [$this->serial]);
+                $actions[$item] = Gate::allows($this->route_src.".".$item, [$this->serial]);
             }
             if (count($actions))$data['actions'] = $actions;
         }

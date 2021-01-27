@@ -67,7 +67,7 @@ class iResponse
 
     public function terminate($request, $response)
     {
-        /*\App\iLog::create([
+        /*\iLaravel\iLogs\iApp\iLog::create([
             'user_id' => auth()->id(),
             'endpoint' => $request->url(),
             'method' => $request->method(),

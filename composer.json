@@ -34,7 +34,6 @@
     "prefer-stable": true,
     "require": {
         "laravel/socialite": "^4.1.4",
-        "doctrine/dbal": "^2.9.2",
         "laravel/passport": "^7.4",
         "intervention/image" : "^2.5"
     }
