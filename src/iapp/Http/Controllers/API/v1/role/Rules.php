@@ -21,7 +21,8 @@ trait Rules
             case 'store':
                 $rules = [
                     'name' => 'required|alpha',
-                    'title' => 'required|min:3'
+                    'title' => 'required|min:3',
+                    'status' => 'nullable|in:' . join(iconfig('status.roles', iconfig('status.global')), ','),
                 ];
                 return $rules;
                 break;

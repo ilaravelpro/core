@@ -74,12 +74,8 @@ trait Store
         } else {
             $fields = $this->fillable('store') ?: array_keys($this->rules($request, 'store', $parent, ...$args));
             $except = method_exists($this, 'except') ? $this->except($request, 'store', $parent, ...$args) : [];
-            foreach ($except as $key => $value) {
-                $index = array_search($value, $fields);
-                if ($index !== -1) {
-                    unset($fields[$index]);
-                }
-            }
+            $requestArray = $request->toArray();
+            $fields = $this->handelFields($except, $fields, $requestArray);
             foreach ($fields as $value) {
                 if (_has_key($request->toArray(), $value)) {
                     $data = _set_value($data, $value, _get_value($request->toArray(), $value));

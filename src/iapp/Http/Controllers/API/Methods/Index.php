@@ -60,6 +60,14 @@ trait Index
         if (method_exists($this, 'filters')) {
             list($filters, $current_filter) = $this->filters($request, $model, $parent, $operators);
         }
+        if (!$parent && \Schema::hasColumn($model->getModel()->getTable(), 'status')){
+            $statuses = iconfig("status.{$model->getModel()->getTable()}", iconfig("status.global"));
+            $status = $request->status ? (in_array($request->status, $statuses) ? $request->status : $statuses[0]) : $statuses[0];
+            if ($status) {
+                $model->where('status', $status)->orWhere('status', null);
+                $current_filter['status'] = $status;
+            }
+        }
         if (auth()->check() && !in_array(auth()->user()->role, ipreference('admins')) && !$parent) {
             if (!isset($this->action)) {
                 $this->action = $request->route()->getAction('as');
@@ -92,6 +100,7 @@ trait Index
                 }
             }
         }
+
         list($model, $order_list, $current_order, $default_order) = $this->paginate($request, $model, $parent);
         if ($current_filter) {
             $model->appends($request->all(...array_keys($current_filter)));

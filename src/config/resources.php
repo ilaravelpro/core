@@ -36,7 +36,8 @@ $resources = [
     ],
     'roles' => [
         'data' => [
-            'text' => 'title'
+            'text' => 'title',
+            'value' => 'name',
         ],
     ],
     'role_scopes' => [

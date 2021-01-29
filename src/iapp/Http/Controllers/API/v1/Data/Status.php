@@ -15,6 +15,8 @@ trait Status
 {
     public function status(Request $request, $type = 'global')
     {
-        return ['data' => iconfig("status.$type")];
+        if ($request->type)
+            $type = $request->type;
+        return ['data' => iconfig("status.$type", iconfig("status.global"))];
     }
 }

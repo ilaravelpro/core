@@ -19,6 +19,12 @@ class User extends Resource
         if (!count($data['mobile'])) unset($data['mobile']);
         if (!count($data['email'])) unset($data['email']);
         if (isset($data['email']) && count($data['email']) && $this->email) $data['email'] = $this->email->text;
+        if (isset($data['mobile'])) {
+            $data['mobile'] = [
+                'country' => $data['mobile']['country'],
+                'number' => $data['mobile']['number']
+            ];
+        }
         unset($data['avatar_id']);
         unset($data['tokens']);
         return $data;

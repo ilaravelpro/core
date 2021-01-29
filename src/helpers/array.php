@@ -49,3 +49,30 @@ function remove_empty($array, $max = null) {
         return is_array($item) || is_object($item) ? count((array) $item) : strlen($item) && ($max ? $key <= $max: true);
     }, ARRAY_FILTER_USE_BOTH );
 }
+
+function handel_fields($except, $fields, $requestArray) {
+    foreach ($except as $key => $value) {
+        $fields = array_filter($fields, function ($field) use ($value) {
+            return !(substr($field, 0, strlen($value)) == $value);
+        });
+    }
+    foreach ($fields as $index => $field) {
+        if (strpos($field, '*') !== false){
+            $efield = array_filter(explode('.*', $field),function ($fi) { return $fi;});
+            $bfield = $efield[0];
+            unset($efield[0]);
+            $fieldChild = [];
+            foreach (_get_value($requestArray, $bfield) as $i => $item) {
+                $fieldChild[$i] = "$bfield.$i";
+                if (count($efield))
+                    $fieldChild[$i] .= ".".implode('.*', $efield);
+            }
+            if (count($fieldChild)){
+                $fieldChild = handel_fields([], $fieldChild, $requestArray);
+            }
+            unset($fields[$index]);
+            $fields = array_merge($fields, $fieldChild);
+        }
+    }
+    return $fields;
+}

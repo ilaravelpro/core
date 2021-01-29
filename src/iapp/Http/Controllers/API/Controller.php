@@ -22,5 +22,6 @@ class Controller extends iController
         Methods\Store,
         Methods\Update,
         Methods\Destroy,
-        Methods\RequestFilter;
+        Methods\RequestFilter,
+        Methods\HandelFields;
 }

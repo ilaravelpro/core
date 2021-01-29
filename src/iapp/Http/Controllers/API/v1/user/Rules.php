@@ -11,6 +11,7 @@
 namespace iLaravel\Core\iApp\Http\Controllers\API\v1\User;
 
 use iLaravel\Core\iApp\Http\Requests\iLaravel as Request;
+use iLaravel\Core\iApp\Role;
 
 trait Rules
 {
@@ -43,8 +44,8 @@ trait Rules
                     'email.name' => "nullable|max:191|regex:/^[a-zA-Z0-9._-]*$/",
                     'email.domain' => "nullable|max:191|regex:/^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.[a-zA-Z]{2,}$/",
                     'website' => "nullable|max:191|regex:/^(?!:\/\/)([a-zA-Z0-9-_]+\.)*[a-zA-Z0-9][a-zA-Z0-9-_]+\.[a-zA-Z]{2,11}?$/",
-                    'status' => 'nullable|in:' . join(config('bit.status', ['awaiting', 'active', 'disable']), ','),
-                    'role' => 'nullable|in:' . join(config('bit.types', ['admin', 'user']), ','),
+                    'status' => 'nullable|in:' . join(iconfig('status.users', iconfig('status.global')), ','),
+                    'role' => 'nullable|in:'.("admin,". implode(',', Role::all()->pluck('name')->toArray())),
                     //'mobile' => 'nullable|regex:\+(9[976]\d|8[987530]\d|6[987]\d|5[90]\d|42\d|3[875]\d|2[98654321]\d|9[8543210]|8[6421]|6[6543210]|5[87654321]|4[987654310]|3[9643210]|2[70]|7|1)\W*\d\W*\d\W*\d\W*\d\W*\d\W*\d\W*\d\W*\d\W*(\d{1,2})$',
                     'mobile.country' => 'nullable|numeric',
                     'mobile.number' => 'nullable|numeric',
@@ -63,7 +64,7 @@ trait Rules
                 break;
         }
         $unique = $request->has('unique') ? $request->unique : $unique;
-        if ($unique) return str_replace(['required'], ['nullable'], $rules[$unique]);
+        if ($unique) return str_replace(['required'], ['nullable'], _get_value($rules, $unique, 'nullable|string'));
         return $rules;
     }
 }

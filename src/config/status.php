@@ -12,8 +12,8 @@ $status = [
         'inactive'
     ],
     'users' => [
-        'waiting',
         'active',
+        'waiting',
         'block'
     ]
 ];
