@@ -56,23 +56,27 @@ function handel_fields($except, $fields, $requestArray) {
             return !(substr($field, 0, strlen($value)) == $value);
         });
     }
+    $child = [];
     foreach ($fields as $index => $field) {
         if (strpos($field, '*') !== false){
+            unset($fields[$index]);
+            $other[] = $field;
             $efield = array_filter(explode('.*', $field),function ($fi) { return $fi;});
             $bfield = $efield[0];
             unset($efield[0]);
-            $fieldChild = [];
-            foreach (_get_value($requestArray, $bfield) as $i => $item) {
-                $fieldChild[$i] = "$bfield.$i";
-                if (count($efield))
-                    $fieldChild[$i] .= ".".implode('.*', $efield);
+            if (_get_value($requestArray, $bfield)){
+                $fieldChild = [];
+                foreach (_get_value($requestArray, $bfield) as $i => $item) {
+                    $fieldChild[$i] = "$bfield.$i";
+                    if (count($efield))
+                        $fieldChild[$i] .= implode('.*', $efield);
+                }
+                if (count($fieldChild)){
+                    $fieldChild = handel_fields([], $fieldChild, $requestArray);
+                }
+                $child = array_merge($child, $fieldChild);
             }
-            if (count($fieldChild)){
-                $fieldChild = handel_fields([], $fieldChild, $requestArray);
-            }
-            unset($fields[$index]);
-            $fields = array_merge($fields, $fieldChild);
         }
     }
-    return $fields;
+    return array_merge(array_values($fields), array_values($child));
 }

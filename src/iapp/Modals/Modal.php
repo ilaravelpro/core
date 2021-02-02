@@ -9,6 +9,7 @@
 
 namespace iLaravel\Core\iApp\Modals;
 
+use iLaravel\Core\iApp\Post;
 use Illuminate\Support\Facades\DB;
 
 trait Modal
@@ -18,10 +19,6 @@ trait Modal
 
     public $datetime = [
         'global' => 'Y-m-d H:i:s',
-    ];
-
-    public $files = [
-
     ];
 
     public static function statusList()
@@ -70,5 +67,54 @@ trait Modal
     public static function getTableColumns()
     {
         return \DB::getSchemaBuilder()->getColumnListing(with(new static)->getTable());
+    }
+
+    public static function getRules($request, $action, $item = null, ...$args) {
+        $model = new static();
+        return method_exists($model, 'rules') ? $model->rules($request, $action, $item, ...$args) : [];
+    }
+
+    public function getAdditional($request = null) {
+        if (!$request) $request = request();
+        $rules = method_exists($this, 'rules') ? $this->rules($request, 'additional', $this) : [];
+        if (!count($rules)) return $request->all();
+        $fields = handel_fields([], array_keys($rules), $request->all());
+        $data = [];
+        foreach ($fields as $value)
+            if (_has_key($request->toArray(), $value))
+                $data = _set_value($data, $value, _get_value($request->toArray(), $value));
+        return $data;
+    }
+
+    public function saveFile($name, $request, $event = null) {
+        $fileattachment = $request->file($name."_file");
+        \request()->files->remove($name."_file");
+        \request()->request->remove($name."_file");
+        $file = imodal('File');
+        $post = imodal('Post');
+        if($fileattachment){
+            $attachment = $file::upload($request, $name."_file");
+            if ($attachment) {
+                if ($this->{$name."_id"} && $post::find($this->{$name."_id"}))
+                    $post::find($this->{$name."_id"})->delete();
+                $this->{$name."_id"} = $attachment->id;
+                if (preg_match(' /(?:image)/', $fileattachment->getClientMimeType()))
+                    foreach (["52","75", "150" ,"300" , "600" ,"900"] as $size)
+                        $file::imageSize($attachment, $size);
+            }
+            unset($this->{$name."_file"});
+        }
+    }
+
+    public function saveFiles($names, $request, $event = null) {
+        foreach ($names as $name)
+            $this->saveFile($name, $request, $event);
+    }
+
+    public function getFile($key)
+    {
+        if (!$this->{$key.'_id'}) return $this->{$key.'_id'};
+        $file = imodal('File');
+        return $file::where('post_id', $this->{$key.'_id'})->get()->keyBy('mode');
     }
 }

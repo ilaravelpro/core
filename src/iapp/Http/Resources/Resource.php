@@ -24,7 +24,7 @@ class Resource extends JsonResource
         $hidden = iconfig('resources.' . $this->table, []) ? $this->table : 'global';
         $hidden = array_merge(iconfig('resources.' . $hidden . '.hidden.' . $role, []), iconfig('resources.' . $hidden . '.hidden.global', []));
         $data = parent::toArray($request);
-        if (isset($data['id']) && isset($this->serial)) {
+        if (isset($this->id) && $this->id && isset($data['id']) && isset($this->serial)) {
             $data['id'] = $this->serial;
             $data = insert_into_array($data, 'id', 'id_text', $this->serial_text);
         }
@@ -38,6 +38,11 @@ class Resource extends JsonResource
                 $data[$item] = (new self($this->$item))->toArray($request);
             }
         }
+        if (isset($this->resource->files))
+            foreach ($this->resource->files as $item) {
+                if ($this->$item) $data = insert_into_array($data, $item.'_id', $item, File::collection($this->$item));
+                unset($data[$item.'_id']);
+            }
         if (isset($data['id']) && method_exists($request, 'route')) {
             if (!$this->route_src){
                 $this->route_src = $request->route()->getAction('as');
@@ -45,7 +50,6 @@ class Resource extends JsonResource
                 $this->route_action = end($aAaction);
                 array_pop($aAaction);
                 $this->route_src = str_replace('api.', '', join('.', $aAaction));
-
             }
             $actions = [];
             foreach (iconfig('scopes.' . $this->route_src . '.items', []) as $index => $item) {

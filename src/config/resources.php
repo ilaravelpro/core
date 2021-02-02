@@ -17,7 +17,6 @@ $resources = [
         ],
         'hidden' => [
             'global' => [
-                'avatar_id'
             ],
             'guest' => [
                 'role'

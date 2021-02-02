@@ -9,7 +9,7 @@
 
 namespace iLaravel\Core\iApp\Modals;
 
-use iLaravel\Core\Vendor\iMobile;
+use iLaravel\Core\Vendor\Validations\iPhone;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 
 class _Phone extends Eloquent
@@ -26,8 +26,15 @@ class _Phone extends Eloquent
 
     public static function findByMobile($mobile, $model = null, $id = null, $key = null)
     {
-        $mobile = iMobile::parse($mobile);
-        $find  = static::where('country', $mobile['code'])->where('number', $mobile['number'])->where('type', 'mobile');
+        $mobile = iPhone::parse($mobile);
+        if (!$mobile) return false;
+        $find  = static::where('type', 'mobile')->where(function ($query) use ($mobile) {
+            foreach ($mobile as $index => $item){
+                if ($item)
+                    $query->where($index, $item);
+            }
+            return $query;
+        });
         if ($model) $find->where('model', $model);
         if ($id) $find->where('model_id', $id);
         if ($key) $find->where('key', $key);

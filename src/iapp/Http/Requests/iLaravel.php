@@ -9,7 +9,7 @@
 
 namespace iLaravel\Core\iApp\Http\Requests;
 
-use iLaravel\Core\Vendor\iMobile;
+use iLaravel\Core\Vendor\Validations\iPhone;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
 use App\User;
@@ -54,8 +54,8 @@ class iLaravel extends FormRequest
         foreach ($this->parseRules() as $key => $value) {
             foreach ($value as $k => $v) {
                 if ($k == 'mobile' && isset($data[$key])) {
-                    list($mobile, $country, $code) = iMobile::parse($data[$key]);
-                    $data[$key] = $mobile ? "$code$mobile" : $data[$key];
+                    $mobile = iPhone::parse($data[$key]);
+                    $data[$key] = $mobile && isset($mobile['full']) ? $mobile : $data[$key];
                 }
             }
         }
@@ -191,6 +191,9 @@ class iLaravel extends FormRequest
         if (!$this->controller()) return $rules;
         if (method_exists($this->controller(), 'rules')) {
             $rules = $this->controller()->rules($this, $this->route()->getActionMethod(), ...array_values($this->route()->parameters()));
+            $this->controller()->setFillable($this->route()->getActionMethod(), array_keys($rules));
+        }elseif($this->controller()->model && method_exists($this->controller()->model, 'rules')) {
+            $rules = $this->controller()->model::getRules($this, $this->route()->getActionMethod(), ...array_values($this->route()->parameters()));
             $this->controller()->setFillable($this->route()->getActionMethod(), array_keys($rules));
         }
         return $rules;

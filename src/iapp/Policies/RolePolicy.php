@@ -7,12 +7,11 @@
  * Copyright (c) 2020. Powered by iamir.net
  */
 
-namespace iLaravel\Core\iApp\Http\Policies;
+namespace iLaravel\Core\iApp\Policies;
 
 use iLaravel\Core\Vendor\iRole\iRolePolicy;
 
-class PostPolicy extends iRolePolicy
+class RolePolicy extends iRolePolicy
 {
-    public $prefix = 'posts';
-    public $model = 'Post';
+    public $prefix = 'roles';
 }

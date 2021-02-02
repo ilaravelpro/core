@@ -57,7 +57,6 @@ class AppServiceProvider extends ServiceProvider
         $this->app['validator']->resolver(function ($translator, $data, $rules, $messages) {
             return new \iLaravel\Core\iApp\Http\Validators\iLaravel($translator, $data, $rules, $messages);
         });
-        Validator::extendImplicit('serial_has', 'iLaravel\Core\iApp\Http\Validators\SerialHas@validate');
         Schema::defaultStringLength(191);
 
     }

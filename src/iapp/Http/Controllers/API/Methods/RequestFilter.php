@@ -13,9 +13,9 @@ use Illuminate\Http\Request;
 
 trait RequestFilter
 {
-    public function requestFilter(Request $request, $model, $parent, $filters, $operators){
-        $filter = (object) [];
-        if ($request->has('filter')){
+    public function requestFilter(Request $request, $model, $parent, $current, $filters, $operators){
+        $req_filters = $request->filters && is_array($request->filters) && count($request->filters) ? $request->filters : ($request->filter ? [$request->filter] : []);
+        foreach ($req_filters as $index => $filter) {
             $filter = is_array($request->filter) ? (object)$request->filter : (object) json_decode($request->filter);
             $ftype = isset($filter->type) && in_array($filter->type, array_column($filters, 'name')) ? $filter->type : 'all';
             $filterOPT = array_values(array_filter($filters, function ($value) use ($ftype) {
@@ -31,6 +31,11 @@ trait RequestFilter
                 $fsymbol = '=';
             if (method_exists($this, 'query_filter_type'))
                 $this->query_filter_type($model, $filter, (object)['value' =>  $filter->value, 'type' => $ftype, 'symbol' => $fsymbol]);
+            $rules = method_exists($this, 'rules') ? $this->rules($request, 'store', $model, $parent) : $this->model::getRules($request, 'store', $model, $parent);
+            $rule = str_replace(['required'], ['nullable'], _get_value($rules, $ftype, 'nullable|string'));
+            $request->validate([
+                'filter.value' => explode('|', (isset($filterOPT[0]['rule']) ? $filterOPT[0]['rule'] : $rule)),
+            ]);
             if (isset($filterOPT[0]) && !isset($filterOPT[0]['handel']))
                 switch ($ftype) {
                     case 'all':
@@ -39,13 +44,11 @@ trait RequestFilter
                         $current['q'] = $request->q;
                         break;
                     default:
-                        $request->validate([
-                            'filter.value' => explode('|', (isset($filterOPT[0]['rule']) ? $filterOPT[0]['rule'] : $this->rules($request, 'store', null, $filter->type))),
-                        ]);
                         $model->where($ftype, $fsymbol , $filter->value);
                         break;
                 }
+            $current[_get_value((array)$filter, 'type')] = _get_value((array)$filter, 'value');
         }
-        return [_get_value((array)$filter, 'type'), _get_value((array)$filter, 'value')];
+        return [$filters, $current];
     }
 }

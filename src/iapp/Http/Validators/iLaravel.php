@@ -14,61 +14,10 @@ use Illuminate\Validation\Validator;
 
 class iLaravel extends Validator
 {
-    public function validateSerial($attribute, $value, $parameters, $validator)
-    {
-        if (!isset($parameters[0])) return true;
-        $model = imodal(ucfirst($parameters[0]));
-        if (is_array($value)) {
-            $value = array_unique($value);
-            foreach ($value as $dk => $dv) {
-                $value[$dk] = $model::encode_id($dv);
-            }
-        } else {
-            $value = $model::encode_id($value);
-        }
-        return $this->checkSerial($attribute, $value, $parameters, $validator);
-    }
-
-    public function validateExistsSerial($attribute, $value, $parameters, $validator)
-    {
-        if (!isset($parameters[0])) return true;
-        $model = imodal(ucfirst($parameters[0]));
-        if (is_array($value)) {
-            $value = array_unique($value);
-            foreach ($value as $dk => $dv) {
-                $value[$dk] = $model::encode_id($dv);
-            }
-        } else {
-            $value = $model::encode_id($value);
-        }
-        return $this->checkSerial($attribute, $value, $parameters, $validator);
-    }
-
-    public function checkSerial($attribute, $value, $parameters, $validator)
-    {
-        if (is_array($value)) {
-            $all_numeric = true;
-            foreach ($value as $key) {
-                if (!(is_numeric($key))) {
-                    $all_numeric = false;
-                    break;
-                }
-            }
-            return $all_numeric;
-        }
-        if (!is_null($value))
-            return is_integer($value);
-        return true;
-    }
-
-    public function validateMobile($attribute, $value, $parameters, $validator)
-    {
-        list($mobile, $country, $code) = \iLaravel\Core\Vendor\iMobile::parse($value, $parameters);
-        if (!$mobile) {
-            return false;
-        }
-        return true;
-    }
+    use iLaravel\Serial,
+        iLaravel\Phone,
+        iLaravel\Numeric,
+        iLaravel\File;
 
     public function validateOneOf($attribute, $value, $parameters, $validator)
     {
@@ -83,9 +32,32 @@ class iLaravel extends Validator
         return $one_of;
     }
 
-    public function validateDouble($attribute, $value, $parameters, $validator)
+    public function validateCountry($attribute, $value, $parameters, $validator)
     {
-        $parameters = ['/^\d*(\.\d{1,2})?$/'];
+        $parameters = ['/^[a-zA-Z]+(([\',. -][a-zA-Z ])?[a-zA-Z]*)*$/'];
+        return $this->validateRegex($attribute, $value, $parameters);
+    }
+
+    public function validateIEmail($attribute, $value, $parameters, $validator)
+    {
+        return \iLaravel\Core\Vendor\Validations\iEmail::parse($value, $parameters);
+    }
+
+    public function validateUsername($attribute, $value, $parameters, $validator)
+    {
+        $parameters = ['/^[a-z0-9_-]{3,16}$/'];
+        return $this->validateRegex($attribute, $value, $parameters);
+    }
+
+    public function validateWebsite($attribute, $value, $parameters, $validator)
+    {
+        $parameters = ['/^(?!:\/\/)([a-zA-Z0-9-_]+\.)*[a-zA-Z0-9][a-zA-Z0-9-_]+\.[a-zA-Z]{2,11}?$/'];
+        return $this->validateRegex($attribute, $value, $parameters);
+    }
+
+    public function validatePassword($attribute, $value, $parameters, $validator)
+    {
+        $parameters = ['/^[a-zA-Z0-9._\-!?@#$%&*\/]*$/'];
         return $this->validateRegex($attribute, $value, $parameters);
     }
 }

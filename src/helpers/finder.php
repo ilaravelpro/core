@@ -23,6 +23,11 @@ function imodal($modal)
     return class_exists("\\App\\$modal") ? "\\App\\$modal" : i_class_exists("iApp", $modal);
 }
 
+function ipolicy($policy)
+{
+    return class_exists("\\App\\Policies\\$policy") ? "\\App\\Policies\\$policy" : i_class_exists("iApp\\Policies", $policy);
+}
+
 function iresource($resource)
 {
     return class_exists("\\App\\Http\\Resources\\$resource") ? "\\App\\Http\\Resources\\$resource" : i_class_exists("iApp\\Http\\Resources", $resource);
@@ -64,16 +69,6 @@ function class_name($class_name, $plural = false, $lower = 0)
             return $class_name;
     }
 }
-
-/*function getClosestKey($search, $arr) {
-    $closest = null;
-    foreach ($arr as $key => $item) {
-        if ($closest === null || abs($search - $closest) > abs($item - $search)) {
-            $closest = $key;
-        }
-    }
-    return $closest;
-}*/
 
 function getClosestKey($search, $arr)
 {

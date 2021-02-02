@@ -32,12 +32,6 @@ trait Filters
                 'type' => 'text'
             ],
         ];
-        $this->requestFilter($request, $model, $parent, $filters, $operators);
-        $current = [];
-        if ($request->q) {
-            $this->searchQ($request, $model, $parent);
-            $current['q'] = $request->q;
-        }
-        return [$filters, $current, $operators];
+        return [$filters, [], $operators];
     }
 }

@@ -57,10 +57,14 @@ trait Index
             $parent = null;
         }
         list($filters, $current_filter, $operators) = [null, null, iconfig('database.operators')];
-        if (method_exists($this, 'filters')) {
+        if (method_exists($this, 'filters'))
             list($filters, $current_filter) = $this->filters($request, $model, $parent, $operators);
+        list($filters, $current_filter) = $this->requestFilter($request, $model, $parent, $current_filter, $filters, $operators);
+        if ($request->q) {
+            $this->searchQ($request, $model, $parent);
+            $current['q'] = $request->q;
         }
-        if (!$parent && \Schema::hasColumn($model->getModel()->getTable(), 'status')){
+        if (\Schema::hasColumn($model->getModel()->getTable(), 'status')){
             $statuses = iconfig("status.{$model->getModel()->getTable()}", iconfig("status.global"));
             $status = $request->status ? (in_array($request->status, $statuses) ? $request->status : $statuses[0]) : $statuses[0];
             if ($status) {

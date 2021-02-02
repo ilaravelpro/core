@@ -6,9 +6,10 @@
  * Copyright (c) 2020. Powered by iamir.net
  */
 
-namespace iLaravel\Core\Vendor;
+namespace iLaravel\Core\Vendor\Validations;
 
 class iMobile {
+
     public static function parse($value, $parameters = null)
     {
         if(!preg_match("#^\+?\d+#", $value))

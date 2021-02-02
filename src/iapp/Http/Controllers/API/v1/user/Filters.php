@@ -15,11 +15,13 @@ trait Filters
 {
     public function filters($request, $model, $parent = null, $operators = [])
     {
-        $types = imodal('Role');
-        $types = array_merge([
-            'text' => 'Admin',
-            'value' => 'admin'
-        ], $types::select('title as text', 'name as value')->get()->toArray());
+        $roles = imodal('Role');
+        $roles = $roles::select('title as text', 'name as value')->get()->toArray();
+        if (in_array(auth()->user()->role, ipreference('admins', ['admin'])))
+            $roles = array_merge([
+                ['text' => 'Admin',
+                    'value' => 'admin']
+            ], $roles);
         $filters = [
             [
                 'name' => 'all',
@@ -36,7 +38,7 @@ trait Filters
                 'name' => 'role',
                 'title' => _t('role'),
                 'type' => 'select',
-                'items' => $types
+                'items' => $roles
             ],
             [
                 'name' => 'gender',
@@ -50,12 +52,6 @@ trait Filters
                 'type' => 'text'
             ],
         ];
-        $current = [];
-        $this->requestFilter($request, $model, $parent, $filters, $operators);
-        if ($request->q) {
-            $this->searchQ($request, $model, $parent);
-            $current['q'] = $request->q;
-        }
-        return [$filters, $current, $operators];
+        return [$filters, [], $operators];
     }
 }
