@@ -64,7 +64,7 @@ trait Index
             $this->searchQ($request, $model, $parent);
             $current['q'] = $request->q;
         }
-        if (\Schema::hasColumn($model->getModel()->getTable(), 'status')){
+        if (method_exists($model, 'getModel') && \Schema::hasColumn($model->getModel()->getTable(), 'status')){
             $statuses = iconfig("status.{$model->getModel()->getTable()}", iconfig("status.global"));
             $status = $request->status ? (in_array($request->status, $statuses) ? $request->status : $statuses[0]) : $statuses[0];
             if ($status) {
@@ -106,7 +106,7 @@ trait Index
         }
 
         list($model, $order_list, $current_order, $default_order) = $this->paginate($request, $model, $parent);
-        if ($current_filter) {
+        if (method_exists($model, 'appends') && $current_filter) {
             $model->appends($request->all(...array_keys($current_filter)));
         }
 
