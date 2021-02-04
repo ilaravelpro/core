@@ -16,7 +16,7 @@ trait RequestFilter
     public function requestFilter(Request $request, $model, $parent, $current, $filters, $operators){
         $req_filters = $request->filters && is_array($request->filters) && count($request->filters) ? $request->filters : ($request->filter ? [$request->filter] : []);
         foreach ($req_filters as $index => $filter) {
-            $filter = is_array($request->filter) ? (object)$request->filter : (object) json_decode($request->filter);
+            $filter = is_array($filter) ? (object)$filter : (object)json_decode($filter);
             $ftype = isset($filter->type) && in_array($filter->type, array_column($filters, 'name')) ? $filter->type : 'all';
             $filterOPT = array_values(array_filter($filters, function ($value) use ($ftype) {
                 return $value['name'] == $ftype;
@@ -29,8 +29,6 @@ trait RequestFilter
             }
             else
                 $fsymbol = '=';
-            if (method_exists($this, 'query_filter_type'))
-                $this->query_filter_type($model, $filter, (object)['value' =>  $filter->value, 'type' => $ftype, 'symbol' => $fsymbol]);
             $rules = method_exists($this, 'rules') ? $this->rules($request, 'store', $model, $parent) : $this->model::getRules($request, 'store', $model, $parent);
             $rule = str_replace(['required'], ['nullable'], _get_value($rules, $ftype, 'nullable|string'));
             $request->validate([
@@ -44,7 +42,10 @@ trait RequestFilter
                         $current['q'] = $request->q;
                         break;
                     default:
-                        $model->where($ftype, $fsymbol , $filter->value);
+                        if (method_exists($this, 'query_filter_type'))
+                            $current = $this->query_filter_type($model, $filter, (object)['value' =>  $filter->value, 'type' => $ftype, 'symbol' => $fsymbol], $current);
+                        if (!isset($current[$ftype]))
+                            $model->where($ftype, $fsymbol , $filter->value);
                         break;
                 }
             $current[_get_value((array)$filter, 'type')] = _get_value((array)$filter, 'value');

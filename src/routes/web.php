@@ -9,9 +9,13 @@
 
 Route::group(['middleware' => ['auth']], function () {
     Route::get('/dashboard', 'DashboardController@index')->name('dashboard');
-    Route::resource('users', 'UserController');
-    Route::resource('users/{parent}/scopes', 'UserScopeController', ['as' => 'users']);
-    Route::resource('roles', 'RoleController');
-    Route::resource('roles/{parent}/scopes', 'RoleScopeController', ['as' => 'roles']);
+    if (iconfig('routes.web.users.status')){
+        Route::resource('users', 'UserController');
+        Route::resource('users/{parent}/scopes', 'UserScopeController', ['as' => 'users']);
+    }
+    if (iconfig('routes.web.roles.status')){
+        Route::resource('roles', 'RoleController');
+        Route::resource('roles/{parent}/scopes', 'RoleScopeController', ['as' => 'roles']);
+    }
 });
 

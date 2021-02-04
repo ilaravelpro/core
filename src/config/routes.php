@@ -9,9 +9,13 @@
 $routes = [
     'api' => [
         'status' => true,
+        'users' => ['status' => true,],
+        'roles' => ['status' => true,]
     ],
     'web' => [
         'status' => false,
+        'users' => ['status' => true,],
+        'roles' => ['status' => true,]
     ],
     'auth' => [
         'status' => false,

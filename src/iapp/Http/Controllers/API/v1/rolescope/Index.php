@@ -10,13 +10,12 @@
 namespace iLaravel\Core\iApp\Http\Controllers\API\v1\RoleScope;
 
 use iLaravel\Core\iApp\Http\Requests\iLaravel as Request;
-use iLaravel\Core\Vendor\iRole\iRole;
+use iLaravel\Core\iApp\Methods\Scopes;
 
-trait QueryIndex
+trait Index
 {
-    public function queryIndex(Request $request, $parent)
+    public function index(Request $request, $parent)
     {
-        $scopes = iRole::scopes($parent->scopes, $this->model);
-        return [$parent, $scopes];
+        return Scopes::parse($request, 'role', $parent);
     }
 }

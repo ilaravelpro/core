@@ -64,11 +64,14 @@ trait Index
             $this->searchQ($request, $model, $parent);
             $current['q'] = $request->q;
         }
-        if (method_exists($model, 'getModel') && \Schema::hasColumn($model->getModel()->getTable(), 'status')){
+        if ((isset($this->statusFilter) ? $this->statusFilter : true) && method_exists($model, 'getModel') && \Schema::hasColumn($model->getModel()->getTable(), 'status')){
             $statuses = iconfig("status.{$model->getModel()->getTable()}", iconfig("status.global"));
             $status = $request->status ? (in_array($request->status, $statuses) ? $request->status : $statuses[0]) : $statuses[0];
             if ($status) {
-                $model->where('status', $status)->orWhere('status', null);
+                $request->validate([
+                    'status' => 'nullable|string',
+                ]);
+                $model->where('status', "like",$status);
                 $current_filter['status'] = $status;
             }
         }

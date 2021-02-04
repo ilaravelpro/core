@@ -21,7 +21,7 @@ class User extends Resource
         if (isset($data['mobile'])) {
             $data['mobile'] = [
                 'country' => $data['mobile']['country'],
-                'number' => $data['mobile']['prefix'] . $data['mobile']['number']
+                'number' => (isset($data['mobile']['prefix']) ? $data['mobile']['prefix']:''). $data['mobile']['number']
             ];
         }
         unset($data['tokens']);

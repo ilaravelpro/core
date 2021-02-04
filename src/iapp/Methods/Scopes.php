@@ -1,31 +1,25 @@
 <?php
 
 
+namespace iLaravel\Core\iApp\Methods;
 
-/**
- * Author: Amir Hossein Jahani | iAmir.net
- * Last modified: 9/10/20, 12:49 AM
- * Copyright (c) 2020. Powered by iamir.net
- */
-
-namespace iLaravel\Core\iApp\Http\Controllers\API\v1\Data;
 
 use iLaravel\Core\iApp\Http\Requests\iLaravel as Request;
 
-trait Scopes
+class Scopes
 {
-    public function scopes(Request $request, $type, $parent)
+    public static function parse(Request $request, $type, $parent)
     {
         switch ($type) {
             case 'user':
                 $model = imodal('UserScope');
                 $mparent = imodal('User');
-                $parent = $mparent::findBySerial($parent);
+                $parent = is_string($parent) ? $mparent::findBySerial($parent) : $parent;
                 break;
             case 'role':
                 $model = imodal('RoleScope');
                 $mparent = imodal('Role');
-                $parent = $mparent::findBySerial($parent);
+                $parent = is_string($parent) ? $mparent::findBySerial($parent) : $parent;
                 break;
         }
         $positions = [];

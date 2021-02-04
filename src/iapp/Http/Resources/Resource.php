@@ -24,7 +24,7 @@ class Resource extends JsonResource
         $hidden = iconfig('resources.' . $this->table, []) ? $this->table : 'global';
         $hidden = array_merge(iconfig('resources.' . $hidden . '.hidden.' . $role, []), iconfig('resources.' . $hidden . '.hidden.global', []));
         $data = parent::toArray($request);
-        if (isset($this->id) && $this->id && isset($data['id']) && isset($this->serial)) {
+        if (isset($data['id']) && isset($this->serial)) {
             $data['id'] = $this->serial;
             $data = insert_into_array($data, 'id', 'id_text', $this->serial_text);
         }
