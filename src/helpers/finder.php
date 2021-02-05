@@ -3,8 +3,8 @@
 
 /**
  * Author: Amir Hossein Jahani | iAmir.net
- * Last modified: 9/12/20, 6:18 PM
- * Copyright (c) 2020. Powered by iamir.net
+ * Last modified: 2/2/21, 8:13 AM
+ * Copyright (c) 2021. Powered by iamir.net
  */
 
 use Illuminate\Support\Str;

@@ -1,4 +1,9 @@
 <?php
+/**
+ * Author: Amir Hossein Jahani | iAmir.net
+ * Last modified: 2/2/21, 3:59 PM
+ * Copyright (c) 2021. Powered by iamir.net
+ */
 
 namespace iLaravel\Core\iApp\Http\Validators\iLaravel;
 

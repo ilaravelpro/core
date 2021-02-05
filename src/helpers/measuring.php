@@ -3,8 +3,8 @@
 
 /**
  * Author: Amir Hossein Jahani | iAmir.net
- * Last modified: 9/1/20, 7:24 AM
- * Copyright (c) 2020. Powered by iamir.net
+ * Last modified: 1/8/21, 9:58 AM
+ * Copyright (c) 2021. Powered by iamir.net
  */
 
 function _getDistanceGeo($c1, $c2, $opt_radius = 6371008.8)

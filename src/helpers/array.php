@@ -3,8 +3,8 @@
 
 /**
  * Author: Amir Hossein Jahani | iAmir.net
- * Last modified: 9/1/20, 7:24 AM
- * Copyright (c) 2020. Powered by iamir.net
+ * Last modified: 2/1/21, 3:25 PM
+ * Copyright (c) 2021. Powered by iamir.net
  */
 
 function insert_into_array( $array, $search_key, $insert_key, $insert_value, $insert_after_founded_key = true, $append_if_not_found = false ) {

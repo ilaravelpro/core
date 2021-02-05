@@ -1,4 +1,10 @@
 <?php
+/**
+ * Author: Amir Hossein Jahani | iAmir.net
+ * Last modified: 1/27/21, 7:52 PM
+ * Copyright (c) 2021. Powered by iamir.net
+ */
+
 namespace iLaravel\Core\iApp\Http\Registrars;
 use Illuminate\Routing\ResourceRegistrar as OriginalRegistrar;
 

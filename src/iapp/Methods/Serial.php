@@ -2,8 +2,8 @@
 
 /**
  * Author: Amir Hossein Jahani | iAmir.net
- * Last modified: 12/5/20, 9:26 AM
- * Copyright (c) 2020. Powered by iamir.net
+ * Last modified: 12/20/20, 11:25 AM
+ * Copyright (c) 2021. Powered by iamir.net
  */
 
 namespace iLaravel\Core\iApp\Methods;

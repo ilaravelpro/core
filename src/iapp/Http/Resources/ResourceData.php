@@ -3,8 +3,8 @@
 
 /**
  * Author: Amir Hossein Jahani | iAmir.net
- * Last modified: 9/17/20, 9:16 PM
- * Copyright (c) 2020. Powered by iamir.net
+ * Last modified: 1/27/21, 10:46 PM
+ * Copyright (c) 2021. Powered by iamir.net
  */
 
 namespace iLaravel\Core\iApp\Http\Resources;

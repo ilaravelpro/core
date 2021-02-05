@@ -2,8 +2,8 @@
 
 /**
  * Author: Amir Hossein Jahani | iAmir.net
- * Last modified: 9/13/20, 7:13 AM
- * Copyright (c) 2020. Powered by iamir.net
+ * Last modified: 2/2/21, 5:27 PM
+ * Copyright (c) 2021. Powered by iamir.net
  */
 
 namespace iLaravel\Core\Vendor\Validations;

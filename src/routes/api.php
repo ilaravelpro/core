@@ -2,8 +2,8 @@
 
 /**
  * Author: Amir Hossein Jahani | iAmir.net
- * Last modified: 9/13/20, 6:07 PM
- * Copyright (c) 2020. Powered by iamir.net
+ * Last modified: 2/4/21, 7:25 PM
+ * Copyright (c) 2021. Powered by iamir.net
  */
 
 Route::namespace('v1')->prefix('v1')->group(function () {
