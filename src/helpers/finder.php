@@ -174,3 +174,19 @@ function _save_child($kid, $items, $model, $set = [], $unset = [], $callback = n
     }
     $model::destroy($deletes);
 }
+
+function extract_links($sourceURL) {
+    $content=file_get_contents($sourceURL);
+    $content = strip_tags($content,"<a>");
+    $output_links = array();
+    $subString = preg_split("/<\/a>/",$content);
+    foreach ( $subString as $val ){
+        if( strpos($val, "<a href=") !== FALSE ){
+            $val = preg_replace("/.*<a\s+href=\"/sm","",$val);
+            $val = preg_replace("/\".*/","",$val);
+            array_push($output_links, $sourceURL.$val);
+        }
+    }
+    array_shift($output_links);
+    return $output_links;
+}

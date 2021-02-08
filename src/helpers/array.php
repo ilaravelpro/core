@@ -80,3 +80,52 @@ function handel_fields($except, $fields, $requestArray) {
     }
     return array_merge(array_values($fields), array_values($child));
 }
+
+// str_slice(string $str, int $start [, int $end])
+function str_slice() {
+    $args = func_get_args();
+    switch (count($args)) {
+        case 1:
+            return $args[0];
+        case 2:
+            $str        = $args[0];
+            $str_length = strlen($str);
+            $start      = $args[1];
+            if ($start < 0) {
+                if ($start >= - $str_length) {
+                    $start = $str_length - abs($start);
+                } else {
+                    $start = 0;
+                }
+            }
+            else if ($start >= $str_length) {
+                $start = $str_length;
+            }
+            $length = $str_length - $start;
+            return substr($str, $start, $length);
+        case 3:
+            $str        = $args[0];
+            $str_length = strlen($str);
+            $start      = $args[1];
+            $end        = $args[2];
+            if ($start >= $str_length) {
+                return "";
+            }
+            if ($start < 0) {
+                if ($start < - $str_length) {
+                    $start = 0;
+                } else {
+                    $start = $str_length - abs($start);
+                }
+            }
+            if ($end <= $start) {
+                return "";
+            }
+            if ($end > $str_length) {
+                $end = $str_length;
+            }
+            $length = $end - $start;
+            return substr($str, $start, $length);
+    }
+    return null;
+}

@@ -41,6 +41,23 @@ function _uv2ddff($u, $v)
     return $wind;
 }
 
+function _wind_speed($u, $v)
+{
+    $wind = ['speed' => 0, 'dir' => 0];
+    if($v==0) {
+        if ($u == 0) return $wind;
+        if ($u > 0) return ['speed' => $u, 'dir' => 270];
+        else return ['speed' => $u, 'dir' => 90];
+    }if($v<0)
+        $wind['dir']= atan($u/$v)*180/pi();
+    else
+        $wind['dir']= atan($u/$v)*180/pi()+180;
+    if($wind['dir'] <0)
+        $wind['dir']= $wind['dir']+360;
+    $wind['speed'] = sqrt($u*$u+$v*$v);
+    return $wind;
+}
+
 function windDir($u, $v)
 {
     if ($u > 0) return ((180 / pi()) * atan($v ? $u / $v : $u) + 180);
@@ -82,4 +99,14 @@ function odd(array $numbers) {
     return array_filter($numbers, function ($number) {
         return !($number % 2 == 0);
     });
+}
+
+function _pa_to_alt($num, $h = false) {
+    if (!$h) $num = $num / 100;
+    return (pow(10,log10($num / 1013.25) / 5.2558797) - 1)/ (-6.8755856*pow(10,-6));
+}
+
+function _alt_to_pa($num, $h = true) {
+    $calc = 1013.25 * pow((1 - 6.87535 * pow(10,-6) * $num), 5.2561);
+    return $h ? $calc : $calc * 1000;
 }
