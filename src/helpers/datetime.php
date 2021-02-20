@@ -13,8 +13,7 @@ function format_datetime($datetime, $format, $attr) {
             $format = is_json(request('format')) ? array_merge(json_decode(request('format')), $format) : array_merge(request('format'), $format);
         }else
             $format = request('format');
-    if (is_array($format))
-        $format = isset($format[$attr]) ? $format[$attr] : $format['global'];
+    $format = is_array($format) && isset($format[$attr]) ? $format[$attr] : 'Y-m-d H:i:s';
     if (ipreference('lang') == 'fa')
         $datetime =  jdate($datetime)->format($format);
     else

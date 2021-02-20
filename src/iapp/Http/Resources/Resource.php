@@ -20,7 +20,7 @@ class Resource extends JsonResource
     public function toArray($request)
     {
         $role = auth()->check() ? auth()->user()->role : 'guest';
-        if (!isset($this->table)) $this->table = class_name($request->route()->getController(), true, 2);
+        if (!isset($this->table)) $this->table = class_name(request()->route()->getController(), true, 2);
         $hidden = iconfig('resources.' . $this->table, []) ? $this->table : 'global';
         $hidden = array_merge(iconfig('resources.' . $hidden . '.hidden.' . $role, []), iconfig('resources.' . $hidden . '.hidden.global', []));
         $data = parent::toArray($request);

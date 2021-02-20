@@ -33,11 +33,15 @@ function random_filename($length, $directory = '', $extension = '')
     return $key . (!empty($extension) ? '.' . $extension : '');
 }
 
-// Checks in the directory of where this file is located.
-//echo random_filename(50);
-
-// Checks in a user-supplied directory...
-//echo random_filename(50, '/ServerRoot/mysite/myfiles');
-
-// Checks in current directory of php file, with zip extension...
-//echo random_filename(50, '', 'zip');
+function _add_get_method($url, $parameters) {
+    $url_parts = parse_url($url);
+    // If URL doesn't have a query string.
+    if (isset($url_parts['query'])) { // Avoid 'Undefined index: query'
+        parse_str($url_parts['query'], $params);
+    } else {
+        $params = array();
+    }
+    $params = array_merge($params, $parameters);
+    $url_parts['query'] = http_build_query($params);
+    return $url_parts['scheme'] . '://' . $url_parts['host'] . $url_parts['path'] . '?' . $url_parts['query'];
+}

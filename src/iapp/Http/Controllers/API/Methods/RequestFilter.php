@@ -44,7 +44,7 @@ trait RequestFilter
                     default:
                         if (method_exists($this, 'query_filter_type'))
                             $current = $this->query_filter_type($model, $filter, (object)['value' =>  $filter->value, 'type' => $ftype, 'symbol' => $fsymbol], $current);
-                        if (!isset($current[$ftype]))
+                        if (!isset($current[$ftype]) && $filter->value)
                             $model->where($ftype, $fsymbol , $filter->value);
                         break;
                 }

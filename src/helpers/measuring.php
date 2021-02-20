@@ -35,14 +35,6 @@ function _getBearingGeo($lonlat1, $lonlat2, $precision = 2)
 
 function _uv2ddff($u, $v)
 {
-    $u2v2 = $u ^ 2 + $v ^ 2;
-    $wind['speed'] = sqrt($u2v2 < 0 ? $u2v2 * -1 : $u2v2);
-    $wind['dir'] =  atan2($v, $u) * (180 / pi());
-    return $wind;
-}
-
-function _wind_speed($u, $v)
-{
     $wind = ['speed' => 0, 'dir' => 0];
     if($v==0) {
         if ($u == 0) return $wind;
@@ -56,13 +48,6 @@ function _wind_speed($u, $v)
         $wind['dir']= $wind['dir']+360;
     $wind['speed'] = sqrt($u*$u+$v*$v);
     return $wind;
-}
-
-function windDir($u, $v)
-{
-    if ($u > 0) return ((180 / pi()) * atan($v ? $u / $v : $u) + 180);
-    if ($u < 0 & $v < 0) return ((180 / pi()) * atan($u / $v) + 0);
-    if ($u > 0 & $v < 0) return ((180 / pi()) * atan($u / $v) + 360);
 }
 
 function _find_second_point($start, $dist, $bearing, $precision = 4)

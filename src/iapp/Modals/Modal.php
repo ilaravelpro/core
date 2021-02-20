@@ -17,9 +17,6 @@ trait Modal
     use \iLaravel\Core\iApp\Methods\Serial,
         \iLaravel\Core\iApp\Methods\Data;
 
-    public $datetime = [
-        'global' => 'Y-m-d H:i:s',
-    ];
 
     public static function statusList()
     {
@@ -35,12 +32,12 @@ trait Modal
 
     public function getCreatedAtAttribute($value)
     {
-        return format_datetime($value, $this->datetime, 'created_at');
+        return format_datetime($value, isset($this->datetime) ? $this->datetime : [], 'created_at');
     }
 
     public function getUpdatedAtAttribute($value)
     {
-        return format_datetime($value, $this->datetime, 'updated_at');
+        return format_datetime($value, isset($this->datetime) ? $this->datetime : [], 'updated_at');
     }
 
     public static function resetRecordsId()
