@@ -60,4 +60,21 @@ class iLaravel extends Validator
         $parameters = ['/^[a-zA-Z0-9._\-!?@#$%&*\/]*$/'];
         return $this->validateRegex($attribute, $value, $parameters);
     }
+
+    public function validateSlug($attribute, $value, $parameters, $validator)
+    {
+        $string = '';
+        if (in_array('just', $parameters) === false){
+            $parameters = array_merge($parameters, ['en', 'num']);
+        }
+        foreach ($parameters as $index => $parameter) {
+            if (in_array($parameter, ['just', 'num']) !== false)
+                $string .= iconfig("regex.string.$parameter.low", iconfig("regex.string.$parameter"));
+        }
+        if (in_array('num', $parameters) !== false){
+            $string .= '0-9';
+        }
+        $regex = "/^[ {$string}]+(?:-[ {$string}]+)*$/";
+        return $this->validateRegex($attribute, $value, [$regex]);
+    }
 }

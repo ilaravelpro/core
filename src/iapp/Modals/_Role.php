@@ -9,11 +9,12 @@
 
 namespace iLaravel\Core\iApp\Modals;
 
-use Illuminate\Database\Eloquent\Model as Eloquent;
+use iLaravel\Core\iApp\Http\Requests\iLaravel as Request;
 
-class _Role extends Eloquent
+use iLaravel\Core\iApp\Model;
+
+class _Role extends Model
 {
-    use Modal;
     public static $s_prefix = 'IR';
     public static $s_start = 30;
     public static $s_end = 899;
@@ -21,6 +22,14 @@ class _Role extends Eloquent
     protected $guarded = [];
 
     protected $hidden = ['scopes'];
+
+    protected static function boot()
+    {
+        parent::boot();
+        parent::creating(function (self $event) {
+            $event->creator_id = auth()->id();
+        });
+    }
 
     public function scopes()
     {
@@ -38,5 +47,22 @@ class _Role extends Eloquent
             'name' => $name,
             'title' => ucfirst($name),
         ]);
+    }
+
+    public function rules(Request $request, $action, $parent = null)
+    {
+        $rules = [];
+        switch ($action) {
+            case 'store':
+                $rules = ["creator_id" => "required|exists:users,id"];
+            case 'update':
+                $rules = array_merge($rules, [
+                    'title' => 'required|min:3',
+                    'name' => 'required|alpha',
+                    'status' => 'nullable|in:' . join(iconfig('status.roles', iconfig('status.global')), ','),
+                ]);
+                break;
+        }
+        return $rules;
     }
 }

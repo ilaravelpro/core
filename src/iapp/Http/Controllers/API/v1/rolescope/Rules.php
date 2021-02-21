@@ -21,7 +21,7 @@ trait Rules
             case 'update':
                 $rules = [
                     'scope' => 'required',
-                    'can' => 'required|in:1,0',
+                    'can' => 'required|boolean',
                     'role_id' => 'required'
                 ];
                 return $rules;

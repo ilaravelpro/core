@@ -22,6 +22,8 @@ class CreateRolesTable extends Migration
     {
         Schema::create('roles', function (Blueprint $table) {
             $table->increments('id');
+            $table->unsignedInteger('creator_id')->nullable();
+            $table->foreign('creator_id')->references('id')->on('creator_id');
             $table->string('name')->unique();
             $table->string('title');
             $table->string('description')->nullable();

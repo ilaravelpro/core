@@ -22,6 +22,8 @@ class CreatePreferencesTable extends Migration
     {
         Schema::create('preferences', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->unsignedInteger('creator_id')->nullable();
+            $table->foreign('creator_id')->references('id')->on('creator_id');
             $table->string('section')->nullable()->default('core');
             $table->string('name')->nullable();
             $table->string('value')->nullable();

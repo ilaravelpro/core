@@ -27,8 +27,8 @@ trait Filters
                 'type' => 'text'
             ],
             [
-                'name' => 'group',
-                'title' => _t('group'),
+                'name' => 'name',
+                'title' => _t('name'),
                 'type' => 'text'
             ],
         ];

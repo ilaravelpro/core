@@ -25,6 +25,5 @@ class PostController extends Controller
         Store,
         Update,
         Destroy,
-        Post\Filters,
-        Post\Rules;
+        Post\Filters;
 }

@@ -8,18 +8,16 @@
  */
 
 namespace iLaravel\Core\iApp\Modals;
+use iLaravel\Core\iApp\Http\Requests\iLaravel as Request;
 
+use iLaravel\Core\iApp\Model;
 use iLaravel\Core\iApp\PostMeta;
-use Illuminate\Database\Eloquent\Model as Eloquent;
 
-class _Post extends Eloquent
+class _Post extends Model
 {
-    use Modal;
     use \iLaravel\Core\iApp\Methods\Metable;
 
-    protected $guarded = [
-        'id'
-    ];
+    protected $guarded = ['id'];
 
     public static $s_prefix = 'IP';
     public static $s_start = 729000000;
@@ -33,25 +31,32 @@ class _Post extends Eloquent
 
     public $metaClass = PostMeta::class;
     public $metaTable = 'post_meta';
-    protected static function boot()
-    {
-        parent::boot();
-        parent::deleted(function (self $event) {
-            if ($event->type == 'attachment') {
-                foreach ($event->attachments as $file) {
-                    if (file_exists($file->slug)) {unlink($file->slug); $file->delete();}
-                }
-            }
-        });
-    }
-
-    public function attachments()
-    {
-        return $this->hasMany(imodal('File'));
-    }
 
     public function creator()
     {
         return $this->belongsTo(\App\User::class);
+    }
+
+    public function rules(Request $request, $action, $parent = null)
+    {
+        $rules = [];
+        switch ($action) {
+            case 'store':
+                $rules = ["creator_id" => "required|exists:users,id"];
+            case 'update':
+                $rules = array_merge($rules, [
+                    'parent_id' => "nullable|exits:terms,id",
+                    'title' => "required|string",
+                    'slug' => 'nullable|slug',
+                    'content' => 'nullable|string',
+                    'summary' => 'nullable|string',
+                    'type' => 'nullable|exits:types,name',
+                    'order' => "required|numeric|min:0",
+                    'published_at' => "nullable|date_format:Y-m-d H:i:s",
+                    'status' => 'nullable|in:' . join(iconfig('status.posts', iconfig('status.global')), ','),
+                ]);
+                break;
+        }
+        return $rules;
     }
 }

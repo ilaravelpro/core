@@ -17,6 +17,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 
+use Illuminate\Support\Facades\Hash;
 use Laravel\Passport\HasApiTokens;
 
 class _User extends Authenticatable
@@ -56,6 +57,9 @@ class _User extends Authenticatable
     {
         parent::boot();
         parent::saving(function (self $event) {
+            if ($event->password) {
+                $request->merge(['password' => Hash::make($request->password)]);
+            }
             if (isset($event->attributes['mobile'])) {
                 $event->_mobile = $event->attributes['mobile'];
                 unset($event->mobile);

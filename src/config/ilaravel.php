@@ -18,6 +18,7 @@ include 'resources.php';
 include 'routes.php';
 include 'preferences.php';
 include 'plugins.php';
+include 'regex.php';
 
 return [
     "auth" => $auth,
@@ -32,5 +33,6 @@ return [
     "routes" => $routes,
     "preferences" => $preferences,
     "plugins" => $plugins,
+    "regex" => $regex,
 ];
 ?>

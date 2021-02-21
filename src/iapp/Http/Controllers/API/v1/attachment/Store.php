@@ -9,11 +9,10 @@
 
 namespace iLaravel\Core\iApp\Http\Controllers\API\v1\Attachment;
 
+use iLaravel\Core\iApp\Attachment;
 use iLaravel\Core\iApp\File;
-use iLaravel\Core\iApp\Post;
 
 use iLaravel\Core\iApp\Http\Requests\iLaravel as Request;
-use Illuminate\Support\Facades\Hash;
 
 trait Store
 {
@@ -28,6 +27,6 @@ trait Store
         $post_record->resource->save();
         $file = File::move($post_record->resource, $request->file('file'));
         \DB::commit();
-        return new $this->resourceClass(Post::find($post_record->id));
+        return new $this->resourceClass(Attachment::find($post_record->id));
     }
 }

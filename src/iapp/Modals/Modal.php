@@ -88,7 +88,7 @@ trait Modal
         \request()->files->remove($name."_file");
         \request()->request->remove($name."_file");
         $file = imodal('File');
-        $post = imodal('Post');
+        $post = imodal('Attachment');
         if($fileattachment){
             $attachment = $file::upload($request, $name."_file");
             if ($attachment) {

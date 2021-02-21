@@ -31,13 +31,16 @@ trait RequestFilter
                 $fsymbol = '=';
             $rules = method_exists($this, 'rules') ? $this->rules($request, 'store', $model, $parent) : $this->model::getRules($request, 'store', $model, $parent);
             $rule = str_replace(['required'], ['nullable'], _get_value($rules, $ftype, 'nullable|string'));
-            $request->validate([
-                'filter.value' => explode('|', (isset($filterOPT[0]['rule']) ? $filterOPT[0]['rule'] : $rule)),
-            ]);
+            if (isset($filterOPT[0]['rule']) && is_callable($filterOPT[0]['rule']))
+                $filter = (object) $filterOPT[0]['rule']($filter);
+            else{
+                (new Request((array) $filter))->validate([
+                    'value' => explode('|', (isset($filterOPT[0]['rule']) ? $filterOPT[0]['rule'] : $rule)),
+                ]);
+            }
             if (isset($filterOPT[0]) && !isset($filterOPT[0]['handel']))
                 switch ($ftype) {
                     case 'all':
-                        $request->validate(['filter.value' => ['string']]);
                         $this->searchQ(new Request(['q' => $filter->value]), $model, $parent);
                         $current['q'] = $request->q;
                         break;

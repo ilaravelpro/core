@@ -17,15 +17,41 @@ trait Filters
     {
         $filters = [
             [
-                'status' => config('ilaravel.status.attachment', ['awaiting', 'active', 'disable']),
-            ]
+                'name' => 'all',
+                'title' => _t('all'),
+                'type' => 'text',
+            ],
+            [
+                'name' => 'title',
+                'title' => _t('title'),
+                'type' => 'text',
+            ],
+            [
+                'name' => 'slug',
+                'title' => _t('slug'),
+                'type' => 'text',
+            ],
+            [
+                'name' => 'summary',
+                'title' => _t('summary'),
+                'type' => 'text',
+            ],
+            [
+                'name' => 'type',
+                'title' => _t('type'),
+                'type' => 'text',
+            ],
+            [
+                'name' => 'order',
+                'title' => _t('order'),
+                'type' => 'number',
+            ],
+            [
+                'name' => 'published_at',
+                'title' => _t('published datetime'),
+                'type' => 'datetime',
+            ],
         ];
-        $current = [];
-        if(in_array($request->status, $filters[0]['status']))
-        {
-            $model->where('status', $request->status);
-            $current['status'] = $request->status;
-        }
-        return [$filters, $current];
+        return [$filters, []];
     }
 }
