@@ -157,7 +157,7 @@ function _save_child($kid, $items, $model, $set = [], $unset = [], $callback = n
 {
     $deletes = $kid->pluck('id')->toArray();
     $unseted = [];
-    foreach ($items as $value) {
+    foreach ($items as $index => $value) {
         foreach ($unset as $item){
             if (isset($value[$item])) $unseted[$item] = $value[$item];
             unset($value[$item]);
@@ -171,8 +171,10 @@ function _save_child($kid, $items, $model, $set = [], $unset = [], $callback = n
             $record = $kid->create(array_merge($value, $set));
         if (is_callable($callback))
             $callback($record, $unseted);
+        $items[$index] = $record;
     }
     $model::destroy($deletes);
+    return [$items, $deletes];
 }
 
 function extract_links($sourceURL) {

@@ -84,23 +84,33 @@ trait Modal
     }
 
     public function saveFile($name, $request, $event = null) {
-        $fileattachment = $request->file($name."_file");
-        \request()->files->remove($name."_file");
-        \request()->request->remove($name."_file");
-        $file = imodal('File');
+        $attachment = $this->saveAttachment($name."_file", $request);
         $post = imodal('Attachment');
-        if($fileattachment){
-            $attachment = $file::upload($request, $name."_file");
-            if ($attachment) {
-                if ($this->{$name."_id"} && $post::find($this->{$name."_id"}))
-                    $post::find($this->{$name."_id"})->delete();
-                $this->{$name."_id"} = $attachment->id;
-                if (preg_match(' /(?:image)/', $fileattachment->getClientMimeType()))
-                    foreach (["52","75", "150" ,"300" , "600" ,"900"] as $size)
-                        $file::imageSize($attachment, $size);
-            }
-            unset($this->{$name."_file"});
+        if ($attachment){
+            if ($this->{$name."_id"} && $post::find($this->{$name."_id"}))
+                $post::find($this->{$name."_id"})->delete();
+            $this->{$name."_id"} = $attachment->id;
         }
+        unset($this->{$name."_file"});
+    }
+
+
+    public function saveAttachment($name, $request, $sizes = ["52","75", "150" ,"300" , "600" ,"900"]) {
+        $fileattachment = $request->file($name);
+        \request()->files->remove($name);
+        \request()->request->remove($name);
+        $file = imodal('File');
+        if($fileattachment){
+            $attachment = $file::upload($request, $name);
+            if ($attachment) {
+                if (preg_match(' /(?:image)/', $fileattachment->getClientMimeType())){
+                    foreach ($sizes as $size)
+                        $file::imageSize($attachment, $size);
+                }
+                return $attachment;
+            }
+        }
+        return false;
     }
 
     public function saveFiles($names, $request, $event = null) {
