@@ -45,3 +45,16 @@ function _add_get_method($url, $parameters) {
     $url_parts['query'] = http_build_query($params);
     return $url_parts['scheme'] . '://' . $url_parts['host'] . $url_parts['path'] . '?' . $url_parts['query'];
 }
+
+function to_slug($string, $separator = '-')
+{
+    $string = trim($string);
+    $string = mb_strtolower($string, 'UTF-8');
+
+    $string = preg_replace("/[^a-z0-9_\s-ءاآؤئبپتثجچحخدذرزژسشصضطظعغفقكکگلمنوهی]/u", '', $string);
+
+    $string = preg_replace("/[\s-_]+/", ' ', $string);
+
+    $string = preg_replace("/[\s_]/", $separator, $string);
+    return $string;
+}
