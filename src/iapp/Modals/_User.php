@@ -57,9 +57,6 @@ class _User extends Authenticatable
     {
         parent::boot();
         parent::saving(function (self $event) {
-            if ($event->password) {
-                $request->merge(['password' => Hash::make($request->password)]);
-            }
             if (isset($event->attributes['mobile'])) {
                 $event->_mobile = $event->attributes['mobile'];
                 unset($event->mobile);
@@ -73,7 +70,7 @@ class _User extends Authenticatable
             $event->saveFiles($event->files, request());
         });
         parent::saved(function (self $event) {
-            if (isset($event->_mobile) && count($event->_mobile)) {
+            if (isset($event->_mobile) && (is_string($event->_mobile) || (is_array($event->_mobile) && count($event->_mobile)))) {
                 $event->_mobile = iPhone::parse($event->_mobile);
                 $event->_mobile = is_array($event->_mobile) ? $event->_mobile : $event->mobile->toArray();
                 unset($event->_mobile['full']);

@@ -28,7 +28,8 @@ class _Phone extends Eloquent
     {
         $mobile = iPhone::parse($mobile);
         if (!$mobile) return false;
-        $find  = static::where('type', 'mobile')->where(function ($query) use ($mobile) {
+        unset($mobile['full']);
+        $find = static::where('type', 'mobile')->where(function ($query) use ($mobile) {
             foreach ($mobile as $index => $item){
                 if ($item)
                     $query->where($index, $item);

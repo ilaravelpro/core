@@ -15,31 +15,31 @@ trait Serial
 
     public function getSerialAttribute()
     {
-        return self::decode_id($this->id);
+        return static::decode_id($this->id);
     }
 
     public static function serial($id)
     {
-        return self::decode_id($id);
+        return static::decode_id($id);
     }
 
     public static function id($serial = null)
     {
-        return self::encode_id($serial);
+        return static::encode_id($serial);
     }
 
     public static function decode_id($id)
     {
-        return self::$s_prefix . Engine::encode($id + self::$s_start);
+        return static::$s_prefix . Engine::encode($id + static::$s_start);
     }
 
     public static function encode_id($serial)
     {
         $serial = strtoupper($serial);
-        if (substr($serial, 0, strlen(self::$s_prefix)) != self::$s_prefix) {
+        if (substr($serial, 0, strlen(static::$s_prefix)) != static::$s_prefix) {
             return false;
         }
-        return Engine::decode(substr($serial, strlen(self::$s_prefix))) - self::$s_start;
+        return Engine::decode(substr($serial, strlen(static::$s_prefix))) - static::$s_start;
     }
 
     public static function rangeId($serial)
@@ -64,25 +64,25 @@ trait Serial
 
     public static function serialCheck($serial)
     {
-        $id = self::encode_id($serial);
-        if (!$id || ($id + self::$s_start) < self::$s_start || self::$s_end < ($id + self::$s_start)) return false;
+        $id = static::encode_id($serial);
+        if (!$id || ($id + static::$s_start) < static::$s_start || static::$s_end < ($id + static::$s_start)) return false;
         return true;
     }
 
     public static function idCheck($id)
     {
-        if (!$id || ($id + self::$s_start) < self::$s_start || self::$s_end < ($id + self::$s_start)) return false;
+        if (!$id || ($id + static::$s_start) < static::$s_start || static::$s_end < ($id + static::$s_start)) return false;
         return true;
     }
 
     public function getSerialTextAttribute()
     {
-        return self::$s_prefix . '-' . Engine::encode($this->id + self::$s_start);
+        return static::$s_prefix . '-' . Engine::encode($this->id + static::$s_start);
     }
 
     public function resolveRouteBinding($value, $filed = null)
     {
-        $value = self::encode_id($value);
+        $value = static::encode_id($value);
         return parent::resolveRouteBinding($value);
     }
 
