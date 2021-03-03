@@ -13,7 +13,8 @@ trait RequestFilter
     public function requestFilter($request, $model, $parent, $current, $filters, $operators)
     {
         list($filters, $current)  = parent::requestFilter($request, $model, $parent, $current, $filters, $operators);
-        if (!isset($current['parent']) || !$current['parent'] ){
+        $parentSet = $request->has('parent') ? (boolean) $request->parent : true;
+        if ((!isset($current['parent']) || !$current['parent']) && $parentSet){
             $model->where('parent_id', null)->orWhere('parent_id','<=', 0);
         }
         return [$filters, $current];

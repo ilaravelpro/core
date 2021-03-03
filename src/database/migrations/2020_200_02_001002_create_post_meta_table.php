@@ -22,7 +22,7 @@ class CreatePostMetaTable extends Migration
     {
         Schema::create('post_meta', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedInteger('post_id');
+            $table->unsignedBigInteger('post_id');
             $table->foreign('post_id')->references('id')->on('posts');
             $table->string('type')->default('null');
             $table->string('key')->index();

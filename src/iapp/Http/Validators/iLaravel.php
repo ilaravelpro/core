@@ -68,13 +68,25 @@ class iLaravel extends Validator
             $parameters = array_merge($parameters, ['en', 'num']);
         }
         foreach ($parameters as $index => $parameter) {
-            if (in_array($parameter, ['just', 'num']) !== false)
-                $string .= iconfig("regex.string.$parameter.low", iconfig("regex.string.$parameter"));
+            if (in_array($parameter, ['just', 'num']) === false)
+                $string .= iconfig("regex.string.lang.$parameter.low", iconfig("regex.string.lang.$parameter"));
         }
         if (in_array('num', $parameters) !== false){
             $string .= '0-9';
         }
         $regex = "/^[ {$string}]+(?:-[ {$string}]+)*$/";
+        return $this->validateRegex($attribute, $value, [$regex]);
+    }
+
+    public function validateTld($attribute, $value, $parameters, $validator)
+    {
+        $regex = "/^\w+(\.\w+)*$/";
+        return $this->validateRegex($attribute, $value, [$regex]);
+    }
+
+    public function validateInputRegex($attribute, $value, $parameters, $validator)
+    {
+        $regex = "/^((?:(?:[^?+*{}()[\]\\|]+|\\.|\[(?:\^?\\.|\^[^\\]|[^\\^])(?:[^\]\\]+|\\.)*\]|\((?:\?[:=!]|\?<[=!]|\?>)?(?1)??\)|\(\?(?:R|[+-]?\d+)\))(?:(?:[?+*]|\{\d+(?:,\d*)?\})[?+]?)?|\|)*)$/";
         return $this->validateRegex($attribute, $value, [$regex]);
     }
 }

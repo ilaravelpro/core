@@ -22,9 +22,9 @@ class CreatePostsTable extends Migration
     {
         Schema::create('posts', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedInteger('creator_id')->nullable();
-            $table->foreign('creator_id')->references('id')->on('creator_id');
-            $table->unsignedInteger('parent_id')->nullable();
+            $table->unsignedBigInteger('creator_id')->nullable();
+            $table->foreign('creator_id')->references('id')->on('users');
+            $table->unsignedBigInteger('parent_id')->nullable();
             $table->foreign('parent_id')->references('id')->on('posts');
             $table->string('title')->nullable();
             $table->string('slug')->nullable()->unique();

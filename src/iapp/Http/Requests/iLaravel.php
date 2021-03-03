@@ -38,7 +38,7 @@ class iLaravel extends FormRequest
     {
         $fields = ['country', 'number'];
         foreach ($data as $key => $value) {
-            if (in_array($key, $fields) && $this->has($key)) {
+            if (in_array($key, $fields) && $this->has($key) && !is_json($this->$key) && !is_array($this->$key)) {
                 $data[$key] = $this->numberial($this->$key) ?: null;
             }
         }

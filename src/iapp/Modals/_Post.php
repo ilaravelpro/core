@@ -45,12 +45,12 @@ class _Post extends Model
                 $rules = ["creator_id" => "required|exists:users,id"];
             case 'update':
                 $rules = array_merge($rules, [
-                    'parent_id' => "nullable|exits:terms,id",
+                    'parent_id' => "nullable|exists:terms,id",
                     'title' => "required|string",
                     'slug' => 'nullable|slug',
                     'content' => 'nullable|string',
                     'summary' => 'nullable|string',
-                    'type' => 'nullable|exits:types,name',
+                    'type' => 'nullable|exists:types,name',
                     'order' => "required|numeric|min:0",
                     'published_at' => "nullable|date_format:Y-m-d H:i:s",
                     'status' => 'nullable|in:' . join(iconfig('status.posts', iconfig('status.global')), ','),

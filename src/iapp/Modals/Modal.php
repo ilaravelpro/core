@@ -66,6 +66,11 @@ trait Modal
         return \DB::getSchemaBuilder()->getColumnListing(with(new static)->getTable());
     }
 
+    public static function hasTableColumn(string $column)
+    {
+        return method_exists(self::class, 'getTable') ? \Schema::hasColumn(self::getTable(), $column) : false;
+    }
+
     public static function getRules($request, $action, $item = null, ...$args) {
         $model = new static();
         return method_exists($model, 'rules') ? $model->rules($request, $action, $item, ...$args) : [];

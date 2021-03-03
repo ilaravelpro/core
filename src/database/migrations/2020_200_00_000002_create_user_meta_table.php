@@ -22,11 +22,11 @@ class CreateUserMetaTable extends Migration
     {
         Schema::create('user_meta', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedInteger('user_id');
+            $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
             $table->string('type')->default('null');
             $table->string('key')->index();
-            $table->text('value')->nullable();
+            $table->longText('value')->nullable();
             $table->timestamps();
         });
     }

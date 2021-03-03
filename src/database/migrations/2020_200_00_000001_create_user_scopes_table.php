@@ -22,7 +22,7 @@ class CreateUserScopesTable extends Migration
     {
         Schema::create('user_scopes', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedInteger('user_id');
+            $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
 			$table->string('scope');
 			$table->boolean('can');

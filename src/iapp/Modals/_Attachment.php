@@ -15,11 +15,9 @@ use iLaravel\Core\iApp\PostMeta;
 
 class _Attachment extends Model
 {
-    use \iLaravel\Core\iApp\Methods\Metable;
-
     protected $guarded = ['id'];
 
-    public static $s_prefix = 'IF';
+    public static $s_prefix = 'IA';
     public static $s_start = 729000000;
     public static $s_end = 21869999999;
 
@@ -30,9 +28,6 @@ class _Attachment extends Model
     ];
     protected $table = 'posts';
 
-    public $metaClass = PostMeta::class;
-    public $metaTable = 'post_meta';
-
     public $size_max = 102400;
     public $mimes = 'jpeg,jpg,png,gif,zip,pdf';
 
@@ -40,12 +35,12 @@ class _Attachment extends Model
     {
         parent::boot();
         parent::saving(function (self $event) {
+            unset($event->file);
             $event->type = 'attachment';
             if (!$event->status)
                 $event->status = 'publish';
             if ($event->status == 'publish' && !$event->published_at)
                 $event->published_at = Carbon::now()->timestamp;
-
         });
         parent::deleted(function (self $event) {
             if ($event->type == 'attachment') {
@@ -58,7 +53,7 @@ class _Attachment extends Model
 
     public function attachments()
     {
-        return $this->hasMany(imodal('File'));
+        return $this->hasMany(imodal('File'), 'post_id');
     }
 
     public function creator()

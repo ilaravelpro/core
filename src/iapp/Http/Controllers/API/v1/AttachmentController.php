@@ -23,5 +23,6 @@ class AttachmentController extends Controller
         Attachment\Store,
         Update,
         Destroy,
-        Attachment\Filters;
+        Attachment\Filters,
+        Attachment\RequestData;
 }

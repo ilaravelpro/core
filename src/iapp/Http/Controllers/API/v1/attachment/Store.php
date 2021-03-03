@@ -20,6 +20,7 @@ trait Store
     {
         \DB::beginTransaction();
         $request->request->remove('file');
+        $request->merge(['creator_id' => auth()->id()]);
         $post_record = $this->_store(new Request($request->all()));
         $slug = "/attachments/$post_record->serial". ($post_record->title ? '_'. $post_record->title : '');
         $post_record->resource->slug = $slug;
