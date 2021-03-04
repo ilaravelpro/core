@@ -64,7 +64,7 @@ function handel_fields($except, $fields, $requestArray) {
             $efield = array_filter(explode('.*', $field),function ($fi) { return $fi;});
             $bfield = $efield[0];
             unset($efield[0]);
-            if (_get_value($requestArray, $bfield)){
+            if (_get_value($requestArray, $bfield) && is_array(_get_value($requestArray, $bfield))){
                 $fieldChild = [];
                 foreach (_get_value($requestArray, $bfield) as $i => $item) {
                     $fieldChild[$i] = "$bfield.$i";

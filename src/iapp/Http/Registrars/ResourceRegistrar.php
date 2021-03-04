@@ -62,7 +62,6 @@ class ResourceRegistrar extends OriginalRegistrar
     protected function getResourceAction($resource, $controller, $method, $options)
     {
         $name = $this->getResourceRouteName($resource, $method, $options);
-
         $action = ['as' => $name, 'uses' => $controller.'@'.$method, 'method' => $method];
 
         if (isset($options['middleware'])) {

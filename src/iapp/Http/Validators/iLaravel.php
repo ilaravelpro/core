@@ -80,13 +80,19 @@ class iLaravel extends Validator
 
     public function validateTld($attribute, $value, $parameters, $validator)
     {
-        $regex = "/^\w+(\.\w+)*$/";
+        $regex = '/^(\.?)\w+(\.\w+)*$/';
         return $this->validateRegex($attribute, $value, [$regex]);
     }
 
     public function validateInputRegex($attribute, $value, $parameters, $validator)
     {
-        $regex = "/^((?:(?:[^?+*{}()[\]\\|]+|\\.|\[(?:\^?\\.|\^[^\\]|[^\\^])(?:[^\]\\]+|\\.)*\]|\((?:\?[:=!]|\?<[=!]|\?>)?(?1)??\)|\(\?(?:R|[+-]?\d+)\))(?:(?:[?+*]|\{\d+(?:,\d*)?\})[?+]?)?|\|)*)$/";
+        $regex = '/^((?:(?:[^?+*{}()[\]\\\\|]+|\\\\.|\[(?:\^?\\\\.|\^[^\\\\]|[^\\\\^])(?:[^\]\\\\]+|\\\\.)*\]|\((?:\?[:=!]|\?<[=!]|\?>)?(?1)??\)|\(\?(?:R|[+-]?\d+)\))(?:(?:[?+*]|\{\d+(?:,\d*)?\})[?+]?)?|\|)*)$/';
+        return $this->validateRegex($attribute, $value, [$regex]);
+    }
+
+    public function validateFormatInput($attribute, $value, $parameters, $validator)
+    {
+        $regex = "/^[A-Za-z0-9\-\|\@\#\ \(\)]*$/";
         return $this->validateRegex($attribute, $value, [$regex]);
     }
 }

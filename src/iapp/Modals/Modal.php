@@ -68,7 +68,7 @@ trait Modal
 
     public static function hasTableColumn(string $column)
     {
-        return method_exists(self::class, 'getTable') ? \Schema::hasColumn(self::getTable(), $column) : false;
+        return method_exists(static::class, 'getTable') ? \Schema::hasColumn(with(new static)->getTable(), $column) : false;
     }
 
     public static function getRules($request, $action, $item = null, ...$args) {
