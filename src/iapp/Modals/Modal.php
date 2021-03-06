@@ -8,8 +8,8 @@
  */
 
 namespace iLaravel\Core\iApp\Modals;
+use iLaravel\Core\iApp\Http\Requests\iLaravel as Request;
 
-use iLaravel\Core\iApp\Post;
 use Illuminate\Support\Facades\DB;
 
 trait Modal
@@ -76,10 +76,10 @@ trait Modal
         return method_exists($model, 'rules') ? $model->rules($request, $action, $item, ...$args) : [];
     }
 
-    public function getAdditional($request = null) {
-        if (!$request) $request = request();
-        $rules = method_exists($this, 'rules') ? $this->rules($request, 'additional', $this) : [];
-        if (!count($rules)) return $request->all();
+    public function getAdditional(Request $request = null, $action = 'additional') {
+        if (!$request) $request = new Request(request()->all());
+        $rules = method_exists($this, 'rules') ? $this->rules($request, $action, $this) : [];
+        if (!count($rules)) return [];
         $fields = handel_fields([], array_keys($rules), $request->all());
         $data = [];
         foreach ($fields as $value)

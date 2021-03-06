@@ -9,6 +9,7 @@
 
 namespace iLaravel\Core\iApp\Http\Resources;
 
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Gate;
 
@@ -43,7 +44,7 @@ class Resource extends JsonResource
                 if ($this->$item) $data = insert_into_array($data, $item.'_id', $item, File::collection($this->$item));
                 unset($data[$item.'_id']);
             }
-        if (isset($data['id']) && method_exists($request, 'route')) {
+        if (isset($data['id']) && method_exists($request, 'route') && !request()->has('no_actions')) {
             if (!$this->route_src){
                 $this->route_src = $request->route()->getAction('as');
                 $aAaction = explode('.', $this->route_src);
@@ -60,4 +61,5 @@ class Resource extends JsonResource
         }
         return $data;
     }
+
 }
