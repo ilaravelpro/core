@@ -15,10 +15,12 @@ class File extends JsonResource
     public function toArray($request)
     {
         $file = explode('/', $this->slug);
+        $model = imodal('Attachment');
         return [
             'id' => $this->serial,
             'file_name' => last($file),
             'slug' => $this->slug,
+            'attachment' => $model::serial($this->post_id),
             'url' => $this->url,
             'type' => $this->type,
             'mime' => $this->mime,
