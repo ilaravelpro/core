@@ -44,7 +44,7 @@ class Resource extends JsonResource
                 if ($this->$item) $data = insert_into_array($data, $item.'_id', $item, File::collection($this->$item));
                 unset($data[$item.'_id']);
             }
-        if (isset($data['id']) && method_exists($request, 'route') && !request()->has('no_actions')) {
+        if (isset($data['id']) && method_exists($request, 'route') && !request()->has('no_actions') && $request->route()) {
             if (!$this->route_src){
                 $this->route_src = $request->route()->getAction('as');
                 $aAaction = explode('.', $this->route_src);

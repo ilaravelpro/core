@@ -15,6 +15,7 @@ $plugins = [
     'iLogs',
     'iLocation',
     'iAWC',
+    'iWX',
     'ICAO',
     'iOpenAip',
     'iPost',

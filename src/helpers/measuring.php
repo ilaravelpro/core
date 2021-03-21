@@ -91,7 +91,7 @@ function _pa_to_alt($num, $h = false) {
     return (pow(10,log10($num / 1013.25) / 5.2558797) - 1)/ (-6.8755856*pow(10,-6));
 }
 
-function _alt_to_pa($num, $h = true) {
+function _alt_to_pa($num, $h = false) {
     $calc = 1013.25 * pow((1 - 6.87535 * pow(10,-6) * $num), 5.2561);
-    return $h ? $calc : $calc * 1000;
+    return $h ? $calc : $calc * 100;
 }

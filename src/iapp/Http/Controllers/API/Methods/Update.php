@@ -49,9 +49,10 @@ trait Update
         }
         else
         {
-            $rules = method_exists($this, 'rules') ? $this->rules($request, 'update', $parent, ...$args) : $this->model::getRules($request, 'update', $parent, ...$args);
+            $args2 = $parent ? array_merge([$parent], $args): $args;
+            $rules = method_exists($this, 'rules') ? $this->rules($request, 'update', ...$args2) : $this->model::getRules($request, 'update', ...$args2);
             $fields = $this->fillable('update') ?: array_keys($rules);
-            $except = method_exists($this, 'except') ? $this->except($request, 'update', ...$args) : [];
+            $except = method_exists($this, 'except') ? $this->except($request, 'update', ...$args2) : [];
             $changed = [];
             $original = [];
             $requestArray = $request->toArray();

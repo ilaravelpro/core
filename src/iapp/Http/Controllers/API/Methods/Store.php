@@ -72,9 +72,10 @@ trait Store
         if (method_exists($this, 'fields')) {
             $data = $this->fields($request, 'store', $parent, ...$args);
         } else {
-            $rules = method_exists($this, 'rules') ? $this->rules($request, 'store', $parent, ...$args) : $this->model::getRules($request, 'store', $parent, ...$args);
+            $args2 = $parent ? array_merge([$parent], $args): $args;
+            $rules = method_exists($this, 'rules') ? $this->rules($request, 'store', ...$args2) : $this->model::getRules($request, 'store', ...$args2);
             $fields = $this->fillable('store') ?: array_keys($rules);
-            $except = method_exists($this, 'except') ? $this->except($request, 'store', $parent, ...$args) : [];
+            $except = method_exists($this, 'except') ? $this->except($request, 'store', ...$args2) : [];
             $requestArray = $request->toArray();
             $fields = $this->handelFields($except, $fields, $requestArray);
             foreach ($fields as $value) {
