@@ -19,6 +19,7 @@ $plugins = [
     'ICAO',
     'iOpenAip',
     'iPost',
+    'iProduct',
 ];
 
 ?>
