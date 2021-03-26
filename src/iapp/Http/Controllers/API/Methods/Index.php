@@ -62,7 +62,7 @@ trait Index
         list($filters, $current_filter) = $this->requestFilter($request, $model, $parent, $current_filter, $filters, $operators);
         if ($request->q) {
             $this->searchQ($request, $model, $parent);
-            $current['q'] = $request->q;
+            $current_filter['q'] = $request->q;
         }
         if ((isset($this->statusFilter) ? $this->statusFilter : true) && method_exists($model, 'getModel') && \Schema::hasColumn($model->getModel()->getTable(), 'status')){
             $statuses = iconfig("status.{$model->getModel()->getTable()}", iconfig("status.global"));
@@ -112,7 +112,6 @@ trait Index
         if (method_exists($model, 'appends') && $current_filter) {
             $model->appends($request->all(...array_keys($current_filter)));
         }
-
         return [$parent, $model, $order_list, $current_order, $default_order, $filters, $current_filter, $operators];
     }
 

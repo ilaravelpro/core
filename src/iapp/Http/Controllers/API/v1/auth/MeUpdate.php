@@ -44,6 +44,6 @@ trait MeUpdate
         }
         $this->statusMessage = "Profile changed";
         $user->update($update);
-        return $user;
+        return new $this->resourceClass($user);
     }
 }

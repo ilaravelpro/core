@@ -19,12 +19,19 @@ trait SearchQ
         $id = $parent_id = null;
         if ($id = $this->model::id($q)) $q = $id;
         if (!$id && isset($this->parentModel) && $this->parentModel && $parent_id = $this->parentModel::id($q)) $q = $parent_id;
-        $model->where(function ($query) use ($q, $id, $parent_id) {
-            foreach ($this->model::getTableColumns() as $column)
+        $first = false;
+        $model->where(function ($query) use ($q, $id, $parent_id, $first) {
+            foreach ($this->model::getTableColumns() as $index => $column)
                 if (in_array($column, ['id', 'parent']))
                     $query->where($column, $q);
-                elseif (!$id && !$parent_id)
-                    $query->orWhere($column, 'LIKE', "%$q%");
+                elseif (!$id && !$parent_id){
+                    if ($first || (($id || $parent_id) && !$first))
+                        $query->orWhere($column, 'LIKE', "%$q%");
+                    else{
+                        $first = true;
+                        $query->where($column, 'LIKE', "%$q%");
+                    }
+                }
             return $query;
         });
     }

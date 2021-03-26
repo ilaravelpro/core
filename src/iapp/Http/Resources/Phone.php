@@ -15,7 +15,7 @@ class Phone extends Resource
         $data = parent::toArray($request);
         if ($this->model && $model = imodal($this->model))
             $this->model_id = $model::serial($this->model_id);
-        $data['number'] = (isset($data['prefix']) ? $data['prefix']:''). $data['number'];
+        if($this->type == 'type') $data['number'] = (isset($data['prefix']) ? $data['prefix']:''). $data['number'];
         if (isset($data['pivot']))
             unset($data['actions']);
         unset($data['pivot']);

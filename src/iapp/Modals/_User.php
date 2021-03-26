@@ -38,6 +38,7 @@ class _User extends Authenticatable
     public $metaClass = UserMeta::class;
     public $metaTable = 'user_meta';
     public $metaExplodes = ['email', 'mobile'];
+    public $hideMeta = true;
     public $_mobile = [];
     public $_email = [];
     public $files = ['avatar'];

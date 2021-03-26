@@ -25,6 +25,7 @@ class User extends Resource
             ];
         }
         unset($data['tokens']);
+        unset($data['metas']);
         return $data;
     }
 
