@@ -13,8 +13,9 @@ use Illuminate\Http\Request;
 
 trait Update
 {
-    public function _update(Request $request, $arg1, $arg2 = null, $arg3 = null)
+    public function _update(Request $request, $arg1, $arg2 = null, $arg3 = null, $arg4 = null)
     {
+        if (!$arg4) $arg4 = 'update';
         $callback = null;
         if($arg2 instanceof \Closure)
         {
@@ -31,8 +32,8 @@ trait Update
             array_unshift($args, $parent);
         }
         if (method_exists($this, 'fields')) {
-            $fields = $this->fields($request, 'update', $parent, ...$args);
-            $except = method_exists($this, 'except') ? $this->except($request, 'update', ...$args) : [];
+            $fields = $this->fields($request, $arg4, $parent, ...$args);
+            $except = method_exists($this, 'except') ? $this->except($request, $arg4, ...$args) : [];
             foreach ($except as $value) {
                 if (isset($fields[$value])) {
                     unset($fields[$value]);
@@ -50,9 +51,9 @@ trait Update
         else
         {
             $args2 = $parent ? array_merge([$parent], $args): $args;
-            $rules = method_exists($this, 'rules') ? $this->rules($request, 'update', ...$args2) : $this->model::getRules($request, 'update', ...$args2);
-            $fields = $this->fillable('update') ?: array_keys($rules);
-            $except = method_exists($this, 'except') ? $this->except($request, 'update', ...$args2) : [];
+            $rules = method_exists($this, 'rules') ? $this->rules($request, $arg4, ...$args2) : $this->model::getRules($request, $arg4, ...$args2);
+            $fields = $this->fillable($arg4) ?: array_keys($rules);
+            $except = method_exists($this, 'except') ? $this->except($request, $arg4, ...$args2) : [];
             $changed = [];
             $original = [];
             $requestArray = $request->toArray();

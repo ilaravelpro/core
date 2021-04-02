@@ -8,6 +8,7 @@
  */
 
 function format_datetime($datetime, $format, $attr) {
+    if (!$datetime) return $datetime;
     if (request('format'))
         if (is_array(request('format')) || is_json(request('format'))){
             $format = is_json(request('format')) ? array_merge(json_decode(request('format')), $format) : array_merge(request('format'), $format);
