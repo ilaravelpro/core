@@ -17,6 +17,7 @@ class Resource extends JsonResource
 {
     public $route_action = null;
     public $route_src = null;
+    public $c_serial = null;
 
     public function toArray($request)
     {
@@ -55,7 +56,7 @@ class Resource extends JsonResource
             $actions = [];
             foreach (iconfig('scopes.' . $this->route_src . '.items', []) as $index => $item) {
                 $item = str_replace(['edit', 'destroy'], ['update', 'delete'], is_integer($index) ? $item : $index);
-                $actions[$item] = Gate::allows($this->route_src.".".$item, [$this->serial]);
+                $actions[$item] = Gate::allows($this->route_src.".".$item, [$this->c_serial ? : $this->serial]);
             }
             if (count($actions))$data['actions'] = $actions;
         }
