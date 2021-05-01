@@ -59,6 +59,8 @@ trait Index
         list($filters, $current_filter, $operators) = [null, null, iconfig('database.operators')];
         if (method_exists($this, 'filters'))
             list($filters, $current_filter) = $this->filters($request, $model, $parent, $operators);
+        if (method_exists($this->model, 'filters'))
+            list($filters, $current_filter) = $this->model::filters($request, $model, $parent, $operators, $filters, $current_filter);
         list($filters, $current_filter) = $this->requestFilter($request, $model, $parent, $current_filter, $filters, $operators);
         if ($request->q) {
             $this->searchQ($request, $model, $parent);

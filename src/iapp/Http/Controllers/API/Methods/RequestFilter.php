@@ -15,6 +15,7 @@ trait RequestFilter
 {
     public function requestFilter(Request $request, $model, $parent, $current, $filters, $operators){
         $req_filters = $request->filters && is_array($request->filters) && count($request->filters) ? $request->filters : ($request->filter ? [$request->filter] : []);
+
         foreach ($req_filters as $index => $filter) {
             $filter = is_array($filter) ? (object)$filter : (object)json_decode($filter);
             $ftype = isset($filter->type) && in_array($filter->type, array_column($filters, 'name')) ? $filter->type : 'all';
@@ -48,7 +49,7 @@ trait RequestFilter
                         if (method_exists($this, 'query_filter_type'))
                             $current = $this->query_filter_type($model, $filter, (object)['value' =>  $filter->value, 'type' => $ftype, 'symbol' => $fsymbol], $current, $filters);
                         if (!isset($current[$ftype]) && $filter->value)
-                            $model->where($ftype, $fsymbol , $filter->value);
+                            $model->whereRaw("$ftype $fsymbol '{$filter->value}'");
                         break;
                 }
             $current[_get_value((array)$filter, 'type')] = _get_value((array)$filter, 'value');
