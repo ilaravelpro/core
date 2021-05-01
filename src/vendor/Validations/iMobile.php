@@ -12,6 +12,7 @@ class iMobile {
 
     public static function parse($value, $parameters = null)
     {
+        $value = array_filter($value, 'strlen');
         if(!preg_match("#^\+?\d+#", $value))
         {
             return false;

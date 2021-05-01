@@ -95,3 +95,23 @@ function _alt_to_pa($num, $h = false) {
     $calc = 1013.25 * pow((1 - 6.87535 * pow(10,-6) * $num), 5.2561);
     return $h ? $calc : $calc * 100;
 }
+
+function WGS84LL($longitude, $latitude, $nordsud = 1, $estouest = 1)
+{
+    $lat_degrees = (float) _get_value($latitude, '0', 0);
+    $lat_minutes = (float) _get_value($latitude, '1', 0);
+    $lat_minutes = $lat_minutes ? $lat_minutes / 60 : $lat_minutes;
+    $lat_seconds = (float) _get_value($latitude, '2', 0);
+    $lat_seconds = $lat_seconds ? $lat_seconds / 3600 : $lat_seconds;
+
+    $lng_degrees = (float) _get_value($longitude, '0', 0);
+    $lng_minutes = (float) _get_value($longitude, '1', 0);
+    $lng_minutes = $lng_minutes ? $lng_minutes / 60 : $lng_minutes;
+    $lng_seconds = (float) _get_value($longitude, '2', 0);
+    $lng_seconds = $lng_seconds ? $lng_seconds / 3600 : $lng_seconds;
+
+    $lat = $nordsud * ($lat_degrees + $lat_minutes + $lat_seconds);
+    $lng = $estouest * ($lng_degrees + $lng_minutes + $lng_seconds);
+    return [round(round($lat*10000000)/10000000, 6), round($lng, 6)];
+}
+
