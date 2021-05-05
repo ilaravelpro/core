@@ -96,7 +96,7 @@ function _alt_to_pa($num, $h = false) {
     return $h ? $calc : $calc * 100;
 }
 
-function WGS84LL($longitude, $latitude, $nordsud = 1, $estouest = 1)
+function WGS84Lat($latitude, $nordsud = 1)
 {
     $lat_degrees = (float) _get_value($latitude, '0', 0);
     $lat_minutes = (float) _get_value($latitude, '1', 0);
@@ -104,14 +104,23 @@ function WGS84LL($longitude, $latitude, $nordsud = 1, $estouest = 1)
     $lat_seconds = (float) _get_value($latitude, '2', 0);
     $lat_seconds = $lat_seconds ? $lat_seconds / 3600 : $lat_seconds;
 
+    $lat = $nordsud * ($lat_degrees + $lat_minutes + $lat_seconds);
+    return round(round($lat*10000000)/10000000, 6);
+}
+
+function WGS84Lng($longitude, $estouest = 1)
+{
     $lng_degrees = (float) _get_value($longitude, '0', 0);
     $lng_minutes = (float) _get_value($longitude, '1', 0);
     $lng_minutes = $lng_minutes ? $lng_minutes / 60 : $lng_minutes;
     $lng_seconds = (float) _get_value($longitude, '2', 0);
     $lng_seconds = $lng_seconds ? $lng_seconds / 3600 : $lng_seconds;
 
-    $lat = $nordsud * ($lat_degrees + $lat_minutes + $lat_seconds);
     $lng = $estouest * ($lng_degrees + $lng_minutes + $lng_seconds);
-    return [round(round($lat*10000000)/10000000, 6), round($lng, 6)];
+    return round($lng, 6);
 }
 
+function WGS84LL($longitude, $latitude, $nordsud = 1, $estouest = 1)
+{
+    return [WGS84Lat($latitude, $nordsud), WGS84Lng($longitude, $estouest)];
+}
