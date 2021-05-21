@@ -18,6 +18,7 @@ trait Modal
         \iLaravel\Core\iApp\Methods\Data;
 
 
+    public $eagerLoad = [];
     public static function statusList()
     {
         $status = iconfig('status.' . (new self())->getTable());

@@ -34,6 +34,11 @@ $database = [
             'value' => 'less',
             'symbol' => '<',
         ],
+        [
+            'text' => '%like%',
+            'value' => 'like_any',
+            'symbol' => 'like_any',
+        ],
     ],
 ];
 ?>

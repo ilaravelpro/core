@@ -54,7 +54,6 @@ class _Role extends Model
         $rules = [];
         switch ($action) {
             case 'store':
-                $rules = ["creator_id" => "required|exists:users,id"];
             case 'update':
                 $rules = array_merge($rules, [
                     'title' => 'required|min:3',

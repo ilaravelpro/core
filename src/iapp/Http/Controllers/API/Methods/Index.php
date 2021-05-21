@@ -11,6 +11,7 @@ namespace iLaravel\Core\iApp\Http\Controllers\API\Methods;
 
 use iLaravel\Core\Vendor\iRole\iRole;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 trait Index
 {
@@ -30,6 +31,10 @@ trait Index
         if (!isset($additional['meta'])) {
             $additional['meta'] = [];
         }
+
+        if (isset($this->disablePagination))
+            $additional['meta']['total'] = $result->count();
+
         $additional['meta']['orders'] = [
             'allowed' => $order_list ?: [],
             'current' => $current_order ?: [],
@@ -50,12 +55,13 @@ trait Index
         if (method_exists($this, 'queryIndex')) {
             list($parent, $model) = $this->queryIndex($request, $parent);
         } elseif ($parent) {
-            $model = $this->model::select('*');
+            $model = $this->model::setEagerLoads([])->select('*');
             $parent = $this->findOrFail($parent, $this->parentController);
         } else {
-            $model = $this->model::select('*');
+            $model = $this->model::setEagerLoads([])->select('*');
             $parent = null;
         }
+
         list($filters, $current_filter, $operators) = [null, null, iconfig('database.operators')];
         if (method_exists($this, 'filters'))
             list($filters, $current_filter) = $this->filters($request, $model, $parent, $operators);
@@ -168,6 +174,7 @@ trait Index
         }
         if (isset($this->disablePagination)) {
             $paginate = $model->get();
+            //$paginate = new LengthAwarePaginator($paginate, $paginate->count(), $paginate->count());
         } else {
             if (isset($model->emptyModel) && $model->emptyModel === true) {
                 $model->limit(0);

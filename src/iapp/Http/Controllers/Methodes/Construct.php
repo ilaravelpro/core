@@ -58,5 +58,8 @@ trait Construct
                 if (!class_exists($this->parentResourceDataCollectionClass)) $this->parentResourceDataCollectionClass = iresource('ResourceData');
             }
         }
+        if ($request->format && is_string($request->format) && in_array($request->format, ['gjson', 'geojson'])) {
+            $this->disablePagination = true;
+        }
     }
 }

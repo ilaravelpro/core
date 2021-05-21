@@ -48,8 +48,16 @@ trait RequestFilter
                     default:
                         if (method_exists($this, 'query_filter_type'))
                             $current = $this->query_filter_type($model, $filter, (object)['value' =>  $filter->value, 'type' => $ftype, 'symbol' => $fsymbol], $current, $filters);
-                        if (!isset($current[$ftype]) && $filter->value)
-                            $model->whereRaw("$ftype $fsymbol '{$filter->value}'");
+                        if (!isset($current[$ftype]) && $filter->value) {
+                            switch ($fsymbol) {
+                                case 'like_any':
+                                    $model->whereRaw("$ftype like '%{$filter->value}%'");
+                                    break;
+                                default:
+                                    $model->whereRaw("$ftype $fsymbol '{$filter->value}'");
+                                    break;
+                            }
+                        }
                         break;
                 }
             $current[_get_value((array)$filter, 'type')] = _get_value((array)$filter, 'value');
