@@ -21,6 +21,11 @@ trait Store
             $request->merge(['password' => Hash::make($request->password)]);
         }
         $store = $this->_store($request);
-        return $store;
+        $record = $store->resource;
+        if ($request->has('email'))
+            $record->saveEmail($request->email);
+        if ($request->has('mobile'))
+            $record->saveMobile($request->mobile);
+        return $this->resultStore($request, $record);
     }
 }

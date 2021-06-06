@@ -31,7 +31,7 @@ class Scopes
         unset($configScopes['global']);
         foreach ($configScopes as $key => $section) {
             $positions[$key] = [
-                'title' => $section['title'],
+                'title' => _t($section['title']),
                 'name' => $key,
             ];
             foreach ($section['items'] as $skey => $scope) {
@@ -41,7 +41,7 @@ class Scopes
                     $positions[$key]['scopes'][] = [
                         'id' => $smodel ? $smodel->serial : null,
                         'parent_id' => $parent->serial,
-                        'title' => (is_string($skey) ? ucfirst($skey) . " " : '') . ucfirst($jscope),
+                        'title' => _t((is_string($skey) ? ucfirst($skey) . " " : '') . ucfirst($jscope)),
                         'scope' =>  "$key.".(is_string($skey) ? "$skey.": '') .$jscope,
                         'can' => $smodel ? $smodel->can : 0
                     ];

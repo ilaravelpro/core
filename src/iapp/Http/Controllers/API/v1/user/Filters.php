@@ -19,20 +19,14 @@ trait Filters
         $roles = $roles::select('title as text', 'name as value')->get()->toArray();
         if (in_array(auth()->user()->role, ipreference('admins', ['admin'])))
             $roles = array_merge([
-                ['text' => 'Admin',
-                    'value' => 'admin']
+                ['text' => _t('admin'),
+                    'value' => 'admin'],
             ], $roles);
         $filters = [
             [
                 'name' => 'all',
                 'title' => _t('all'),
                 'type' => 'text',
-            ],
-            [
-                'name' => 'status',
-                'title' => _t('status'),
-                'type' => 'select',
-                'items' => iconfig('status.users', ['awaiting', 'active', 'disable'])
             ],
             [
                 'name' => 'role',
@@ -44,7 +38,16 @@ trait Filters
                 'name' => 'gender',
                 'title' => _t('gender'),
                 'type' => 'select',
-                'items' => ['male', 'female']
+                'items' => [
+                    [
+                        'text' => _t('male'),
+                        'value' => 'male'
+                    ],
+                    [
+                        'text' => _t('female'),
+                        'value' => 'female'
+                    ]
+                ]
             ],
             [
                 'name' => 'username',

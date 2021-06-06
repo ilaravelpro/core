@@ -47,8 +47,8 @@ class ChangeUsersTable extends Migration
             $table->string('website')->nullable()->after('country');
             $table->string('lang')->nullable()->default('en')->after('website');
 
-            $table->string('role')->default('user')->after('mobile'); // ['guest', 'user', 'admin']
-            $table->string('log')->nullable()->after('meta');
+            $table->string('role')->default('user')->after('lang'); // ['guest', 'user', 'admin']
+            $table->string('log')->nullable()->after('role');
             $table->string('status')->default('active')->after('log'); // ['waiting', 'active', 'block']
         });
     }

@@ -71,54 +71,61 @@ class _User extends Authenticatable
             $event->saveFiles($event->files, request());
         });
         parent::saved(function (self $event) {
-            if (isset($event->_mobile) && (is_string($event->_mobile) || (is_array($event->_mobile) && count($event->_mobile)))) {
-                $event->_mobile = iPhone::parse($event->_mobile);
-                $event->_mobile = is_array($event->_mobile) ? $event->_mobile : $event->mobile->toArray();
-                unset($event->_mobile['full']);
-                if ($event->_mobile) {
-                    if ($mobile = $event->mobile()->first()) {
-                        foreach ($event->_mobile as $index => $item)
-                            $mobile->$index = $item;
-                        $mobile->verified_at = null;
-                        $mobile->save();
-                    } else {
-                        $event->mobile()->create(array_merge(
-                            [
-                                'model' => 'User',
-                                'model_id' => $event->id,
-                                'key' => 'mobile',
-                            ], $event->_mobile));
-                    }
-                }
-                $event->_mobile = [];
-
-            }
-            if (isset($event->_email) && (is_string($event->_email) || (is_array($event->_email) && count($event->_email)))) {
-                if (!is_string($event->_email)) $event->_email = is_array($event->_email) ? $event->_email : $event->email->toArray();
-                list($name, $domain) = is_string($event->_email) ? explode('@', $event->_email) : [_get_value($event->_email, 'name'), _get_value($event->_email, 'domain')];
-                if ($email = $event->email()->first()) {
-                    if (($has_name = $name && $email->name != $name) || ($has_domain = $domain && $email->domain != $domain)) {
-                        if (isset($has_name) && $has_name) $email->name = $name;
-                        if (isset($has_domain) && $has_domain) $email->domain = $domain;
-                        $email->verified_at = null;
-                        $email->save();
-                    }
-                } else {
-                    $event->email()->create([
-                        'model' => 'User',
-                        'model_id' => $event->id,
-                        'key' => 'email',
-                        'name' => $name,
-                        'domain' => $domain
-                    ]);
-                }
-                $event->_email = [];
-            }
+            $event->saveMobile($event->_mobile)->saveEmail($event->_email);
+            $event->_mobile = [];
+            $event->_email = [];
         });
         static::deleted(function (self $event) {
             $event->mobile()->delete();
             $event->email()->delete();
         });
+    }
+
+    public function saveMobile($mobile) {
+        if ($mobile && isset($mobile) && (is_string($mobile) || (is_array($mobile) && count($mobile)))) {
+            $mobile = iPhone::parse($mobile);
+            $mobile = is_array($mobile) ? $mobile : $this->mobile->toArray();
+            unset($mobile['full']);
+            if ($mobile) {
+                if ($mobileModel = $this->mobile()->first()) {
+                    foreach ($mobile as $index => $item)
+                        $mobileModel->$index = $item;
+                    $mobileModel->verified_at = null;
+                    $mobileModel->save();
+                } else {
+                    $this->mobile()->create(array_merge(
+                        [
+                            'model' => 'User',
+                            'model_id' => $this->id,
+                            'key' => 'mobile',
+                        ], $mobile));
+                }
+            }
+        }
+        return $this;
+    }
+
+    public function saveEmail($email) {
+        if ($email && isset($email) && (is_string($email) || (is_array($email) && count($email)))) {
+            if (!is_string($email)) $email = is_array($email) ? $email : $this->email->toArray();
+            list($name, $domain) = is_string($email) ? explode('@', $email) : [_get_value($email, 'name'), _get_value($email, 'domain')];
+            if ($emailModel = $this->email()->first()) {
+                if (($has_name = $name && $emailModel->name != $name) || ($has_domain = $domain && $emailModel->domain != $domain)) {
+                    if (isset($has_name) && $has_name) $emailModel->name = $name;
+                    if (isset($has_domain) && $has_domain) $emailModel->domain = $domain;
+                    $emailModel->verified_at = null;
+                    $emailModel->save();
+                }
+            } else {
+                $this->email()->create([
+                    'model' => 'User',
+                    'model_id' => $this->id,
+                    'key' => 'email',
+                    'name' => $name,
+                    'domain' => $domain
+                ]);
+            }
+        }
     }
 
     public function sendPasswordResetNotification($token)
@@ -208,6 +215,13 @@ class _User extends Authenticatable
             'avatar_file' => 'nullable|mimes:jpeg,jpg,png,gif|max:5120',
         ];
         switch ($action) {
+            case 'login':
+            case 'register':
+                $rules = [
+                    'username' => "required",
+                    'password' => 'required|min:6|password',
+                ];
+                break;
             case 'account':
                 $rules = [
                     'avatar_file' => 'nullable|mimes:jpeg,jpg,png,gif|max:5120',
@@ -240,6 +254,10 @@ class _User extends Authenticatable
                     unset($rules['password']);
                 if ($arg == null || (isset($arg->username) && $arg->username != $request->username)) $rules['username'] .= '|unique:users,username';
                 if ($arg == null || (isset($arg->website) && $arg->website != $request->website)) $rules['website'] .= '|unique:users,website';
+                if ($arg == null || ($arg->mobile && is_array($request->mobile) && $arg->mobile->text != _get_value($request->mobile, 'full', implode('', $request->mobile)))) $rules['mobile'] .= ':unique,User';
+                if ($arg == null || ($arg->email && $arg->email->text != $request->email)) $rules['email'] .= ':unique,User';
+               /* if ($arg == null || ($arg->mobile && is_array($request->mobile) && $arg->mobile->text != implode('', $request->mobile)))
+                    dd($arg->mobile ,$request->mobile);*/
                 break;
             case 'additional':
                 $rules = $additionalRules;

@@ -17,6 +17,11 @@ trait Status
     {
         if ($request->type)
             $type = $request->type;
-        return ['data' => iconfig("status.$type", iconfig("status.global"))];
+        return ['data' => array_map(function ($status) {
+            return [
+                'text' => _t($status),
+                'value' => $status,
+            ];
+        }, iconfig("status.$type", iconfig("status.global")))];
     }
 }

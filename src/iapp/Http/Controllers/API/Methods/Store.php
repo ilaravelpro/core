@@ -42,7 +42,7 @@ trait Store
         return $this->additionalStore($request,$this->resultStore($request, $model, $parent), $parent);
     }
 
-    public function resultStore($request, $model, $parent)
+    public function resultStore($request, $model, $parent = null)
     {
         $model = get_class($model)::findOrFail($model->id);
         return new $this->resourceClass($model);

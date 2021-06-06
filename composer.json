@@ -37,8 +37,8 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
-        "laravel/socialite": "^4.1.4",
-        "laravel/passport": "^7.4",
-        "intervention/image" : "^2.5"
+        "laravel/socialite": "^5.2",
+        "laravel/passport": "^10.1",
+        "intervention/image": "^2.5"
     }
 }

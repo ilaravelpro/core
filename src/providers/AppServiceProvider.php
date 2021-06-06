@@ -39,7 +39,7 @@ class AppServiceProvider extends ServiceProvider
             }
             $this->app->bind(
                 \Illuminate\Contracts\Debug\ExceptionHandler::class,
-                substr($this->app::VERSION, 0, 1) == '7' ? \iLaravel\Core\iApp\Exceptions\ExceptionHandler7::class : \iLaravel\Core\iApp\Exceptions\ExceptionHandler::class
+                substr($this->app::VERSION, 0, 1) >= '7' ? \iLaravel\Core\iApp\Exceptions\ExceptionHandler7::class : \iLaravel\Core\iApp\Exceptions\ExceptionHandler::class
             );
 
         }

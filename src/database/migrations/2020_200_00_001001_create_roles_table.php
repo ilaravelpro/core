@@ -28,6 +28,7 @@ class CreateRolesTable extends Migration
             $table->string('title');
             $table->string('description')->nullable();
             $table->text('meta')->nullable();
+            $table->string('status')->default('active'); // ['waiting', 'active', 'block']
             $table->timestamps();
         });
     }

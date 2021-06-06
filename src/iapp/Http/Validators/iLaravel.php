@@ -55,7 +55,7 @@ class iLaravel extends Validator
         return $this->validateRegex($attribute, $value, $parameters);
     }
 
-    public function validatePassword($attribute, $value, $parameters, $validator)
+    public function validatePassword($attribute, $value, $parameters = null, $validator = null)
     {
         $parameters = ['/^[a-zA-Z0-9._\-!?@#$%&*\/]*$/'];
         return $this->validateRegex($attribute, $value, $parameters);

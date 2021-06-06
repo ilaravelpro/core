@@ -12,6 +12,8 @@ trait Phone
 {
     public function validateMobile($attribute, $value, $parameters, $validator)
     {
+        /*if ($parameters)
+            dd($attribute);*/
         return \iLaravel\Core\Vendor\Validations\iPhone::parse($value, $parameters);
     }
 

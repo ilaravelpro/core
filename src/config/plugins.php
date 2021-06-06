@@ -20,6 +20,7 @@ $plugins = [
     'iOpenAip',
     'iPost',
     'iProduct',
+    'iOrder',
 ];
 
 ?>

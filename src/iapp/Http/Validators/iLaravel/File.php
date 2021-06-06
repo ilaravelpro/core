@@ -15,4 +15,10 @@ trait File
         if ($this->validateMimes($attribute, $value, $parameters)) return true;
         return in_array($value->getClientOriginalExtension(), $parameters);
     }
+
+    public function validateDataUrl($attribute, $value, $parameters)
+    {
+        $regex = "/^\s*data:(?<media_type>(?<mime_type>[a-z\-]+\/[a-z\-\+]+)(?<params>(;[a-z\-]+\=[a-z\-]+)*))?(?<encoding>;base64)?,(?<data>[a-z0-9\!\$\&\'\,\(\)\*\+\,\;\=\-\.\_\~\:\@\/\?\%\s]*\s*)$/i";
+        return $this->validateRegex($attribute, $value, [$regex]);
+    }
 }

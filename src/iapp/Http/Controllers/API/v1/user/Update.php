@@ -17,9 +17,14 @@ trait Update
 {
     public function update(Request $request, $record)
     {
+        $record = $this->model::findBySerial($record);
         if ($request->password) {
             $request->merge(['password' => Hash::make($request->password)]);
         }
+        if ($request->has('email'))
+            $record->_email = $request->email;
+        if ($request->has('mobile'))
+            $record->_mobile = $request->mobile;
         $update = $this->_update($request, $record);
         return $update;
     }

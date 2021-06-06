@@ -16,10 +16,12 @@ include 'finder.php';
 include 'measuring.php';
 include 'math.php';
 
-function _t($trans)
-{
-    return $trans;
-}
+/*if (!function_exists('_t')){
+    function _t($trans)
+    {
+        return $trans;
+    }
+}*/
 
 function random_filename($length, $directory = '', $extension = '')
 {

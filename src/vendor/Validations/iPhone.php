@@ -9,8 +9,10 @@
 namespace iLaravel\Core\Vendor\Validations;
 
 class iPhone {
+
     public static function parse($value, $parameters = null)
     {
+        $model = imodal('Phone');
         if (is_array($value) || is_object($value)){
             $value = (array) $value;
             $number = null;
@@ -26,6 +28,12 @@ class iPhone {
         preg_match($re, $value, $matches);
         $phone = [];
         list($phone['full'], $phone['country'], $phone['prefix'], $phone['number']) = $matches;
+        if ($parameters && is_array($parameters) && in_array('unique', $parameters))
+            return $model::where('model', _get_value($parameters, '1', 'User'))
+                ->where('key', _get_value($parameters, '2', 'mobile'))
+                ->where('country', $phone['country'])
+                ->where('prefix', $phone['prefix'])
+                ->where('number', $phone['number'])->first() ? false : $phone;
         return $phone;
     }
 }
