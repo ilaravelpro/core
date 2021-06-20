@@ -15,6 +15,10 @@ trait Update
 {
     public function _update(Request $request, $arg1, $arg2 = null, $arg3 = null, $arg4 = null)
     {
+        if (method_exists($this, 'before_update'))
+            $this->before_update($request, $arg1, $arg2, $arg3, $arg4);
+        if (method_exists($this, 'before_save'))
+            $this->before_save($request, $arg1, $arg2, $arg3, $arg4);
         if (!$arg4) $arg4 = 'update';
         $callback = null;
         if($arg2 instanceof \Closure)
@@ -81,6 +85,10 @@ trait Update
         {
             $model->update($changed);
         }
+        if (method_exists($this, 'after_update'))
+            $this->after_update($request, $model, $parent);
+        if (method_exists($this, 'after_save'))
+            $this->after_save($request, $model, $parent);
         $result = new $this->resourceClass($model);
         $result->additional([
             'changed' => $original,
@@ -106,6 +114,10 @@ trait Update
         {
             $this->statusMessage = "changed";
         }
+        if (method_exists($this, 'after_updated'))
+            $this->after_updated($request, $model, $parent, $result);
+        if (method_exists($this, 'after_saved'))
+            $this->after_saved($request, $model, $parent, $result);
         return $result;
     }
 

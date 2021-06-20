@@ -46,7 +46,7 @@ function ipreference($key = null, $default = null, $type = 'auto')
         }
     }
     if (in_array($type, ['auto', 'config']))
-        $value = $key ? iconfig('preferences.'.$key, $default) : iconfig('preferences', $default);
+        $value = $key ? iconfig('preferences.'.$key, iconfig($key, $default) ) : iconfig('preferences', $default);
     return $value;
 }
 

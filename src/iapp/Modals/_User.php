@@ -81,8 +81,11 @@ class _User extends Authenticatable
         });
     }
 
-    public function saveMobile($mobile) {
+    public function saveMobile($mobile, $verified_at = null) {
         if ($mobile && isset($mobile) && (is_string($mobile) || (is_array($mobile) && count($mobile)))) {
+            if (is_string($mobile) && strlen($mobile) <= 11) {
+                $mobile = "98". ltrim($mobile, '0');
+            }
             $mobile = iPhone::parse($mobile);
             $mobile = is_array($mobile) ? $mobile : $this->mobile->toArray();
             unset($mobile['full']);
@@ -90,7 +93,7 @@ class _User extends Authenticatable
                 if ($mobileModel = $this->mobile()->first()) {
                     foreach ($mobile as $index => $item)
                         $mobileModel->$index = $item;
-                    $mobileModel->verified_at = null;
+                    $mobileModel->verified_at = $verified_at;
                     $mobileModel->save();
                 } else {
                     $this->mobile()->create(array_merge(
@@ -98,6 +101,7 @@ class _User extends Authenticatable
                             'model' => 'User',
                             'model_id' => $this->id,
                             'key' => 'mobile',
+                            'verified_at' => $verified_at,
                         ], $mobile));
                 }
             }
@@ -105,7 +109,7 @@ class _User extends Authenticatable
         return $this;
     }
 
-    public function saveEmail($email) {
+    public function saveEmail($email, $verified_at = null) {
         if ($email && isset($email) && (is_string($email) || (is_array($email) && count($email)))) {
             if (!is_string($email)) $email = is_array($email) ? $email : $this->email->toArray();
             list($name, $domain) = is_string($email) ? explode('@', $email) : [_get_value($email, 'name'), _get_value($email, 'domain')];
@@ -113,7 +117,7 @@ class _User extends Authenticatable
                 if (($has_name = $name && $emailModel->name != $name) || ($has_domain = $domain && $emailModel->domain != $domain)) {
                     if (isset($has_name) && $has_name) $emailModel->name = $name;
                     if (isset($has_domain) && $has_domain) $emailModel->domain = $domain;
-                    $emailModel->verified_at = null;
+                    $emailModel->verified_at = $verified_at;
                     $emailModel->save();
                 }
             } else {
@@ -122,7 +126,8 @@ class _User extends Authenticatable
                     'model_id' => $this->id,
                     'key' => 'email',
                     'name' => $name,
-                    'domain' => $domain
+                    'domain' => $domain,
+                    'verified_at' => $verified_at,
                 ]);
             }
         }
@@ -184,10 +189,13 @@ class _User extends Authenticatable
 
     public static function guest()
     {
-        return new static([
+        $user = new static([
             'id' => 0,
-            'type' => 'guest'
+            'role' => 'guest',
+            'status' => 'active',
         ]);
+        $user->setAttribute('id', 0);
+        return $user;
     }
 
     public function mobile()
@@ -202,7 +210,7 @@ class _User extends Authenticatable
 
     public static function findTokenID($token)
     {
-        return (new \Lcobucci\JWT\Parser())->parse($token)->getHeader('jti');
+        return (new \Lcobucci\JWT\Parser())->parse($token)->getClaim('jti');
     }
 
     public function revokeAllTokens()
