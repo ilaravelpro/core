@@ -9,6 +9,11 @@
 
 namespace iLaravel\Core\iApp\Exceptions;
 
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Routing\Router;
+use Illuminate\Validation\ValidationException;
 use Throwable;
 use Illuminate\Foundation\Exceptions\Handler;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -40,7 +45,7 @@ class ExceptionHandler7 extends Handler
     /**
      * Report or log an exception.
      *
-     * @param  \Exception  $exception
+     * @param \Exception $exception
      * @return void
      */
     public function report(Throwable $exception)
@@ -50,17 +55,16 @@ class ExceptionHandler7 extends Handler
 
     public function render($request, Throwable $exception)
     {
-        $render = parent::render($request, $exception);
-        $data = (array) $render->getData();
+        $render = $exception instanceof iException ? response()->json(['message' => $exception->getMessage()], 422) : parent::render($request, $exception);
+        $data = (array)$render->getData();
         $data = array_replace_recursive([
             'is_ok' => false,
             'message' => null,
             'message_text' => null,
             'referer' => $request->headers->get('referer')
         ], $data);
-        result_message($data, $data['message'] ?: Response::$statusTexts[$render->getStatusCode()]);
-        if(!config('app.debug'))
-        {
+        result_message($data, $data['message'] ?: Response::$statusTexts[$render->getStatusCode()], method_exists($exception, 'replace_values') ? $exception->replace_values() : null);
+        if (!config('app.debug')) {
             if ($exception instanceof ModelNotFoundException) {
                 result_message($data, str_replace('App\\', '', $exception->getModel()) . ' not found');
             } elseif ($exception instanceof QueryException) {

@@ -15,6 +15,10 @@ trait Store
 {
     public function _store(Request $request, $parent = null, ...$args)
     {
+        if (method_exists($this, 'before_store'))
+            $this->before_store($request, $parent = null, ...$args);
+        if (method_exists($this, 'before_save'))
+            $this->before_save($request, $parent = null, ...$args);
         $callback = null;
         if (last($args) instanceof \Closure) {
             $callback = last($args);
@@ -38,8 +42,16 @@ trait Store
         } else {
             $model = $this->model::create($this->store_data($request, $parent, ...$args));
         }
-
-        return $this->additionalStore($request,$this->resultStore($request, $model, $parent), $parent);
+        if (method_exists($this, 'after_store'))
+            $this->after_store($request, $model, $parent);
+        if (method_exists($this, 'after_save'))
+            $this->after_save($request, $model, $parent);
+        $result = $this->additionalStore($request,$this->resultStore($request, $model, $parent), $parent);
+        if (method_exists($this, 'after_stored'))
+            $this->after_stored($request, $model, $parent, $result);
+        if (method_exists($this, 'after_saved'))
+            $this->after_saved($request, $model, $parent, $result);
+        return $result;
     }
 
     public function resultStore($request, $model, $parent = null)

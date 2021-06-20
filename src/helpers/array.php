@@ -129,3 +129,10 @@ function str_slice() {
     }
     return null;
 }
+
+function _set_values_text($text, $values)
+{
+    $replace_values = array_map(function($replace_value) {return ":{$replace_value}";}, array_keys($values));
+    $text = str_replace($replace_values, array_values($values), $text);
+    return $text;
+}

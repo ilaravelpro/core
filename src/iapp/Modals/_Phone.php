@@ -26,6 +26,9 @@ class _Phone extends Eloquent
 
     public static function findByMobile($mobile, $model = null, $id = null, $key = null)
     {
+        if (strlen($mobile) <= 11) {
+            $mobile = "98". ltrim($mobile, '0');
+        }
         $mobile = iPhone::parse($mobile);
         if (!$mobile) return false;
         unset($mobile['full']);
