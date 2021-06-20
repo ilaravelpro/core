@@ -153,6 +153,11 @@ class _User extends Authenticatable
         return $this->name . " " . $this->family;
     }
 
+    public function getIsAdminAttribute()
+    {
+        return in_array($this->role, ipreference('admins', ['admin']));
+    }
+
     public function scopes()
     {
         return $this->hasMany(imodal('UserScope'));
@@ -254,10 +259,8 @@ class _User extends Authenticatable
                     unset($rules['password']);
                 if ($arg == null || (isset($arg->username) && $arg->username != $request->username)) $rules['username'] .= '|unique:users,username';
                 if ($arg == null || (isset($arg->website) && $arg->website != $request->website)) $rules['website'] .= '|unique:users,website';
-                if ($arg == null || ($arg->mobile && is_array($request->mobile) && $arg->mobile->text != _get_value($request->mobile, 'full', implode('', $request->mobile)))) $rules['mobile'] .= ':unique,User';
-                if ($arg == null || ($arg->email && $arg->email->text != $request->email)) $rules['email'] .= ':unique,User';
-               /* if ($arg == null || ($arg->mobile && is_array($request->mobile) && $arg->mobile->text != implode('', $request->mobile)))
-                    dd($arg->mobile ,$request->mobile);*/
+                if ($arg == null || (isset($arg->mobile) && $arg->mobile && is_array($request->mobile) && $arg->mobile->text != _get_value($request->mobile, 'full', implode('', $request->mobile)))) $rules['mobile'] .= ':unique,User';
+                if ($arg == null || (isset($arg->email) && $arg->email && $arg->email->text != $request->email)) $rules['email'] .= ':unique,User';
                 break;
             case 'additional':
                 $rules = $additionalRules;
