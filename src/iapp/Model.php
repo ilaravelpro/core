@@ -14,7 +14,7 @@ class Model extends \Illuminate\Database\Eloquent\Model
 {
     use \iLaravel\Core\iApp\Modals\Modal;
 
-    protected $guarded = ['id',];
+    protected $guarded = [];
     public $set_creator = true;
 
     protected static function boot()
