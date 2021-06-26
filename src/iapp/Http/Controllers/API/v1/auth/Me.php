@@ -17,7 +17,7 @@ trait Me
     public function me(Request $request)
     {
         $this->statusMessage = 'me';
-        $user = $this->show($request, \Auth::user()->serial);
+        $user = new $this->resourceClass(auth()->check() ? $this->model::findBySerial(\Auth::user()->serial) : $this->model::guest());
         $user->additional(array_merge_recursive($user->additional, [
             'additional' => [ 'token' => $request->bearerToken() ]
         ]));

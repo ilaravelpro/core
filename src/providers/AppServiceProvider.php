@@ -19,6 +19,7 @@ use Illuminate\Routing\Router;
 use Illuminate\Routing\ResourceRegistrar;
 use Illuminate\Routing\PendingResourceRegistration;
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\ServiceProvider;
@@ -77,12 +78,15 @@ class AppServiceProvider extends ServiceProvider
     }
 
     public function registerMacros() {
+        \Route::macro('authIf', function(){
+            if(!app('request')->header('authorization')) {
+                $userClass = imodal('User');
+                Auth::setUser($userClass::guest());
+            }
+            return app('request')->header('authorization') ? 'auth:api' : 'api';
+        });
         RequestGuard::macro('isAdmin', function(){
             return $this->user->isAdmin();
-        });
-
-        \Route::macro('authIf', function(){
-            return app('request')->header('authorization') ? 'auth:api' : 'api';
         });
 
         Router::macro('mResource', function($name, $controller, array $options = []){

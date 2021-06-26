@@ -32,9 +32,12 @@ class Resource extends JsonResource
         }
         if (method_exists($this, 'fields'))
             $data = $this->fields($request, $data);
-        foreach ($data as $key => $value)
+        foreach ($data as $key => $value){
+            if (substr($key, -3, 3) === '_at' && ipreference('lang') == 'fa' && $data[$key])
+                $data[$key] = jdate($data[$key])->format('Y-m-d H:i:s');
             if (in_array($value, [[]]) || in_array($key, $hidden) || (is_array($value) && count($value) == 0))
                 unset($data[$key]);
+        }
         if (isset($this->resource->with)) {
             foreach ($this->resource->with as $index => $item) {
                 $data[$item] = (new self($this->$item))->toArray($request);

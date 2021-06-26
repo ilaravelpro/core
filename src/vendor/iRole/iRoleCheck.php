@@ -10,6 +10,8 @@
 namespace iLaravel\Core\Vendor\iRole;
 
 
+use App\User;
+
 class iRoleCheck
 {
     protected $user = null;
@@ -109,11 +111,11 @@ class iRoleCheck
 
     public static function getRules()
     {
-        return auth()->user()->scopeAll();
+        return auth()->check() ? auth()->user()->scopeAllUnique() : User::guest()->scopeAll();
     }
 
     public static function getRulesUnique()
     {
-        return auth()->user()->scopeAllUnique();
+        return auth()->check() ? auth()->user()->scopeAllUnique() : User::guest()->scopeAllUnique();
     }
 }

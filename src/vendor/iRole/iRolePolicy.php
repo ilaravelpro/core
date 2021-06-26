@@ -59,6 +59,10 @@ class iRolePolicy extends iRole
 
     public function create($user, $item = null, ...$args)
     {
+        if (is_array($list = iconfig('scopes.' . $this->prefix . '.items.create'))){
+            foreach ($list as $view)
+                if ($can = static::has($this->prefix . '.data.' . $view)) return $can;
+        }
         return static::has($this->prefix . '.create');
     }
 
@@ -85,6 +89,10 @@ class iRolePolicy extends iRole
             if(is_string($child) && $this->model::id($child)) {
                 $child = $this->model::findBySerial($child);
             }
+        }
+        if(isset($this->parentPolicy) && $this->parentPolicy) {
+            $parentPolicy = (new $this->parentPolicy())->single($user, $item, null, $action);
+            if (!$parentPolicy) return false;
         }
         if (!$action) $action = $child;
         $anyByUser = function ($context, $sub, $user, $item, $child = null, $action = null, $args = null) {

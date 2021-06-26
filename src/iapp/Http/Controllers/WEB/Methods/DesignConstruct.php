@@ -42,7 +42,7 @@ trait DesignConstruct
             'show' => 'fas fa-atom'
         ];
 
-        self::$result->global->title = _t('Maravel');
+        self::$result->global->title = _t('iAmir');
         self::$result->layouts->mode = 'html';
     }
 }

@@ -8,7 +8,6 @@
 
 Route::namespace('v1')->prefix('v1')->group(function () {
     Route::group(['middleware' => ['auth:api']], function () {
-        if (iconfig('auth.get')) Route::get('/me', 'AuthController@me')->name('api.auth.get');
         if (iconfig('auth.update')) Route::post('/me', 'AuthController@me_update')->name('api.auth.update');
         if (iconfig('routes.api.users.status')){
             Route::apiResource('users', 'UserController', ['as' => 'api']);
@@ -22,16 +21,18 @@ Route::namespace('v1')->prefix('v1')->group(function () {
                 'as' => 'api.roles'
             ]);
         }
+        if (iconfig('auth.logout')) Route::post('auth/logout', 'AuthController@logout')->name('api.auth.logout');
+    });
+    \Route::group(['middleware' => ['auth:apiIf']], function () {
         Route::prefix('data')->group(function () {
             Route::get('statuses/{type?}', 'DataController@status');
         });
-        Route::get('/rules', function () {
+        \Route::get('/rules', function () {
             $rules = \iLaravel\Core\Vendor\iRole\iRoleCheck::getRulesUnique();
             return ['data' => function_exists('i_get_rules_items') ? i_get_rules_items($rules) : $rules];
         });
-        if (iconfig('auth.logout')) Route::post('auth/logout', 'AuthController@logout')->name('api.auth.logout');
+        if (iconfig('auth.get')) Route::get('/me', 'AuthController@me')->name('api.auth.get')->authIf();
     });
-
     Route::prefix('auth')->group(function () {
         if (iconfig('auth.login')) Route::post('login', 'AuthController@login')->name('api.auth.login');
         if (iconfig('auth.register')) Route::post('register', 'AuthController@register')->name('api.auth.register');

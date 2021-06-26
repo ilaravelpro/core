@@ -30,13 +30,16 @@ trait Construct
             $this->resourceDataClass = iresource($class_name."Data");
             if (!class_exists($this->resourceDataClass)) $this->resourceDataClass = iresource('ResourceData');
         }
-
-        if (!isset($this->resourceCollectionClass)) {
+        if (isset($this->resourceCollectionClass) && $this->resourceCollectionClass == 'self') {
+            $this->resourceCollectionClass = null;
+        }elseif (!isset($this->resourceCollectionClass)) {
             $this->resourceCollectionClass = iresource($this->class_name(null, true, 1));
             if (!class_exists($this->resourceCollectionClass)) $this->resourceCollectionClass = iresource('Resources');
         }
 
-        if ($action == 'data' && !isset($this->resourceDataCollectionClass)) {
+        if ($action == 'data' && isset($this->resourceDataCollectionClass) && $this->resourceDataCollectionClass == 'self') {
+            $this->resourceDataCollectionClass = null;
+        }elseif ($action == 'data' && !isset($this->resourceDataCollectionClass)) {
             $this->resourceDataCollectionClass = iresource($this->class_name(null, true, 1) . "Data");
             if (!class_exists($this->resourceDataCollectionClass)) $this->resourceDataCollectionClass = iresource('ResourcesData');
         }

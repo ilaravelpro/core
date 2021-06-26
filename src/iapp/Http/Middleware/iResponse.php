@@ -16,7 +16,6 @@ class iResponse
 {
     public function handle($request, Closure $next)
     {
-
         $response = $next($request);
         if ($request->ajax() && $response instanceof \Illuminate\Http\RedirectResponse) {
             $result = [

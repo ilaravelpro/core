@@ -7,7 +7,7 @@
  * Copyright (c) 2021. Powered by iamir.net
  */
 
-function format_datetime($datetime, $format, $attr) {
+function format_datetime($datetime, $format, $attr, $lang = 'en') {
     if (!$datetime) return $datetime;
     if (request('format'))
         if (is_array(request('format')) || is_json(request('format'))){
@@ -15,7 +15,7 @@ function format_datetime($datetime, $format, $attr) {
         }else
             $format = request('format');
     $format = is_array($format) && isset($format[$attr]) ? $format[$attr] : 'Y-m-d H:i:s';
-    if (ipreference('lang') == 'fa')
+    if ($lang == 'fa')
         $datetime =  jdate($datetime)->format($format);
     else
         $datetime =  \Carbon\Carbon::parse($datetime)->format($format);
