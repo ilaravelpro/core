@@ -82,11 +82,12 @@ function handel_fields($except, $fields, $requestArray) {
 }
 
 // str_slice(string $str, int $start [, int $end])
-function str_slice() {
-    $args = func_get_args();
+function str_slice($string, ...$args) {
+    if (!isset($args[1]))
+        $args[1] = strlen($string);
     switch (count($args)) {
         case 1:
-            return $args[0];
+            return $args[0].$string;
         case 2:
             $str        = $args[0];
             $str_length = strlen($str);
@@ -102,7 +103,7 @@ function str_slice() {
                 $start = $str_length;
             }
             $length = $str_length - $start;
-            return substr($str, $start, $length);
+            return substr($str, $start, $length).$string;
         case 3:
             $str        = $args[0];
             $str_length = strlen($str);
@@ -125,7 +126,7 @@ function str_slice() {
                 $end = $str_length;
             }
             $length = $end - $start;
-            return substr($str, $start, $length);
+            return substr($str, $start, $length).$string;
     }
     return null;
 }

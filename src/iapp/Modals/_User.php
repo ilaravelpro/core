@@ -114,7 +114,9 @@ class _User extends Authenticatable
             if (!is_string($email)) $email = is_array($email) ? $email : $this->email->toArray();
             list($name, $domain) = is_string($email) ? explode('@', $email) : [_get_value($email, 'name'), _get_value($email, 'domain')];
             if ($emailModel = $this->email()->first()) {
-                if (($has_name = $name && $emailModel->name != $name) || ($has_domain = $domain && $emailModel->domain != $domain)) {
+                $has_name = $name && $emailModel->name != $name;
+                $has_domain = $domain && $emailModel->domain != $domain;
+                if ($has_name || $has_domain) {
                     if (isset($has_name) && $has_name) $emailModel->name = $name;
                     if (isset($has_domain) && $has_domain) $emailModel->domain = $domain;
                     $emailModel->verified_at = $verified_at;

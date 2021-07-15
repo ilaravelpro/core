@@ -98,7 +98,7 @@ function _set_value($data, $path, $value)
     return $data;
 }
 
-function _get_value($array, $parents,$default = null, $glue = '.')
+function _get_value($array, $parents,$default = null, $glue = '.', $prepend = null, $append = null)
 {
     if (is_object($array))
         $array = (array) $array;
@@ -115,6 +115,10 @@ function _get_value($array, $parents,$default = null, $glue = '.')
             return $default;
         }
     }
+    if ($prepend)
+        $ref = $prepend . $ref;
+    if ($append)
+        $ref .= $append;
     return $ref;
 }
 
