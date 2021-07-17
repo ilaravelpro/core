@@ -30,18 +30,19 @@ trait MeUpdate
         ];
         if (isset($request->password))
             $update['password'] = $request->password;
-        $avatar = $request->file('avatar_file');
+        /*$avatar = \request()->file('avatar_file');
         \request()->files->remove('avatar_file');
         \request()->request->remove('avatar_file');
+        dd($avatar);
         if ($avatar) {
-            $attachment = File::upload($request, 'avatar_file');
+            $attachment = File::upload(\request(), 'avatar_file');
             if ($attachment) {
                 $update['avatar_id'] = $attachment->id;
             }
             File::imageSize($attachment, 500);
             File::imageSize($attachment, 250);
             File::imageSize($attachment, 150);
-        }
+        }*/
         $this->statusMessage = "Profile changed";
         $user->update($update);
         return new $this->resourceClass($user);

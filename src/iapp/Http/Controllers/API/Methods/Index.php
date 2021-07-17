@@ -72,7 +72,7 @@ trait Index
             $this->searchQ($request, $model, $parent);
             $current_filter['q'] = $request->q;
         }
-        if ((isset($this->statusFilter) ? $this->statusFilter : true) && method_exists($model, 'getModel') && \Schema::hasColumn($model->getModel()->getTable(), 'status')){
+        if ((isset($this->statusFilter) ? $this->statusFilter : true) && ($request->has('statusFilter') ? $request->statusFilter : true) && method_exists($model, 'getModel') && \Schema::hasColumn($model->getModel()->getTable(), 'status')){
             $statuses = iconfig("status.{$model->getModel()->getTable()}", iconfig("status.global"));
             $status = $request->status ? (in_array($request->status, $statuses) ? $request->status : $statuses[0]) : $statuses[0];
             if ($status) {
