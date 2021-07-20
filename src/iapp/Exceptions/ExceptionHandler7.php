@@ -9,6 +9,7 @@
 
 namespace iLaravel\Core\iApp\Exceptions;
 
+use iLaravel\Core\iApp\Http\Requests\Request;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -55,14 +56,15 @@ class ExceptionHandler7 extends Handler
 
     public function render($request, Throwable $exception)
     {
-        $render = $exception instanceof iException ? response()->json(['message' => $exception->getMessage()], 422) : parent::render($request, $exception);
-        $data = (array)$render->getData();
+        $args = func_get_args();
+        $render = $exception instanceof iException && !config('app.debug')? response()->json(['message' => $exception->getMessage()], 422) : parent::render($request, $exception);
+        $dataMain = (array)$render->getData();
         $data = array_replace_recursive([
             'is_ok' => false,
             'message' => null,
             'message_text' => null,
             'referer' => $request->headers->get('referer')
-        ], $data);
+        ], $dataMain);
         result_message($data, $data['message'] ?: Response::$statusTexts[$render->getStatusCode()], method_exists($exception, 'replace_values') ? $exception->replace_values() : null);
         if (!config('app.debug')) {
             if ($exception instanceof ModelNotFoundException) {
@@ -76,6 +78,23 @@ class ExceptionHandler7 extends Handler
             unset($data['file']);
             unset($data['line']);
             unset($data['trace']);
+        }
+        $modalLog = imodal('Log');
+        if (isset($args[2]) && $args[2] instanceof $modalLog) {
+            $data['log'] = $args[2]->serial;
+            $args[2]->responses()->create([
+                'text' => json_encode([
+                    'status' => $render->getStatusCode(),
+                    'code' => $exception->getCode(),
+                    'message' => $exception->getMessage(),
+                    'line' => $exception->getLine(),
+                    'file' => $exception->getFile(),
+                    'trace' => $exception->getTrace(),
+                ]),
+                'type' => 'exception',
+                'order' => 0,
+            ]);
+            if ($render->getStatusCode() !== 401) $data['message_text'] .= " ({$data['log']})";
         }
         $render->setData($data);
         return $render;

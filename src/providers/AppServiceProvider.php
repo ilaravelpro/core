@@ -42,7 +42,6 @@ class AppServiceProvider extends ServiceProvider
                 \Illuminate\Contracts\Debug\ExceptionHandler::class,
                 substr($this->app::VERSION, 0, 1) >= '7' ? \iLaravel\Core\iApp\Exceptions\ExceptionHandler7::class : \iLaravel\Core\iApp\Exceptions\ExceptionHandler::class
             );
-
         }
         if($this->app->runningInConsole())
         {

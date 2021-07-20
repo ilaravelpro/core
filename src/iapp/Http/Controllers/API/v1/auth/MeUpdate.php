@@ -33,7 +33,6 @@ trait MeUpdate
         /*$avatar = \request()->file('avatar_file');
         \request()->files->remove('avatar_file');
         \request()->request->remove('avatar_file');
-        dd($avatar);
         if ($avatar) {
             $attachment = File::upload(\request(), 'avatar_file');
             if ($attachment) {

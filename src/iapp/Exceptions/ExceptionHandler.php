@@ -50,6 +50,7 @@ class ExceptionHandler extends Handler
 
     public function render($request, Exception $exception)
     {
+        $args = func_get_args();
         $render = parent::render($request, $exception);
         $data = (array) $render->getData();
         $data = array_replace_recursive([
@@ -72,6 +73,20 @@ class ExceptionHandler extends Handler
             unset($data['file']);
             unset($data['line']);
             unset($data['trace']);
+        }
+        $modalLog = imodal('Log');
+        if (isset($args[2]) && $args[2] instanceof $modalLog) {
+            $data['log'] = $args[2]->serial;
+            $args[2]->responses()->create([
+                'text' => json_encode([
+                    'status' => $render->getStatusCode(),
+                    'code' => $exception->getCode(),
+                    'message' => $exception->getMessage(),
+                ]),
+                'type' => 'exception',
+                'order' => 0,
+            ]);
+            if ($render->getStatusCode() !== 401) $data['message_text'] .= " ({$data['log']})";
         }
         $render->setData($data);
         return $render;

@@ -25,12 +25,12 @@ Route::namespace('v1')->prefix('v1')->group(function () {
     });
     \Route::group(['middleware' => ['auth:apiIf']], function () {
         Route::prefix('data')->group(function () {
-            Route::get('statuses/{type?}', 'DataController@status');
+            Route::get('statuses/{type?}', 'DataController@status')->name('api.data.status');
         });
         \Route::get('/rules', function () {
             $rules = \iLaravel\Core\Vendor\iRole\iRoleCheck::getRulesUnique();
             return ['data' => function_exists('i_get_rules_items') ? i_get_rules_items($rules) : $rules];
-        });
+        })->name('api.auth.rules');
         if (iconfig('auth.get')) Route::get('/me', 'AuthController@me')->name('api.auth.get')->authIf();
     });
     Route::prefix('auth')->group(function () {
