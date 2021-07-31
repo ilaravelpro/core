@@ -9,7 +9,6 @@
 
 namespace iLaravel\Core\iApp\Exceptions;
 
-use iLaravel\Core\iApp\Http\Requests\Request;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -82,14 +81,15 @@ class ExceptionHandler7 extends Handler
         $modalLog = imodal('Log');
         if (isset($args[2]) && $args[2] instanceof $modalLog) {
             $data['log'] = $args[2]->serial;
+            $is_ve = $exception instanceof ValidationException;
             $args[2]->responses()->create([
                 'text' => json_encode([
                     'status' => $render->getStatusCode(),
                     'code' => $exception->getCode(),
-                    'message' => $exception->getMessage(),
-                    'line' => $exception->getLine(),
-                    'file' => $exception->getFile(),
-                    'trace' => $exception->getTrace(),
+                    'message' => $is_ve ? json_decode($this->convertValidationExceptionToResponse($exception, $request)->getContent()) : $exception->getMessage(),
+                    'line' => $is_ve ? -1 : $exception->getLine(),
+                    'file' => $is_ve ? null : $exception->getFile(),
+                    'trace' => $is_ve ? null : $exception->getTrace(),
                 ]),
                 'type' => 'exception',
                 'order' => 0,
