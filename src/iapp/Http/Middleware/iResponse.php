@@ -17,6 +17,8 @@ class iResponse
     public function handle($request, Closure $next)
     {
         $response = $next($request);
+        if ($response instanceof \Symfony\Component\HttpFoundation\BinaryFileResponse)
+            return $response;
         if ($request->ajax() && $response instanceof \Illuminate\Http\RedirectResponse) {
             $result = [
                 'is_ok' => true,
