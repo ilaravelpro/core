@@ -8,6 +8,8 @@
 namespace iLaravel\Core\iApp\Methods;
 
 
+use iLaravel\Core\iApp\Exceptions\iException;
+
 trait LogLazyLoading
 {
     /**
@@ -23,8 +25,7 @@ trait LogLazyLoading
     protected function getRelationshipFromMethod($method)
     {
         $modelName = static::class;
-
-        $exception = new \Exception(
+        $exception = new iException(
             "Attempting to lazy-load relation '$method' on model '$modelName'"
         );
 

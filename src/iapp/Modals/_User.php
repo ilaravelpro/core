@@ -259,7 +259,7 @@ class _User extends Authenticatable
                     'password' => 'nullable|min:6|password',
                     'email' => "nullable|i_email",
                     'website' => "nullable|website",
-                    'status' => 'nullable|in:' . join(iconfig('status.users', iconfig('status.global')), ','),
+                    'status' => 'nullable|in:' . join(',', iconfig('status.users', iconfig('status.global'))),
                     'role' => 'nullable|in:' . ((in_array(auth()->user()->role, ipreference('admins', ['admin'])) ? "admin," : "") . implode(',', Role::all()->pluck('name')->toArray())),
                     'mobile' => 'nullable|mobile',
                     'gender' => 'nullable|in:male,female',

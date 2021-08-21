@@ -75,7 +75,7 @@ class _Attachment extends Model
                     'summary' => 'nullable|string',
                     'order' => "nullable|numeric|min:0",
                     'published_at' => "nullable|date_format:Y-m-d H:i:s",
-                    'status' => 'nullable|in:' . join(iconfig('status.attachments', iconfig('status.global')), ','),
+                    'status' => 'nullable|in:' . join(',', iconfig('status.attachments', iconfig('status.global'))),
                 ]);
                 break;
         }

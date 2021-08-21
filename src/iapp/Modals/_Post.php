@@ -53,7 +53,7 @@ class _Post extends Model
                     'type' => 'nullable|exists:types,name',
                     'order' => "required|numeric|min:0",
                     'published_at' => "nullable|date_format:Y-m-d H:i:s",
-                    'status' => 'nullable|in:' . join(iconfig('status.posts', iconfig('status.global')), ','),
+                    'status' => 'nullable|in:' . join(',', iconfig('status.posts', iconfig('status.global'))),
                 ]);
                 break;
         }

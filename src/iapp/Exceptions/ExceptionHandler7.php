@@ -65,6 +65,7 @@ class ExceptionHandler7 extends Handler
             'referer' => $request->headers->get('referer')
         ], $dataMain);
         result_message($data, $data['message'] ?: Response::$statusTexts[$render->getStatusCode()], method_exists($exception, 'replace_values') ? $exception->replace_values() : null);
+
         if (!config('app.debug')) {
             if ($exception instanceof ModelNotFoundException) {
                 result_message($data, str_replace('App\\', '', $exception->getModel()) . ' not found');
@@ -89,7 +90,7 @@ class ExceptionHandler7 extends Handler
                     'message' => $is_ve ? json_decode($this->convertValidationExceptionToResponse($exception, $request)->getContent()) : $exception->getMessage(),
                     'line' => $is_ve ? -1 : $exception->getLine(),
                     'file' => $is_ve ? null : $exception->getFile(),
-                    'trace' => $is_ve ? null : $exception->getTrace(),
+                    'trace' => $is_ve ? null : $exception->getTraceAsString(),
                 ]),
                 'type' => 'exception',
                 'order' => 0,

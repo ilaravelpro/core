@@ -95,3 +95,18 @@ function redirect_post($url, array $data) {
 
     return $output;
 }
+
+function _is_local_host($whitelist = ['127.0.0.1', '::1'])
+{
+    return in_array($_SERVER['REMOTE_ADDR'], $whitelist);
+}
+
+function _is_windows()
+{
+    return strtolower(PHP_OS_FAMILY) == 'windows';
+}
+
+function _reset_path($path)
+{
+    return _is_windows() == 'windows' ? str_replace('/', '\\', $path) : str_replace('\\', '/', $path);
+}

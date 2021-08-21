@@ -58,7 +58,7 @@ class _Role extends Model
                 $rules = array_merge($rules, [
                     'title' => 'required|min:3',
                     'name' => 'required|regex:/^[a-z_]*$/',
-                    'status' => 'nullable|in:' . join(iconfig('status.roles', iconfig('status.global')), ','),
+                    'status' => 'nullable|in:' . join(',', iconfig('status.roles', iconfig('status.global'))),
                 ]);
                 break;
         }
