@@ -11,6 +11,9 @@
 namespace iLaravel\Core\iApp\Http\Controllers\API\v1\Role;
 
 
+use iLaravel\Core\Vendor\iRole\iRole;
+use Illuminate\Support\Facades\Gate;
+
 trait Filters
 {
     public function filters($request, $model, $parent = null, $operators = [])
@@ -32,6 +35,17 @@ trait Filters
                 'type' => 'text'
             ],
         ];
+        if (!in_array(auth()->user()->role, ipreference('admins'))) {
+            $model->WhereExists(function ($query) {
+                $role = $this->model::findByName(auth()->user()->role);
+                $query->select(\DB::raw(1))
+                    ->from('role_scopes')
+                    ->where('role_scopes.role_id', $role->id)
+                    ->whereRaw("role_scopes.scope = CONCAT('users.fields.role.', roles.name)")
+                    ->where('role_scopes.can', 1)
+                ;
+            });
+        }
         return [$filters, [], $operators];
     }
 }

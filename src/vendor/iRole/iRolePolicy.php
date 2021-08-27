@@ -57,11 +57,16 @@ class iRolePolicy extends iRole
         return $this->single(...array_merge(func_get_args(), ['view']));
     }
 
+    public function fields($user, $item = null, ...$args)
+    {
+        return $this->single(...array_merge(func_get_args(), ['view']));
+    }
+
     public function create($user, $item = null, ...$args)
     {
         if (is_array($list = iconfig('scopes.' . $this->prefix . '.items.create'))){
             foreach ($list as $view)
-                if ($can = static::has($this->prefix . '.data.' . $view)) return $can;
+                if ($can = static::has($this->prefix . '.create.' . $view)) return $can;
         }
         return static::has($this->prefix . '.create');
     }

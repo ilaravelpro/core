@@ -9,6 +9,7 @@
 
 namespace iLaravel\Core\Vendor\iRole;
 
+use iLaravel\Core\iApp\Role;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class iRole
@@ -39,35 +40,35 @@ class iRole
     public static function scopes($scopes = null , $model = null, $canDef = 0)
     {
         $configScopes = iconfig('scopes', []);
+        if (isset($configScopes['users']['items']) && $configScopes['users']['items']) {
+            $configScopes['users']['items']['fields']['role'] = Role::all()->pluck('name')->toArray();
+        }
         if ($model) {
             unset($configScopes['global']);
             $id = -1;
             foreach ($configScopes as $rkey => $role) {
                 foreach ($role['items'] as $index => $sec) {
-                    if (is_array($sec)) {
-                        foreach ($sec as $keyd => $valued) {
-                            if (!$scopes->where('scope', "$rkey.$index.$valued")->first()) {
-                                $item = new $model;
-                                $item->id = $id;
-                                $item->scope = "$rkey.$index.$valued";
-                                $item->can = $canDef;
-                                $scopes->add($item);
-                                $id--;
-                            }
-                        }
-                    } elseif (!$scopes->where('scope', "$rkey.$sec")->first()) {
-                        $item = new $model;
-                        $item->id = $id;
-                        $item->scope = "$rkey.$sec";
-                        $item->can = $canDef;
-                        $scopes->add($item);
-                        $id--;
-                    }
+                    list($scopes, $id) = static::renderScopes($scopes, $model, $id, $sec, is_array($sec) ? "$rkey.$index" : "$rkey.$sec", $canDef);
                 }
-
             }
         }
         return $scopes;
+    }
+
+    public static function renderScopes($scopes, $model, $id, $sec, $key, $canDef = 0)
+    {
+        if (is_array($sec)) {
+            foreach ($sec as $i => $valued)
+                list($scopes, $id) = static::renderScopes($scopes, $model, $id, $valued, is_array($valued) ? "$key.$i" : "$key.$valued", $canDef);
+        } elseif (!$scopes->where('scope', $key)->first()) {
+            $item = new $model;
+            $item->id = $id;
+            $item->scope = $key;
+            $item->can = $canDef;
+            $scopes->add($item);
+            $id--;
+        }
+        return [$scopes, $id];
     }
 
     public static function permissions($key = false)

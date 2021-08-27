@@ -9,6 +9,7 @@ namespace iLaravel\Core\iApp\Methods;
 
 
 use iLaravel\Core\iApp\Http\Requests\iLaravel as Request;
+use iLaravel\Core\iApp\Role;
 
 class Scopes
 {
@@ -28,6 +29,9 @@ class Scopes
         }
         $positions = [];
         $configScopes = iconfig('scopes', []);
+        if (isset($configScopes['users']['items']) && $configScopes['users']['items']) {
+            $configScopes['users']['items']['fields']['role'] = Role::all()->pluck('name')->toArray();
+        }
         unset($configScopes['global']);
         foreach ($configScopes as $key => $section) {
             $positions[$key] = [
@@ -35,19 +39,27 @@ class Scopes
                 'name' => $key,
             ];
             foreach ($section['items'] as $skey => $scope) {
-                $scopes =  is_array($scope) ? $scope : [$scope];
-                foreach ($scopes as $jscope) {
-                    $smodel = $model::where(['role_id' => $parent->id, 'scope' => "$key.".(is_string($skey) ? "$skey.": '')  .$jscope])->first();
-                    $positions[$key]['scopes'][] = [
-                        'id' => $smodel ? $smodel->serial : null,
-                        'parent_id' => $parent->serial,
-                        'title' => _t((is_string($skey) ? ucfirst($skey) . " " : '') . ucfirst($jscope)),
-                        'scope' =>  "$key.".(is_string($skey) ? "$skey.": '') .$jscope,
-                        'can' => $smodel ? $smodel->can : 0
-                    ];
-                }
+                $positions = static::renderScopes($model, $positions, $parent, $scope,$key, is_array($scope) ? "$key.$skey" : "$key.$scope", 0);
             }
         }
         return ['data' => $positions];
+    }
+
+    public static function renderScopes($model, $positions, $parent, $scope, $key, $skey, $canDef = 0)
+    {
+        if (is_array($scope)) {
+            foreach ($scope as $i => $valued)
+                $positions = static::renderScopes($model, $positions, $parent, $valued,$key, is_array($valued) ? "$skey.$i" : "$skey.$valued", $canDef);
+        } else {
+            $smodel = $model::where(['role_id' => $parent->id, 'scope' => $skey])->first();
+            $positions[$key]['scopes'][] = [
+                'id' => $smodel ? $smodel->serial : null,
+                'parent_id' => $parent->serial,
+                'title' => _t(implode(' ', array_map(function ($key) { return ucfirst($key); }, array_filter(explode('.', $skey), function ($skey) use($key) {return $skey !== $key;})))),
+                'scope' =>  $skey,
+                'can' => $smodel ? $smodel->can : 0
+            ];
+        }
+        return$positions;
     }
 }
