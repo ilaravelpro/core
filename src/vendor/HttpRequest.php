@@ -29,6 +29,19 @@ class HttpRequest
         fclose($fp);
         return $out;
     }
+
+    public static function get($url){
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, $url);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl,CURLOPT_POST, false );
+        curl_setopt($curl,CURLOPT_RETURNTRANSFER, true );
+        curl_setopt($curl,CURLOPT_SSL_VERIFYPEER, false );
+        $result = curl_exec($curl);
+        curl_close($curl);
+        return $result;
+    }
+
     public static function has($url){
         $file_headers = get_headers($url);
         if(!$file_headers || $file_headers[0] == 'HTTP/1.1 404 Not Found') {

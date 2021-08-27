@@ -215,3 +215,8 @@ function _get_user_ip(){
         $ipaddress = 'UNKNOWN';
     return $ipaddress;
 }
+
+function domain_exists($email, $record = 'MX'){
+    list($user, $domain) = explode('@', $email);
+    return checkdnsrr($domain, $record);
+}
