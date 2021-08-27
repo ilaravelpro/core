@@ -22,15 +22,10 @@ trait SearchQ
         $first = false;
         $model->where(function ($query) use ($q, $id, $parent_id, $first) {
             foreach ($this->model::getTableColumns() as $index => $column)
-                if (in_array($column, ['id', 'parent']))
+                if ($id && in_array($column, ['id', 'parent']))
                     $query->where($column, $q);
                 elseif (!$id && !$parent_id){
-                    if ($first || (($id || $parent_id) && !$first))
-                        $query->orWhere($column, 'LIKE', "%$q%");
-                    else{
-                        $first = true;
-                        $query->where($column, 'LIKE', "%$q%");
-                    }
+                    $query->orWhere($column, 'LIKE', "%$q%");
                 }
             return $query;
         });

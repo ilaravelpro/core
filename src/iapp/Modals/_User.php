@@ -20,6 +20,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Passport\HasApiTokens;
 
+
 class _User extends Authenticatable
 {
     use Modal;
@@ -212,7 +213,7 @@ class _User extends Authenticatable
 
     public static function findTokenID($token)
     {
-        return (new \Lcobucci\JWT\Parser())->parse($token)->getClaim('jti');
+        return (new \Lcobucci\JWT\Parser())->parse($token)->claims()->get('jti');
     }
 
     public function revokeAllTokens()
