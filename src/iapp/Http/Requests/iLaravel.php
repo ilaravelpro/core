@@ -162,10 +162,7 @@ class iLaravel extends FormRequest
                 auth()->login(User::guest());
             }
             $args = array_values($this->route()->parameters());
-            /*array_unshift($args, $action);
-            array_unshift($args, $this);*/
             $auth = $this->controller()->authorize($action, $args);
-            //if (auth()->id() == 0) auth()->logout();
         }
         if ($auth && $this->controller() && method_exists($this->controller(), 'gate')) {
             $auth = $this->controller()->gate($this, $this->route()->getActionMethod(), ...array_values($this->route()->parameters()));
