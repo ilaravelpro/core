@@ -18,9 +18,20 @@ class Resource extends JsonResource
     public $route_action = null;
     public $route_src = null;
     public $c_serial = null;
+    public $_local = null;
+    public function __construct($resource)
+    {
+        $args = func_get_args();
+        $this->_local = isset($args[1]) && $args[1] ? $args[1] : null;
+        parent::__construct($resource);
+    }
 
     public function toArray($request)
     {
+        if (!$this->_local) {
+            $args = func_get_args();
+            $this->_local = isset($args[1]) && $args[1] ? $args[1] : $request->local;
+        }
         $role = auth()->check() ? auth()->user()->role : 'guest';
         if (!isset($this->table)) $this->table = class_name(request()->route()->getController(), true, 2);
         $hidden = iconfig('resources.' . $this->table, []) ? $this->table : 'global';
@@ -29,6 +40,12 @@ class Resource extends JsonResource
         if (isset($data['id']) && isset($this->serial)) {
             $data['id'] = $this->serial;
             $data = insert_into_array($data, 'id', 'id_text', $this->serial_text);
+        }
+        if (isset($data['meta_data']) && $data['meta_data'] && count($data['meta_data'])) {
+            foreach ($data['meta_data'] as $index => $meta_datum) {
+                $data = insert_into_array($data, 'status', $index, $meta_datum, false);
+            }
+            unset($data['meta_data']);
         }
         if (method_exists($this, 'fields'))
             $data = $this->fields($request, $data);
@@ -63,7 +80,25 @@ class Resource extends JsonResource
             }
             if (count($actions))$data['actions'] = $actions;
         }
+        $translate = $this->toLocal($this->_local);
+        if ($translate) $data = array_merge($data, $translate);
+
         return $data;
     }
 
+    public function toLocal($local)
+    {
+        return method_exists($this->resource, 'toLocal') ? $this->resource->toLocal($local) : false;
+    }
+
+    public static function collection($resource)
+    {
+        $args = func_get_args();
+        $local = isset($args[1]) && $args[1] ? $args[1] : null;
+        return tap(new AnonymousResourceCollection($resource, static::class), function ($collection) use($local) {
+            if (property_exists(static::class, 'preserveKeys')) {
+                $collection->preserveKeys = (new static([], $local))->preserveKeys === true;
+            }
+        });
+    }
 }

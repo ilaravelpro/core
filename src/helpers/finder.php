@@ -61,9 +61,10 @@ function class_name($class_name, $plural = false, $lower = 0)
         case 3:
             return strtoupper($class_name);
         case 4 :
+            $args = func_get_args();
             $class_name = preg_split('/(?=[A-Z])/', $class_name);
             unset($class_name[0]);
-            $class_name = implode('.', $class_name);
+            $class_name = implode(isset($args[3]) && $args[3] ? $args[3] : '.', $class_name);
             return strtolower($class_name);
         default:
             return $class_name;

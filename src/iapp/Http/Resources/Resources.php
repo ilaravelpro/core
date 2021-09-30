@@ -25,8 +25,9 @@ class Resources extends ResourceCollection
     public function toArray($request)
     {
         $data = [];
-        $resource = iresource(class_name($request->route()->getController(), null, 1));
-        if (!class_exists($resource)) $resource = iresource('Resource');
+        $controller = $request->route()->getController();
+        $resource = isset($controller->resourceClass) && $controller->resourceClass ? $controller->resourceClass :  iresource(class_name($controller, null, 1));
+        if (!class_exists($resource)) $resource =  iresource('Resource');
         foreach ($this->resource as $key => $value) {
             switch ($this->format){
                 case 'gjson':

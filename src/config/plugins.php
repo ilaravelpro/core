@@ -9,18 +9,6 @@
 
 $plugins = [
     'Core',
-    'iWindy',
-    'iAuth',
-    'iSMS',
-    'iLogs',
-    'iLocation',
-    'iAWC',
-    'iWX',
-    'ICAO',
-    'iOpenAip',
-    'iPost',
-    'iProduct',
-    'iOrder',
 ];
 
 ?>

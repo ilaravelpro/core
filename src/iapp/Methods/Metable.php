@@ -20,6 +20,17 @@ trait Metable
 
     // Static property registration sigleton for save observation and slow large set hotfix
     public static $_isObserverRegistered;
+    public static $_columnNames;
+
+    /**
+     * whereMeta scope for easier join
+     * -------------------------
+     */
+    public function scopeWhereMeta($query, $key, $value, $alias = null)
+    {
+        $alias = (empty($alias)) ? $this->getMetaTable() : $alias;
+        return $query->join($this->getMetaTable() . ' AS ' . $alias, $this->getQualifiedKeyName(), '=', $alias . '.' . $this->getMetaKeyName())->where('key', '=', $key)->where('value', '=', $value)->select($this->getTable() . '.*');
+    }
 
     /**
      * Meta scope for easier join
@@ -224,6 +235,7 @@ trait Metable
     {
         foreach ($this->metaData as $meta) {
             $meta->setTable($this->metaTable);
+
             if ($meta->isMarkedForDeletion()) {
                 $meta->delete();
                 continue;
@@ -349,6 +361,79 @@ trait Metable
         }
     }
 
+    /**
+     * Set a given attribute on the model.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return mixed
+     */
+    public function setAttribute($key, $value)
+    {
+        // ignore the trait properties being set.
+
+        if (Str::startsWith($key, 'meta') || $key == 'query') {
+            $this->$key = $value;
+            return $this;
+        }
+        // if key is a model attribute, set as is
+        if (array_key_exists($key, parent::getAttributes())) {
+            return parent::setAttribute($key, $value);
+        }
+
+        // If there is a default value, remove the meta row instead - future returns of
+        // this value will be handled via the default logic in the accessor
+        if(
+            isset($this->defaultMetaValues) &&
+            array_key_exists($key, $this->defaultMetaValues) &&
+            $this->defaultMetaValues[$key] == $value
+        ) {
+            $this->unsetMeta($key);
+            return $this;
+        }
+
+        // if the key has a mutator execute it
+        $mutator = Str::camel('set_'.$key.'_meta');
+
+        if (method_exists($this, $mutator)) {
+            $this->{$mutator}($value);
+            return $this;
+        }
+
+        // if key belongs to meta data, append its value.
+        if ($this->metaData->has($key)) {
+            /*if ( is_null($value) ) {
+                $this->metaData[$key]->markForDeletion();
+                return;
+            }*/
+            $this->metaData[$key]->value = $value;
+            return $this;
+        }
+
+        // if model table has the column named to the key
+        if ($this->hasColumn($key)) {
+            return parent::setAttribute($key, $value);
+        }
+
+        // key doesn't belong to model, lets create a new meta relationship
+        //if ( ! is_null($value) ) {
+        $this->setMetaString($key, $value);
+        //}
+        return $this;
+    }
+
+    /**
+     * Determine if model table has a given column.
+     *
+     * @param  [string]  $column
+     *
+     * @return boolean
+     */
+    public function hasColumn($column) {
+        if(empty(self::$_columnNames)) self::$_columnNames = array_map('strtolower',\Schema::connection($this->getConnectionName())->getColumnListing($this->getTable()));
+        return in_array(strtolower($column), self::$_columnNames);
+    }
+
     public function __unset($key)
     {
         // unset attributes and relations
@@ -387,15 +472,15 @@ trait Metable
     public function __set($key, $value)
     {
         // ignore the trait properties being set.
-        if ((isset($this->metaExplodes) && in_array($key, $this->metaExplodes)) || Str::startsWith($key, 'meta') || $key == 'query') {
+
+        if (Str::startsWith($key, 'meta') || $key == 'query') {
             $this->$key = $value;
 
             return;
         }
-
         // if key is a model attribute, set as is
         if (array_key_exists($key, parent::getAttributes())) {
-            parent::setAttribute($key, $value);
+            self::setAttribute($key, $value);
 
             return;
         }
@@ -414,6 +499,7 @@ trait Metable
 
         // if the key has a mutator execute it
         $mutator = Str::camel('set_'.$key.'_meta');
+
         if (method_exists($this, $mutator)) {
             $this->{$mutator}($value);
 
@@ -432,8 +518,8 @@ trait Metable
         }
 
         // if model table has the column named to the key
-        if (\Schema::connection($this->connection)->hasColumn($this->getTable(), $key)) {
-            parent::setAttribute($key, $value);
+        if ($this->hasColumn($key)) {
+            self::setAttribute($key, $value);
 
             return;
         }
@@ -447,7 +533,7 @@ trait Metable
     public function __isset($key)
     {
         // trait properties.
-        if ((isset($this->metaExplodes) && in_array($key, $this->metaExplodes)) || Str::startsWith($key, 'meta') || $key == 'query') {
+        if (Str::startsWith($key, 'meta') || $key == 'query') {
             return isset($this->{$key});
         }
 
