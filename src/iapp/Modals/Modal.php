@@ -43,7 +43,7 @@ trait Modal
 
     public static function resetRecordsId()
     {
-        $table = (new self())->getTable();
+        $table = (new static())->getTable();
         DB::statement(DB::raw('ALTER TABLE ' . $table . ' CHANGE `id` `id` BIGINT(20) UNSIGNED NOT NULL'));
         DB::statement(DB::raw('ALTER TABLE ' . $table . ' DROP PRIMARY KEY'));
         DB::statement(DB::raw('ALTER TABLE ' . $table . ' AUTO_INCREMENT=0'));
