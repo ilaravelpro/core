@@ -52,12 +52,14 @@ function _uv2ddff($u, $v)
 
 function _find_second_point($start, $dist, $bearing, $precision = 4)
 {
-    $radius = 6378.1;
+    $radius = 6371008.8 / 1000;
     $lon = deg2rad($start[0]);
     $lat = deg2rad($start[1]);
     $brng  = deg2rad($bearing);
+    /*$lat2 = $lat + cos($dist / $radius) * cos($brng);
+    $lon2 = $lon + sin($dist / $radius) * sin($brng);*/
     $lat2 = asin(sin($lat) * cos($dist / $radius) + cos($lat) * sin($dist / $radius) * cos($brng));
-    $lon2 = $lon + atan2(sin($brng) * sin($dist / $radius) * cos($lat), cos($dist / $radius) - sin($lat) * sin($lat2));
+    $lon2 = $lon + atan2(sin($brng) * sin($dist / $radius) * cos($lat), cos($dist / $radius) - sin($lat) * sin($lat));
     return [
         round(rad2deg($lon2), $precision),
         round(rad2deg($lat2), $precision),
