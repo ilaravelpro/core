@@ -19,6 +19,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 
 use Illuminate\Support\Facades\Hash;
 use Laravel\Passport\HasApiTokens;
+use Lcobucci\JWT\Encoding\JoseEncoder;
 
 
 class _User extends Authenticatable
@@ -213,7 +214,7 @@ class _User extends Authenticatable
 
     public static function findTokenID($token)
     {
-        return (new \Lcobucci\JWT\Parser())->parse($token)->claims()->get('jti');
+        return (new \Lcobucci\JWT\Token\Parser(new JoseEncoder()))->parse($token)->claims()->get('jti');
     }
 
     public function revokeAllTokens()

@@ -38,6 +38,7 @@
     "require": {
         "laravel/socialite": "^5.2",
         "laravel/passport": "^10.1",
+        "lcobucci/jwt": "^4.1",
         "intervention/image": "^2.5",
         "doctrine/dbal": "^3.1"
     }
