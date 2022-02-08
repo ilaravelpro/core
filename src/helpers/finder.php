@@ -91,8 +91,13 @@ function getClosestKey($search, $arr)
 function _set_value($data, $path, $value)
 {
     $temp = &$data;
-    foreach (explode('.', $path) as $key) {
-        $temp = &$temp[$key];
+    $keys = explode('.', $path);
+    foreach ($keys as $index => $key) {
+        if (is_numeric($key)) {
+            $temp = (object) $temp;
+            $temp = &$temp->$key;
+        }else
+            $temp = &$temp[$key];
     }
     $temp = $value;
     unset($temp);
@@ -110,6 +115,7 @@ function _get_value($array, $parents,$default = null, $glue = '.', $prepend = nu
     $ref = &$array;
 
     foreach ((array)$parents as $parent) {
+        if (is_object($ref)) $ref = (array) $ref;
         if (is_array($ref) && array_key_exists($parent, $ref)) {
             $ref = &$ref[$parent];
         } else {
@@ -131,6 +137,7 @@ function _has_key(array $array, $parents, $glue = '.')
 
     $ref = &$array;
     foreach ((array)$parents as $parent) {
+        if (is_object($ref)) $ref = (array) $ref;
         if (is_array($ref) && array_key_exists($parent, $ref)) {
             $ref = &$ref[$parent];
         } else {
@@ -149,7 +156,7 @@ function _unset_key(array $array, $parents, $glue = '.')
 
     $ref = &$array;
     foreach ((array)$parents as $parent) {
-        if (is_array($ref) && array_key_exists($parent, $ref)) {
+        if ((is_array($ref) || is_object($ref)) && array_key_exists($parent, $ref)) {
             unset($ref[$parent]);
         } else {
             return false;
