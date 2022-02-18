@@ -30,6 +30,7 @@ class iLaravel extends FormRequest
         $this->mobileRule($data);
         //$this->serialRule($data);
         $this->replace($data);
+
         return $data;
 
     }
@@ -106,14 +107,32 @@ class iLaravel extends FormRequest
         return false;
     }
 
+    public function withValidator(\Illuminate\Contracts\Validation\Validator $validator)
+    {
+        $validator->addCustomAttributes($this->attributes());
+        $validator->addReplacers($this->replacers());
+    }
+
+    public function replacers()
+    {
+        if (method_exists($this->controller(), 'validationReplacers')) {
+            return $this->controller()->validationReplacers($this, $this->route()->getActionMethod(), ...array_values($this->route()->parameters()));
+        }elseif($this->controller()->model && method_exists($this->controller()->model, 'validationReplacers')) {
+            return $this->controller()->model::getValidationReplacers($this, $this->route()->getActionMethod(), ...array_values($this->route()->parameters()));
+        }
+        return [];
+    }
+
     public function messages()
     {
         $messages = [
             'exists_serial' => __('validation.exists'),
             'serial' => __('validation.exists'),
         ];
-        if ($this->controller() && method_exists($this->controller(), 'validationMessages')) {
-            return array_merge($messages, $this->controller()->validationMessages($this, $this->route()->getAction('as'), ...array_values($this->route()->parameters())));
+        if (method_exists($this->controller(), 'validationMessages')) {
+            $messages = array_merge($messages, $this->controller()->validationMessages($this, $this->route()->getActionMethod(), ...array_values($this->route()->parameters())));
+        }elseif($this->controller()->model && method_exists($this->controller()->model, 'validationMessages')) {
+            $messages = array_merge($messages, $this->controller()->model::getValidationMessages($this, $this->route()->getActionMethod(), ...array_values($this->route()->parameters())));
         }
         return $messages;
 
@@ -121,8 +140,11 @@ class iLaravel extends FormRequest
 
     public function attributes()
     {
-        if ($this->controller() && method_exists($this->controller(), 'validationAttributes')) {
-            return $this->controller()->validationAttributes($this, $this->route()->getAction('as'), ...array_values($this->route()->parameters()));
+        if (!$this->controller()) return [];
+        if (method_exists($this->controller(), 'validationAttributes')) {
+            return $this->controller()->validationAttributes($this, $this->route()->getActionMethod(), ...array_values($this->route()->parameters()));
+        }elseif($this->controller()->model && method_exists($this->controller()->model, 'validationAttributes')) {
+            return $this->controller()->model::getValidationAttributes($this, $this->route()->getActionMethod(), ...array_values($this->route()->parameters()));
         }
         return [];
     }

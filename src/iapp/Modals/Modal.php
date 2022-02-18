@@ -77,6 +77,24 @@ trait Modal
         return method_exists($model, 'rules') ? $model->rules($request, $action, $item, ...$args) : [];
     }
 
+    public static function getValidationAttributes($request, $action, $item = null, ...$args)
+    {
+        $model = new static();
+        return method_exists($model, 'validationAttributes') ? $model->validationAttributes($request, $action, $item, ...$args) : [];
+    }
+
+    public static function getValidationMessages($request, $action, $item = null, ...$args)
+    {
+        $model = new static();
+        return method_exists($model, 'validationMessages') ? $model->validationMessages($request, $action, $item, ...$args) : [];
+    }
+
+    public static function getValidationReplacers($request, $action, $item = null, ...$args)
+    {
+        $model = new static();
+        return method_exists($model, 'validationReplacers') ? $model->validationReplacers($request, $action, $item, ...$args) : [];
+    }
+
     public function getAdditional(Request $request = null, $action = 'additional') {
         if (!$request) $request = new Request(request()->all());
         $rules = method_exists($this, 'rules') ? $this->rules($request, $action, $this) : [];
