@@ -88,12 +88,12 @@ function getClosestKey($search, $arr)
     return $keys[$prev == -1 ? 0 : $prev];
 }
 
-function _set_value($data, $path, $value)
+function _set_value($data, $path, $value, $checkNumber = true)
 {
     $temp = &$data;
     $keys = explode('.', $path);
     foreach ($keys as $index => $key) {
-        if (is_numeric($key)) {
+        if (is_numeric($key) && $checkNumber) {
             $temp = (object) $temp;
             $temp = &$temp->$key;
         }else
