@@ -22,7 +22,7 @@ class iEmail {
             if (!$email) return false;
             $value = $email;
         }
-        $re = '/(^[a-zA-Z0-9._-]*)+@+([a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.[a-zA-Z]{2,})$/';
+        $re = '/(^[A-Z0-9a-z._%+-]*)+@+([A-Za-z0-9.-]+\.[A-Za-z]{2,6})$/';
         preg_match($re, $value, $matches);
         $email = [];
         list($email['full'], $email['name'], $email['domain']) = $matches;
