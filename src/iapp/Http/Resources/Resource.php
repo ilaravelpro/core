@@ -88,7 +88,7 @@ class Resource extends JsonResource
 
     public function toLocal($local)
     {
-        return method_exists($this->resource, 'toLocal') ? $this->resource->toLocal($local) : false;
+        return $this->resource && (is_string($this->resource) || is_object($this->resource)) && method_exists($this->resource, 'toLocal') ? $this->resource->toLocal($local) : false;
     }
 
     public static function collection($resource)
