@@ -12,12 +12,23 @@ namespace iLaravel\Core\Providers;
 use Illuminate\Routing\Router;
 
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Auth;
 
 class RouteServiceProvider extends ServiceProvider
 {
     public function boot()
     {
         parent::boot();
+        \Route::macro('authIf', function(){
+            if(!app('request')->header('authorization')) {
+                $userClass = imodal('User');
+                Auth::setUser($userClass::guest());
+            }
+            return app('request')->header('authorization') ? 'auth:api' : 'api';
+        });
+        \Route::macro('authOr', function(){
+            return app('request')->header('authorization') ? 'auth:api' : 'api';
+        });
     }
 
     public function register()

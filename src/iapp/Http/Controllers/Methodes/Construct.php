@@ -9,7 +9,7 @@
 
 namespace iLaravel\Core\iApp\Http\Controllers\Methods;
 
-use Illuminate\Http\Request;
+use iLaravel\Core\iApp\Http\Requests\iLaravel as Request;
 
 trait Construct
 {

@@ -32,7 +32,6 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->mergeConfigFrom(i_path('config/ilaravel.php'), 'ilaravel.main');
-        $this->registerMacros();
         if ($this->app->request->is('api/*') || $this->app->request->ajax()) {
             if($this->app->request->is('api/*'))
             {
@@ -77,13 +76,6 @@ class AppServiceProvider extends ServiceProvider
     }
 
     public function registerMacros() {
-        \Route::macro('authIf', function(){
-            if(!app('request')->header('authorization')) {
-                $userClass = imodal('User');
-                Auth::setUser($userClass::guest());
-            }
-            return app('request')->header('authorization') ? 'auth:api' : 'api';
-        });
         RequestGuard::macro('isAdmin', function(){
             return $this->user->isAdmin();
         });

@@ -49,7 +49,7 @@ class AuthServiceProvider extends ServiceProvider
             'auth.guards.api.driver' => 'passport'
         ]);
         Config::set([
-            'auth.guards.apiIf' => Config::get('auth.guards.api')
+            'auth.guards.apiIf' => array_merge(Config::get('auth.guards.api'), ['driver' => 'passport'])
         ]);
     }
 }

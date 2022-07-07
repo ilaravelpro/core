@@ -10,10 +10,12 @@
 namespace iLaravel\Core\iApp\Http\Requests;
 
 use iLaravel\Core\Vendor\Validations\iPhone;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
 use App\User;
 use Illuminate\Support\Str;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class iLaravel extends FormRequest
 {
@@ -101,8 +103,13 @@ class iLaravel extends FormRequest
 
     public function controller()
     {
-        if ($this->route() && $this->route()->controller) {
-            return $this->route()->getController();
+        if ($this->route()){
+            if($this->route()->controller) {
+                return $this->route()->getController();
+            }/*elseif ($this->route()->getAction('controller')){
+                $controller = explode('@', $this->route()->getAction('controller'))[0];
+                return new $controller($this);
+            }*/
         }
         return false;
     }
@@ -115,9 +122,9 @@ class iLaravel extends FormRequest
 
     public function replacers()
     {
-        if (method_exists($this->controller(), 'validationReplacers')) {
+        if ($this->controller() && method_exists($this->controller(), 'validationReplacers')) {
             return $this->controller()->validationReplacers($this, $this->route()->getActionMethod(), ...array_values($this->route()->parameters()));
-        }elseif($this->controller()->model && method_exists($this->controller()->model, 'validationReplacers')) {
+        }elseif($this->controller() && $this->controller()->model && method_exists($this->controller()->model, 'validationReplacers')) {
             return $this->controller()->model::getValidationReplacers($this, $this->route()->getActionMethod(), ...array_values($this->route()->parameters()));
         }
         return [];
@@ -129,9 +136,9 @@ class iLaravel extends FormRequest
             'exists_serial' => __('validation.exists'),
             'serial' => __('validation.exists'),
         ];
-        if (method_exists($this->controller(), 'validationMessages')) {
+        if ($this->controller() && method_exists($this->controller(), 'validationMessages')) {
             $messages = array_merge($messages, $this->controller()->validationMessages($this, $this->route()->getActionMethod(), ...array_values($this->route()->parameters())));
-        }elseif($this->controller()->model && method_exists($this->controller()->model, 'validationMessages')) {
+        }elseif($this->controller() && $this->controller()->model && method_exists($this->controller()->model, 'validationMessages')) {
             $messages = array_merge($messages, $this->controller()->model::getValidationMessages($this, $this->route()->getActionMethod(), ...array_values($this->route()->parameters())));
         }
         return $messages;
@@ -141,7 +148,7 @@ class iLaravel extends FormRequest
     public function attributes()
     {
         if (!$this->controller()) return [];
-        if (method_exists($this->controller(), 'validationAttributes')) {
+        if ($this->controller() && method_exists($this->controller(), 'validationAttributes')) {
             return $this->controller()->validationAttributes($this, $this->route()->getActionMethod(), ...array_values($this->route()->parameters()));
         }elseif($this->controller()->model && method_exists($this->controller()->model, 'validationAttributes')) {
             return $this->controller()->model::getValidationAttributes($this, $this->route()->getActionMethod(), ...array_values($this->route()->parameters()));
@@ -184,7 +191,11 @@ class iLaravel extends FormRequest
                 auth()->login(User::guest());
             }
             $args = array_values($this->route()->parameters());
-            $auth = $this->controller()->authorize($action, $args);
+            try {
+                $auth = $this->controller()->authorize($action, $args);
+            }catch (AccessDeniedHttpException $e){
+                $auth = false;
+            }
         }
         if ($auth && $this->controller() && method_exists($this->controller(), 'gate')) {
             $auth = $this->controller()->gate($this, $this->route()->getActionMethod(), ...array_values($this->route()->parameters()));
@@ -209,10 +220,10 @@ class iLaravel extends FormRequest
         $rules = [];
         if (!$this->controller()) return $rules;
         if (method_exists($this->controller(), 'rules')) {
-            $rules = $this->controller()->rules($this, $this->route()->getActionMethod(), ...array_values($this->route()->parameters()));
+            $rules = $this->controller()->rules($this, $this->route()->getActionMethod(), ...array_values($this->route()->parameters())) ? : [];
             $this->controller()->setFillable($this->route()->getActionMethod(), array_keys($rules));
         }elseif($this->controller()->model && method_exists($this->controller()->model, 'rules')) {
-            $rules = $this->controller()->model::getRules($this, $this->route()->getActionMethod(), ...array_values($this->route()->parameters()));
+            $rules = $this->controller()->model::getRules($this, $this->route()->getActionMethod(), ...array_values($this->route()->parameters())) ? : [];
             $this->controller()->setFillable($this->route()->getActionMethod(), array_keys($rules));
         }
         return $rules;
