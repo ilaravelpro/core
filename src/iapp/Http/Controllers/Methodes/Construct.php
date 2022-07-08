@@ -9,7 +9,6 @@
  */
 
 namespace iLaravel\Core\iApp\Http\Controllers\Methods;
-namespace iLaravel\Core\iApp\Http\Controllers\API\Methods;
 
 use iLaravel\Core\iApp\Http\Requests\iLaravel as Request;
 
