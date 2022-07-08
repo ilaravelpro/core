@@ -21,9 +21,9 @@ trait Construct
         if ($request->route()){
             if (isset($request->route()->getAction()['method'])){
                 $action = $request->route()->getAction()['method'];
-            }elseif ($request->route()->getAction('as')) {
-                $aAaction = explode('.', $action);
-                $action = $aAaction[0];
+            }elseif ($aAaction = $request->route()->getAction('as')) {
+                $aAaction = explode('.', $aAaction);
+                $action = $aAaction[count($aAaction) - 1] ? : $action;
             }
         }
         if (!isset($this->model)) $this->model = imodal($class_name);
