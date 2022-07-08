@@ -18,7 +18,15 @@ trait Construct
     public function __construct(Request $request)
     {
         $class_name = $this->class_name(null, null, 1);
-        $action = $request->route() && isset($request->route()->getAction()['method']) ? $request->route()->getAction()['method'] : 'index';
+        $action = 'index';
+        if ($request->route()){
+            if (isset($request->route()->getAction()['method'])){
+                $action = $request->route()->getAction()['method'];
+            }elseif ($this->route()->getAction('as')) {
+                $aAaction = explode('.', $action);
+                $action = $aAaction[0];
+            }
+        }
         if (!isset($this->model)) $this->model = imodal($class_name);
         if (isset($this->parentController))
             $this->parentModel = imodal($this->class_name($this->parentController, null, 1));
