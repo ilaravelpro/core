@@ -70,7 +70,7 @@ trait Construct
                 if (!class_exists($this->parentResourceDataCollectionClass)) $this->parentResourceDataCollectionClass = iresource('ResourceData');
             }
         }
-        if ($request->format && is_string($request->format) && in_array($request->format, ['gjson', 'geojson'])) {
+        if (($request->format && is_string($request->format) && in_array($request->format, ['gjson', 'geojson'])) || $request->no_pagination) {
             $this->disablePagination = true;
         }
     }
