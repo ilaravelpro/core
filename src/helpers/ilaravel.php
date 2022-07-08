@@ -50,3 +50,6 @@ function ipreference($key = null, $default = null, $type = 'auto')
     return $value;
 }
 
+function _has_token(){
+    return app('request')->header('authorization');
+}

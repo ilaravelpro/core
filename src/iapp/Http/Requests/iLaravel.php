@@ -187,7 +187,9 @@ class iLaravel extends FormRequest
         $action = str_replace('api.', '', $action);
         $auth = true;
         if (in_array($action, array_keys(Gate::abilities()))) {
-            if (!auth()->check() && in_array('auth:apiIf', $this->route()->getAction('middleware'))) {
+            $middlewares = $this->route()->getAction('middleware');
+            if (in_array('api', is_array($middlewares) ? $middlewares : [$middlewares])) return $auth;
+            if (!auth()->check() && in_array('auth:apiIf', is_array($middlewares) ? $middlewares : [$middlewares])) {
                 auth()->login(User::guest());
             }
             $args = array_values($this->route()->parameters());

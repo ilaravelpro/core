@@ -11,6 +11,7 @@
 namespace iLaravel\Core\iApp\Http\Controllers\API\v1\Auth;
 
 use iLaravel\Core\iApp\Http\Requests\iLaravel as Request;
+use iLaravel\Core\Vendor\Validations\iPhone;
 
 trait UsernameMethod
 {
@@ -19,6 +20,8 @@ trait UsernameMethod
         if ($this->username_method) return $this->username_method;
         $username = $request->input('username');
         $type = 'username';
+        if (is_array($username) && $username = iPhone::parse($username))
+            $username = $username['full'];
         if ($this->model::id($username)) {
             $type = 'id';
             $request->request->remove('username');;

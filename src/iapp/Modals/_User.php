@@ -56,20 +56,27 @@ class _User extends Authenticatable
     ];
     public $with = ['mobile', 'email'];
 
-    protected static function boot()
+    public function __construct(array $attributes = [])
     {
-        parent::boot();
-        parent::saving(function (self $event) {
-            if (isset($event->attributes['mobile'])) {
-                $event->_mobile = $event->attributes['mobile'];
-                unset($event->mobile);
-                unset($event->attributes['mobile']);
+        if (count($attributes)) {
+            if (isset($attributes['mobile'])) {
+                $this->_mobile = $attributes['mobile'];
+                unset($this->mobile);
+                unset($attributes['mobile']);
             }
-            if (isset($event->attributes['email'])) {
-                $event->_email = $event->attributes['email'];
-                unset($event->email);
-                unset($event->attributes['email']);
+            if (isset($attributes['email'])) {
+                $this->_email = $attributes['email'];
+                unset($this->email);
+                unset($attributes['email']);
             }
+        }
+        parent::__construct($attributes);
+    }
+
+    protected static function booting()
+    {
+        parent::booting();
+        parent::saving(function ($event) {
             $event->saveFiles($event->files, request());
         });
         parent::saved(function (self $event) {
