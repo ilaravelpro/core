@@ -21,7 +21,7 @@ trait Construct
         if ($request->route()){
             if (isset($request->route()->getAction()['method'])){
                 $action = $request->route()->getAction()['method'];
-            }elseif ($this->route()->getAction('as')) {
+            }elseif ($request->route()->getAction('as')) {
                 $aAaction = explode('.', $action);
                 $action = $aAaction[0];
             }
