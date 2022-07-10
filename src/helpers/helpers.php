@@ -110,3 +110,11 @@ function _reset_path($path)
 {
     return _is_windows() == 'windows' ? str_replace('/', '\\', $path) : str_replace('\\', '/', $path);
 }
+
+function _level_password($pwd) {
+    $level = 0;
+    if (strlen($pwd) > 8) $level++;
+    if (preg_match("#[0-9]+#", $pwd)) $level++;
+    if (preg_match("#[a-zA-Z]+#", $pwd)) $level++;
+    return $level;
+}

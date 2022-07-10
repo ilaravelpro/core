@@ -34,7 +34,7 @@ class _Post extends Model
 
     public function creator()
     {
-        return $this->belongsTo(\App\User::class);
+        return $this->belongsTo(imodal('User'));
     }
 
     public function rules(Request $request, $action, $parent = null)

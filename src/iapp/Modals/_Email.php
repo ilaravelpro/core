@@ -24,13 +24,14 @@ class _Email extends Eloquent
     protected $hidden = ['model', 'model_id'];
     protected $appends = ['text'];
 
-    public static function findByEmail($name, $domain = null, $model = null, $model_id = null, $key = null)
+    public static function findByEmail($name, $domain = null, $model = null, $model_id = null, $key = null, $verified = false)
     {
         if (!$domain && Str::contains($name, '@'))
             list($name, $domain) = explode('@', $name);
         $static = static::class;
         foreach (['name', 'domain', 'model', 'model_id', 'key', ] as $datum)
             if ($$datum) $static = $datum == 'name' ? $static::where($datum, $$datum) : $static->where($datum, $$datum);
+        if ($verified) $static->whereNotNull('verified_at');
         return $static->first();
     }
 

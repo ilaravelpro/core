@@ -24,9 +24,9 @@ class _Phone extends Eloquent
     protected $hidden = ['model', 'model_id'];
     protected $appends = ['text'];
 
-    public static function findByMobile($mobile, $model = null, $id = null, $key = null)
+    public static function findByMobile($mobile, $model = null, $id = null, $key = null, $verified = false)
     {
-        if (strlen($mobile) <= 11) {
+        if (is_string($mobile) && strlen($mobile) <= 11) {
             $mobile = "98". ltrim($mobile, '0');
         }
         $mobile = iPhone::parse($mobile);
@@ -42,6 +42,7 @@ class _Phone extends Eloquent
         if ($model) $find->where('model', $model);
         if ($id) $find->where('model_id', $id);
         if ($key) $find->where('key', $key);
+        if ($verified) $find->whereNotNull('verified_at');
         return $find->first();
     }
 

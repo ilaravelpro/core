@@ -166,7 +166,7 @@ class _User extends Authenticatable
 
     public function getFullnameAttribute()
     {
-        return $this->name . " " . $this->family;
+        return implode(' ',array_filter([$this->name, $this->family], 'strlen')) ? : null;
     }
 
     public function getIsAdminAttribute()
