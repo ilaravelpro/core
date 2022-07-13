@@ -59,9 +59,11 @@ class AppServiceProvider extends ServiceProvider
         Schema::defaultStringLength(191);
 
     }
+
     public function register()
     {
         $this->app->booting(function () {
+            $this->registerMacros();
             $this->app->bind('Illuminate\Routing\ResourceRegistrar', '\iLaravel\Core\iApp\Http\Registrars\ResourceRegistrar');
             $loader = AliasLoader::getInstance();
             $loader->alias('iRole', \iLaravel\Core\Vendor\iRole\iRole::class);
