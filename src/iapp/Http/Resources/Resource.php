@@ -47,7 +47,7 @@ class Resource extends JsonResource
             }
             unset($data['meta_data']);
         }
-        if (method_exists($this, 'fields'))
+        if ($this && method_exists($this, 'fields'))
             $data = $this->fields($request, $data);
         foreach ($data as $key => $value){
             if (substr($key, -3, 3) === '_at' && ipreference('lang') == 'fa' && $data[$key])
@@ -65,7 +65,7 @@ class Resource extends JsonResource
                 if ($this->$item) $data = insert_into_array($data, $item.'_id', $item, File::collection($this->$item));
                 unset($data[$item.'_id']);
             }
-        if (isset($data['id']) && method_exists($request, 'route') && !request()->has('no_actions') && $request->route()) {
+        if (auth()->check() && isset($data['id']) && method_exists($request, 'route') && !request()->has('no_actions') && $request->route()) {
             if (!$this->route_src){
                 $this->route_src = $request->route()->getAction('as');
                 $aAaction = explode('.', $this->route_src);

@@ -79,7 +79,8 @@ trait Index
                 $request->validate([
                     'status' => 'nullable|string',
                 ]);
-                $model->where('status', "like",$status);
+                $prefix_table = method_exists($model, 'getModel') ? ($model->getModel()->getTable() . ".") : '';
+                $model->where($prefix_table.'status', "like",$status);
                 $current_filter['status'] = $status;
             }
         }
