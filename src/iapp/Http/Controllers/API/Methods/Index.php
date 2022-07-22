@@ -94,12 +94,16 @@ trait Index
             $anyByUser = function ($model) {
                 return $model->where(function ($query) use ($model) {
                     $idName = null;
-                    if (auth()->user()->role && \Schema::hasColumn($model->getModel()->getTable(), auth()->user()->role . '_id'))
+                    $table = $model->getModel()->getTable();
+                    if (auth()->user()->role && \Schema::hasColumn($table, auth()->user()->role . '_id'))
                         $idName = auth()->user()->role."_id";
-                    elseif (\Schema::hasColumn($model->getModel()->getTable(), 'user_id'))
+                    elseif (\Schema::hasColumn($table, 'user_id'))
                         $idName = 'user_id';
-                    elseif (\Schema::hasColumn($model->getModel()->getTable(), 'creator_id'))
+                    elseif (\Schema::hasColumn($table, 'creator_id'))
                         $idName = 'creator_id';
+                    if ($table) {
+                        $idName = "{$table}.{$idName}";
+                    }
                     if ($idName)
                         $query->where($idName, auth()->id());
                     return $query;
