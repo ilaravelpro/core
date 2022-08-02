@@ -25,13 +25,13 @@ class RouteServiceProvider extends ServiceProvider
                 Auth::setUser($userClass::guest());
             }
             $auth = app('request')->header('authorization');
-            $auth = str_replace(['null', 'Bearer null'], '', $auth);
-            return $auth ? 'auth:api' : 'api';
+            $auth = trim(str_replace(['Bearer', 'null'], '', $auth));
+            return strlen($auth) > 5 ? 'auth:api' : 'api';
         });
         \Route::macro('authOr', function(){
             $auth = app('request')->header('authorization');
-            $auth = str_replace(['null', 'Bearer null'], '', $auth);
-            return $auth ? 'auth:api' : 'api';
+            $auth = trim(str_replace(['Bearer', 'null'], '', $auth));
+            return strlen($auth) > 5 ? 'auth:api' : 'api';
         });
     }
 
