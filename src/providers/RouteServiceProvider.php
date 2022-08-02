@@ -24,10 +24,14 @@ class RouteServiceProvider extends ServiceProvider
                 $userClass = imodal('User');
                 Auth::setUser($userClass::guest());
             }
-            return app('request')->header('authorization') ? 'auth:api' : 'api';
+            $auth = app('request')->header('authorization');
+            $auth = str_replace(['null', 'Bearer null'], '', $auth);
+            return $auth ? 'auth:api' : 'api';
         });
         \Route::macro('authOr', function(){
-            return app('request')->header('authorization') ? 'auth:api' : 'api';
+            $auth = app('request')->header('authorization');
+            $auth = str_replace(['null', 'Bearer null'], '', $auth);
+            return $auth ? 'auth:api' : 'api';
         });
     }
 
