@@ -112,6 +112,7 @@ trait Index
             $subs = array_filter(iconfig('scopes.' . $this->action . '.items.view', []), function ($sub) {
                 return iRole::has("$this->action.view.$sub");
             });
+            if (!count($subs)) $subs = ['anyByUser'];
             foreach ($subs as $sub) {
                 if (function_exists('i_query_index_switch'))
                     $model = i_query_index_switch($sub, $model,$this->action , $request, $anyByUser);
