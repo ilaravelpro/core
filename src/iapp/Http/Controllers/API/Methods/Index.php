@@ -101,6 +101,8 @@ trait Index
                         $idName = 'user_id';
                     elseif (\Schema::hasColumn($table, 'creator_id'))
                         $idName = 'creator_id';
+                    else
+                        return $query;
                     if ($table) {
                         $idName = "{$table}.{$idName}";
                     }
