@@ -23,9 +23,9 @@ trait SearchQ
         $model->where(function ($query) use ($q, $id, $parent_id, $first) {
             foreach ($this->model::getTableColumns() as $index => $column)
                 if ($id && in_array($column, ['id', 'parent']))
-                    $query->where($column, $q);
+                    $query->where(with(new static)->getTable().'.'.$column, $q);
                 elseif (!$id && !$parent_id){
-                    $query->orWhere($column, 'LIKE', "%$q%");
+                    $query->orWhere(with(new static)->getTable().'.'.$column, 'LIKE', "%$q%");
                 }
             return $query;
         });
