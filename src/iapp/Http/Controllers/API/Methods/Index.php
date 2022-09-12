@@ -178,7 +178,7 @@ trait Index
             return [$model, $allowed, $order_theory, $default_order];
         }
         foreach ($order_theory as $key => $value) {
-            $model->orderBy($allowed[$key], $value);
+            $model->orderBy($model->getModel()->getTable() . '.' . $allowed[$key], $value);
         }
         if (isset($this->disablePagination)) {
             $paginate = $model->get();
