@@ -9,6 +9,7 @@
 
 namespace iLaravel\Core\iApp\Modals;
 
+use iLaravel\Core\iApp\Http\Requests\iLaravel as Request;
 use iLaravel\Core\iApp\Role;
 use iLaravel\Core\iApp\UserMeta;
 use iLaravel\Core\Vendor\Validations\iPhone;
@@ -77,7 +78,7 @@ class _User extends Authenticatable
     {
         parent::booting();
         parent::saving(function ($event) {
-            $event->saveFiles($event->files, request());
+            $event->saveFiles($event->files, Request::createFrom(request()));
         });
         parent::saved(function (self $event) {
             $event->saveMobile($event->_mobile)->saveEmail($event->_email);
