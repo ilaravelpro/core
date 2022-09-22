@@ -9,6 +9,7 @@
 
 namespace iLaravel\Core\iApp\Modals;
 
+use App\User;
 use iLaravel\Core\iApp\Http\Requests\iLaravel as Request;
 use iLaravel\Core\iApp\Role;
 use iLaravel\Core\iApp\UserMeta;
@@ -20,6 +21,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 
 use Illuminate\Support\Facades\Hash;
 use Laravel\Passport\HasApiTokens;
+use Laravel\Passport\Token;
 use Lcobucci\JWT\Encoding\JoseEncoder;
 
 
@@ -223,6 +225,12 @@ class _User extends Authenticatable
     public static function findTokenID($token)
     {
         return (new \Lcobucci\JWT\Token\Parser(new JoseEncoder()))->parse($token)->claims()->get('jti');
+    }
+
+    public static function findByToken($token)
+    {
+        $token = Token::find(static::findTokenID(trim(str_replace('Bearer', '', $token))));
+        return $token ? static::find($token->user_id) : false;
     }
 
     public function revokeAllTokens()

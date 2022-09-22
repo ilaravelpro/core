@@ -15,6 +15,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
 use App\User;
 use Illuminate\Support\Str;
+use Laravel\Passport\Token;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class iLaravel extends FormRequest
@@ -188,7 +189,8 @@ class iLaravel extends FormRequest
         $auth = true;
         if (in_array($action, array_keys(Gate::abilities()))) {
             $middlewares = $this->route()->getAction('middleware');
-            if (in_array('api', is_array($middlewares) ? $middlewares : [$middlewares])) return $auth;
+            if (is_array($middlewares)) $middlewares = array_unique($middlewares);
+            if (in_array('api', is_array($middlewares) && count($middlewares) == 1 ? $middlewares : [$middlewares])) return $auth;
             if (!auth()->check() && in_array('auth:apiIf', is_array($middlewares) ? $middlewares : [$middlewares])) {
                 auth()->login(User::guest());
             }
@@ -201,7 +203,7 @@ class iLaravel extends FormRequest
         }
         if ($auth && $this->controller() && method_exists($this->controller(), 'gate')) {
             $auth = $this->controller()->gate($this, $this->route()->getActionMethod(), ...array_values($this->route()->parameters()));
-        };
+        }
         return $auth;
     }
 
