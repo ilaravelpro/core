@@ -34,7 +34,9 @@ class iPhone {
                 ->where('key', _get_value($parameters, '2', 'mobile'))
                 ->where('country', $phone['country'])
                 ->where('prefix', $phone['prefix'])
-                ->where('number', $phone['number'])->first() ? false : $phone;
+                ->where('number', $phone['number'])->where(function($q) use ($parameters) {
+                    if (isset($parameters[2]) && is_numeric($parameters[2])) $q->whereNot('model_id', $parameters[2]);
+                })->first() ? false : $phone;
         return $phone;
     }
 }

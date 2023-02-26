@@ -19,6 +19,7 @@ class Resource extends JsonResource
     public $route_src = null;
     public $c_serial = null;
     public $_local = null;
+    public $table = null;
     public function __construct($resource)
     {
         $args = func_get_args();
@@ -33,7 +34,7 @@ class Resource extends JsonResource
             $this->_local = isset($args[1]) && $args[1] ? $args[1] : $request->local;
         }
         $role = auth()->check() ? auth()->user()->role : 'guest';
-        if (!isset($this->table)) $this->table = class_name(request()->route()->getController(), true, 2);
+        if (!$this->table && $this->resource) $this->table = method_exists($this->resource, 'getTable') ? $this->resource->getTable() : class_name(request()->route()->getController(), true, 2);
         $hidden = iconfig('resources.' . $this->table, []) ? $this->table : 'global';
         $hidden = array_merge(iconfig('resources.' . $hidden . '.hidden.' . $role, []), iconfig('resources.' . $hidden . '.hidden.global', []));
         $data = parent::toArray($request);
