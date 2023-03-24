@@ -10,6 +10,7 @@
 namespace iLaravel\Core\iApp\Http\Controllers\API\v1\Auth;
 
 use iLaravel\Core\iApp\Http\Requests\iLaravel as Request;
+use Illuminate\Auth\AuthenticationException;
 
 trait FindUser
 {
@@ -25,6 +26,9 @@ trait FindUser
                     $user = $user->item();
             } else
                 $user = $this->model::where($this->username_method, $request->input($this->username_method))->first();
+        }
+        if ($user->status == "block") {
+            throw new AuthenticationException('You are blocked.');
         }
         return $user;
     }
