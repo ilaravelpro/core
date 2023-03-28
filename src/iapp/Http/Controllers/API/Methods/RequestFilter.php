@@ -30,7 +30,7 @@ trait RequestFilter
                 }
                 else
                     $fsymbol = '=';
-                $rules = method_exists($this, 'rules') ? $this->rules($request, 'store', $model, $parent) : $this->model::getRules($request, 'store', $model, $parent);
+                $rules = method_exists($this, 'rules') ? $this->rules($request, 'store') : $this->model::getRules($request, 'store');
                 $rule = str_replace(['required'], ['nullable'], _get_value($rules, $ftype, 'nullable|string'));
                 if (isset($filterOPT[0]['rule']) && is_callable($filterOPT[0]['rule']))
                     $filter = (object) $filterOPT[0]['rule']($filter);
