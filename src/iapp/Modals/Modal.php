@@ -118,28 +118,49 @@ trait Modal
         unset($this->{$name."_file"});
     }
 
-
-    public function saveAttachment($name, $request, $sizes = ["52","75", "150" ,"300" , "600" ,"900"]) {
-        $fileattachment = $request->file($name);
-        \request()->files->remove($name);
-        \request()->request->remove($name);
-        $file = imodal('File');
-        if($fileattachment){
-            $attachment = $file::upload($request, $name);
-            if ($attachment) {
-                if (preg_match(' /(?:image)/', $fileattachment->getClientMimeType())){
-                    foreach ($sizes as $size)
-                        $file::imageSize($attachment, $size);
-                }
-                return $attachment;
+    public function saveFileInContent(&$content, $parent_name, $name, $request, $event = null) {
+        $attachment = $this->saveAttachment("{$parent_name}.{$name}_file", $request);
+        $post = imodal('Attachment');
+        if ($attachment){
+            if ($attachment){
+                $oldValue = _get_value($content, "{$name}_id");
+                if ($oldValue && $post::find($oldValue))
+                    $post::find($oldValue)->delete();
+                _unset_key($content, "{$name}_file");
+                $content = _set_value($content, "{$name}_id", $attachment->id);
             }
         }
+        return $attachment;
+    }
+
+    public function saveAttachment($name, $request, $sizes = ["52","75", "150" ,"300" , "600" ,"900"]) {
+        try {
+            $fileattachment = $request->file($name);
+            if($fileattachment){
+                \request()->files->remove($name);
+                \request()->request->remove($name);
+                $file = imodal('File');
+                $attachment = $file::upload($request, $name);
+                if ($attachment) {
+                    if (preg_match(' /(?:image)/', $fileattachment->getClientMimeType())){
+                        foreach ($sizes as $size)
+                            $file::imageSize($attachment, $size);
+                    }
+                    return $attachment;
+                }
+            }
+        }catch (\Throwable $exception) {}
         return false;
     }
 
     public function saveFiles($names, $request, $event = null) {
         foreach ($names as $name)
             $this->saveFile($name, $request, $event);
+    }
+
+    public function saveFilesInContent(&$content, $parent_name, $names, $request, $event = null) {
+        foreach ($names as $name)
+            $this->saveFileInContent($content, $parent_name, $name, $request, $event);
     }
 
     public function getFile($key)
