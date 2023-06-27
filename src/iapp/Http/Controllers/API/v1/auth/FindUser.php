@@ -27,7 +27,7 @@ trait FindUser
             } else
                 $user = $this->model::where($this->username_method, $request->input($this->username_method))->first();
         }
-        if ($user->status == "block") {
+        if ($user && $user->status == "block") {
             throw new AuthenticationException('You are blocked.');
         }
         return $user;
