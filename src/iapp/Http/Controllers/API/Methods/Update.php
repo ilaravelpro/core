@@ -38,6 +38,9 @@ trait Update
         if (method_exists($this, 'fields')) {
             $fields = $this->fields($request, $arg4, $parent, ...$args);
             $except = method_exists($this, 'except') ? $this->except($request, $arg4, ...$args) : [];
+            if ($model && isset($model->files) && is_array($model->files) && count($model->files)) $except = array_merge($except, array_map(function ($v) {
+                return "{$v}_file";
+            }, $model->files));
             foreach ($except as $value) {
                 if (isset($fields[$value])) {
                     unset($fields[$value]);
@@ -58,6 +61,9 @@ trait Update
             $rules = method_exists($this, 'rules') ? $this->rules($request, $arg4, ...$args2) : $this->model::getRules($request, $arg4, ...$args2);
             $fields = $this->fillable($arg4) ?: array_keys($rules);
             $except = method_exists($this, 'except') ? $this->except($request, $arg4, ...$args2) : [];
+            if ($model && isset($model->files) && is_array($model->files) && count($model->files)) $except = array_merge($except, array_map(function ($v) {
+                return "{$v}_file";
+            }, $model->files));
             $changed = [];
             $original = [];
             $requestArray = $request->toArray();

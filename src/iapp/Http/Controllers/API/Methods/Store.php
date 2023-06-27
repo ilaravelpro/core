@@ -88,6 +88,10 @@ trait Store
             $rules = method_exists($this, 'rules') ? $this->rules($request, 'store', ...$args2) : $this->model::getRules($request, 'store', ...$args2);
             $fields = $this->fillable('store') ?: array_keys($rules);
             $except = method_exists($this, 'except') ? $this->except($request, 'store', ...$args2) : [];
+            $model = new $this->model;
+            if ($model && isset($model->files) && is_array($model->files) && count($model->files)) $except = array_merge($except, array_map(function ($v) {
+                return "{$v}_file";
+            }, $model->files));
             $requestArray = $request->toArray();
             $fields = $this->handelFields($except, $fields, $requestArray);
             foreach ($fields as $value) {
