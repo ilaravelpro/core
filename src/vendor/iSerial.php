@@ -6,7 +6,7 @@
  * Copyright (c) 2021. Powered by iamir.net
  */
 
-namespace iLaravel\Core\Vendor;;
+namespace iLaravel\Core\Vendor;
 
 class iSerial {
     public static $ALPHABET_NUMBER = '2513964078';

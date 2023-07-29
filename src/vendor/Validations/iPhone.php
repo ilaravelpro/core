@@ -18,7 +18,7 @@ class iPhone {
             $number = null;
             foreach (['country', 'prefix', 'number'] as $item)
                 if (isset($value[$item]) && $value[$item])
-                    $number .= $value[$item];
+                    $number .= intval($value[$item]);
             if (!$number) return false;
             $value = $number;
         }
