@@ -94,57 +94,61 @@ class _User extends Authenticatable
     }
 
     public function saveMobile($mobile, $verified_at = null) {
-        if ($mobile && isset($mobile) && (is_string($mobile) || (is_array($mobile) && count($mobile)))) {
-            if (is_string($mobile) && strlen($mobile) <= 11) {
-                $mobile = "98". ltrim($mobile, '0');
-            }
-            $mobile = iPhone::parse($mobile);
-            $mobile = is_array($mobile) ? $mobile : $this->mobile->toArray();
-            unset($mobile['full']);
-            if ($mobile) {
-                if ($mobileModel = $this->mobile()->first()) {
-                    foreach ($mobile as $index => $item)
-                        $mobileModel->$index = $item;
-                    $mobileModel->verified_at = $verified_at;
-                    $mobileModel->save();
-                } else {
-                    $this->mobile()->create(array_merge(
-                        [
-                            'model' => 'User',
-                            'model_id' => $this->id,
-                            'key' => 'mobile',
-                            'verified_at' => $verified_at,
-                        ], $mobile));
+        try {
+            if ($mobile && isset($mobile) && (is_string($mobile) || (is_array($mobile) && count($mobile)))) {
+                if (is_string($mobile) && strlen($mobile) <= 11) {
+                    $mobile = "98". ltrim($mobile, '0');
+                }
+                $mobile = iPhone::parse($mobile);
+                $mobile = is_array($mobile) ? $mobile : $this->mobile->toArray();
+                unset($mobile['full']);
+                if ($mobile) {
+                    if ($mobileModel = $this->mobile()->first()) {
+                        foreach ($mobile as $index => $item)
+                            $mobileModel->$index = $item;
+                        $mobileModel->verified_at = $verified_at;
+                        $mobileModel->save();
+                    } else {
+                        $this->mobile()->create(array_merge(
+                            [
+                                'model' => 'User',
+                                'model_id' => $this->id,
+                                'key' => 'mobile',
+                                'verified_at' => $verified_at,
+                            ], $mobile));
+                    }
                 }
             }
-        }
+        }catch (\Throwable $exception) {}
         return $this;
     }
 
     public function saveEmail($email, $verified_at = null) {
-        if ($email && isset($email) && (is_string($email) || (is_array($email) && count($email)))) {
-            if (!is_string($email)) $email = is_array($email) ? $email : $this->email->toArray();
-            list($name, $domain) = is_string($email) ? explode('@', $email) : [_get_value($email, 'name'), _get_value($email, 'domain')];
-            if ($emailModel = $this->email()->first()) {
-                $has_name = $name && $emailModel->name != $name;
-                $has_domain = $domain && $emailModel->domain != $domain;
-                if ($has_name || $has_domain) {
-                    if (isset($has_name) && $has_name) $emailModel->name = $name;
-                    if (isset($has_domain) && $has_domain) $emailModel->domain = $domain;
-                    $emailModel->verified_at = $verified_at;
-                    $emailModel->save();
+        try {
+            if ($email && isset($email) && (is_string($email) || (is_array($email) && count($email)))) {
+                if (!is_string($email)) $email = is_array($email) ? $email : $this->email->toArray();
+                list($name, $domain) = is_string($email) ? explode('@', $email) : [_get_value($email, 'name'), _get_value($email, 'domain')];
+                if ($emailModel = $this->email()->first()) {
+                    $has_name = $name && $emailModel->name != $name;
+                    $has_domain = $domain && $emailModel->domain != $domain;
+                    if ($has_name || $has_domain) {
+                        if (isset($has_name) && $has_name) $emailModel->name = $name;
+                        if (isset($has_domain) && $has_domain) $emailModel->domain = $domain;
+                        $emailModel->verified_at = $verified_at;
+                        $emailModel->save();
+                    }
+                } else {
+                    $this->email()->create([
+                        'model' => 'User',
+                        'model_id' => $this->id,
+                        'key' => 'email',
+                        'name' => $name,
+                        'domain' => $domain,
+                        'verified_at' => $verified_at,
+                    ]);
                 }
-            } else {
-                $this->email()->create([
-                    'model' => 'User',
-                    'model_id' => $this->id,
-                    'key' => 'email',
-                    'name' => $name,
-                    'domain' => $domain,
-                    'verified_at' => $verified_at,
-                ]);
             }
-        }
+        }catch (\Throwable $exception) {}
     }
 
     public function sendPasswordResetNotification($token)
