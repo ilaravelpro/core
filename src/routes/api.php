@@ -22,6 +22,7 @@ Route::namespace('v1')->prefix('v1')->group(function () {
             ]);
         }
         if (iconfig('auth.logout')) Route::post('auth/logout', 'AuthController@logout')->name('api.auth.logout');
+        if (iconfig('attachments.uploader.editors.status', true)) Route::post('uploader/editors/{type}', 'AttachmentController@editors')->name('api.attachments.uploader.editors');
     });
     Route::group(['middleware' => ['auth:apiIf']], function () {
         Route::prefix('data')->group(function () {

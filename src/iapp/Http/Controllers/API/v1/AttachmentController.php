@@ -20,6 +20,7 @@ class AttachmentController extends Controller
     use
         Index,
         Show,
+        Attachment\Editors,
         Attachment\Store,
         Update,
         Destroy,
