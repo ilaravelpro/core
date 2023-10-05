@@ -7,6 +7,7 @@
  * Copyright (c) 2021. Powered by iamir.net
  */
 
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
 
 function i_class_exists($patch, $class)
@@ -101,7 +102,7 @@ function _set_value($data, $path, $value, $checkNumber = true)
     }
     $temp = $value;
     unset($temp);
-    return $data;
+    return (array) $data;
 }
 
 function _get_value($array, $parents,$default = null, $glue = '.', $prepend = null, $append = null)
@@ -148,21 +149,25 @@ function _has_key(array $array, $parents, $glue = '.')
 }
 
 
-function _unset_key(array $array, $parents, $glue = '.')
+function _unset_key($array, $parents, $glue = '.')
 {
     if (!is_array($parents)) {
         $parents = explode($glue, $parents);
     }
 
+    $prevEl = null;
     $ref = &$array;
-    foreach ((array)$parents as $parent) {
-        if ((is_array($ref) || is_object($ref)) && array_key_exists($parent, $ref)) {
-            unset($ref[$parent]);
-        } else {
-            return false;
+    try {
+        foreach ($parents as &$parent) {
+            $prevEl = &$ref;
+            $ref = &$ref[$parent];
         }
-    }
-    return $ref;
+    }catch (\Throwable $exception) {}
+    try {
+        if ($prevEl !== null)
+            unset($prevEl[$parent]);
+    }catch (\Throwable $exception) {}
+    return $array;
 }
 
 function _save_child($kid, $items, $model, $set = [], $unset = [], $callback = null)

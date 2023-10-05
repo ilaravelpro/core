@@ -32,6 +32,7 @@ class CreatePostsTable extends Migration
             $table->longText('content')->nullable();
             $table->text('summary')->nullable();
             $table->string('type')->default('post');
+            $table->string('template')->nullable();
             $table->string('status')->default('draft');
             $table->integer('order')->nullable();
             $table->text('meta')->nullable();
