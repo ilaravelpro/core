@@ -109,6 +109,20 @@ trait Modal
         return $data;
     }
 
+    public static function reviewFiles($content,  $path = '', $check_file = true) {
+        $list = [];
+        foreach ($content as $index => $item) {
+            if ((is_array($item) || is_object($item)) && stripos($index, '_file') === false && !($item instanceof UploadedFile)) {
+                $list = array_merge($list, static::review_files((array)$item, "{$path}{$index}.", $check_file));
+            }else {
+                if (stripos($index, '_file') !== false/* && ($check_file ? ($item instanceof UploadedFile) : true)*/) {
+                    $list[] = $path . str_replace('_file', '', $index);
+                }
+            }
+        }
+        return $list;
+    }
+
     public function saveFile($name, $request, $event = null) {
         $attachment = $this->saveAttachment($name."_file", $request);
         $post = imodal('Attachment');
@@ -116,11 +130,16 @@ trait Modal
             if ($this->{$name."_id"} && $post::find($this->{$name."_id"}))
                 $post::find($this->{$name."_id"})->delete();
             $this->{$name."_id"} = $attachment->id;
+        }else {
+            if ($this->{$name."_id"} && $post::find($this->{$name."_id"}))
+                $post::find($this->{$name."_id"})->delete();
+            $this->{$name."_id"} = null;
         }
         unset($this->{$name."_file"});
     }
 
-    public function saveFileInContent($old_content, &$content, $parent_name, $name, $request, $event = null) {
+    public function saveFileInContent(&$content, $parent_name, $name, $request, $event = null) {
+        $old_content = $this->getOriginal($parent_name);
         $old_id = _get_value($content, "{$name}_id");
         $post = imodal('Attachment');
         if (\request()->file("{$parent_name}.{$name}_file") instanceof UploadedFile) {
@@ -137,6 +156,7 @@ trait Modal
             return $attachment;
         }else {
             $content = _unset_key($content, "{$name}");
+            $content = _unset_key($content, "{$name}_url");
             if ($old_id) {
                 if ($old_id && ($oldAttachment = ($post::find(is_int($old_id) ? $old_id : $post::id($old_id))))) {
                     $content = _set_value($content, "{$name}_file", null);
@@ -144,8 +164,7 @@ trait Modal
                     $content = _set_value($content, "{$name}_url", $oldAttachment->attachments->where('mode', 'original')->first()->url);
                     return $oldAttachment;
                 }
-            }
-            else {
+            } else {
                 $oldValue = _get_value($old_content, "{$name}_id");
                 if ($oldValue && ($oldAttachment = ($post::find(is_int($oldValue) ? $oldValue : $post::id($oldValue)))))
                     $oldAttachment->delete();
@@ -181,9 +200,9 @@ trait Modal
             $this->saveFile($name, $request, $event);
     }
 
-    public function saveFilesInContent($old_content, &$content, $parent_name, $names, $request, $event = null) {
+    public function saveFilesInContent(&$content, $parent_name, $names, $request, $event = null) {
         foreach ($names as $name)
-            $this->saveFileInContent($old_content, $content, $parent_name, $name, $request, $event);
+            $this->saveFileInContent($content, $parent_name, $name, $request, $event);
     }
 
     public function getFile($key)
