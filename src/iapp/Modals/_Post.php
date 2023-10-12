@@ -42,7 +42,7 @@ class _Post extends Model
             }
         });
     }
-    
+
     protected function getContentAttribute($value)
     {
         return is_json($value) ? json_decode($value, true) : $value;
