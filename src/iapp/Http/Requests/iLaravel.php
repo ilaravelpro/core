@@ -107,10 +107,12 @@ class iLaravel extends FormRequest
         if ($this->route()){
             if($this->route()->controller) {
                 return $this->route()->getController();
-            }/*elseif ($this->route()->getAction('controller')){
-                $controller = explode('@', $this->route()->getAction('controller'))[0];
-                return new $controller($this);
-            }*/
+            }elseif (!_has_token() && $this->route()->getAction('controller')){
+                try {
+                    $controller = explode('@', $this->route()->getAction('controller'))[0];
+                    return new $controller($this);
+                }catch (\Throwable $e){}
+            }
         }
         return false;
     }
@@ -191,13 +193,15 @@ class iLaravel extends FormRequest
             $middlewares = $this->route()->getAction('middleware');
             if (is_array($middlewares)) $middlewares = array_unique($middlewares);
             if (in_array('api', is_array($middlewares) && count($middlewares) == 1 ? $middlewares : [$middlewares])) return $auth;
-            if (!auth()->check() && in_array('auth:apiIf', is_array($middlewares) ? $middlewares : [$middlewares])) {
+            if (!auth()->check()) {
                 auth()->login(User::guest());
             }
             $args = array_values($this->route()->parameters());
             try {
                 $auth = $this->controller()->authorize($action, $args);
-            }catch (AccessDeniedHttpException $e){
+                if ($auth instanceof \Illuminate\Auth\Access\Response)
+                    $auth = $auth->allowed();
+            }catch (\Throwable $e){
                 $auth = false;
             }
         }

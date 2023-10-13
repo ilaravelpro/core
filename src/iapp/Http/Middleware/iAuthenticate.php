@@ -16,7 +16,7 @@ class iAuthenticate extends Middleware
 {
     protected function authenticate($request, array $guards)
     {
-        if (!in_array('apiIf', $guards) || ($request->server('HTTP_AUTHORIZATION') && in_array($request->server('HTTP_AUTHORIZATION'), ['null', 'Bearer null']) === false))
+        if (!auth()->check() && (!in_array('apiIf', $guards) || ($request->server('HTTP_AUTHORIZATION') && in_array($request->server('HTTP_AUTHORIZATION'), ['null', 'Bearer null']) === false)))
         {
             return parent::authenticate($request, $guards);
         }

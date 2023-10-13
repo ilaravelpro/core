@@ -113,7 +113,7 @@ trait Modal
         $list = [];
         foreach ($content as $index => $item) {
             if ((is_array($item) || is_object($item)) && stripos($index, '_file') === false && !($item instanceof UploadedFile)) {
-                $list = array_merge($list, static::review_files((array)$item, "{$path}{$index}.", $check_file));
+                $list = array_merge($list, static::reviewFiles((array)$item, "{$path}{$index}.", $check_file));
             }else {
                 if (stripos($index, '_file') !== false/* && ($check_file ? ($item instanceof UploadedFile) : true)*/) {
                     $list[] = $path . str_replace('_file', '', $index);

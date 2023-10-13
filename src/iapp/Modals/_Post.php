@@ -37,7 +37,7 @@ class _Post extends Model
         parent::saving(function (self $event) {
             if (is_array($event->content) || is_object($event->content)) {
                 $content = $event->content?:[];
-                $event->saveFilesInContent( $content, 'content', static::reviewFiles($event->getOriginal('content'), '', false), Request::createFrom(\request()));
+                $event->saveFilesInContent( $content, 'content', static::reviewFiles($event->getOriginal('content')?:$content, '', false), Request::createFrom(\request()));
                 $event->content = json_encode($content);
             }
         });
