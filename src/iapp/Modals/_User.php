@@ -188,12 +188,22 @@ class _User extends Authenticatable
 
     public function scopeAll()
     {
-        if (in_array($this->role, ipreference('admins'))) return iRole::scopes(collect(), imodal('RoleScope'), 1)->pluck('can', 'scope')->toArray();
-        $role = imodal('Role');
-        $role = $role::findByName($this->role);
-        $roleScopes = $role ? iRole::scopes($role->scopes, imodal('RoleScope')) : [];
-        $scopes = $this->scopes->merge($roleScopes);
-        return $scopes->pluck('can', 'scope')->toArray();
+        $role_scopes = ipreference('core.irole.cache.'.$this->role . '.scopes', ['time' => 0, 'data' => []], 'db');
+        if (isset($role_scopes['time'])  && $role_scopes['time'] < (time() - 600)) {
+            if (in_array($this->role, ipreference('admins'))) {
+                $scopes = iRole::scopes(collect(), imodal('RoleScope'), 1)->pluck('can', 'scope')->toArray();
+            } else{
+                $role = imodal('Role');
+                $role = $role::findByName($this->role);
+                $roleScopes = $role ? iRole::scopes($role->scopes, imodal('RoleScope')) : [];
+                $scopes = $this->scopes->merge($roleScopes);
+                $scopes = $scopes->pluck('can', 'scope')->toArray();
+            }
+            upreference('core.irole.cache.'.$this->role . '.scopes', ['time' => time(), 'data' => $scopes]);
+            return $scopes;
+        }else {
+            return $role_scopes['data'];
+        }
     }
 
     public function scopeAllUnique()

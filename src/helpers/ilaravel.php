@@ -34,11 +34,16 @@ function ipreference($key = null, $default = null, $type = 'auto')
     if ($key && in_array($type, ['auto', 'db'])){
         $model = imodal('Preference');
         $path = explode('.', $key);
-        $value = $model::findBySectionName($path[0], isset($path[1]) ? $path[1] : null);
+        $section = $path[0];
+        array_shift($path);
+        $rpath = implode('.', $path);
+        if ($value = $model::findBySectionName($section, $rpath)) {
+            return $value->value;
+        }
+        if (count($path))$value = $model::findBySectionName($section, $path[0]);
         if($value) {
-            if (count($path) > 2){
+            if (count($path) > 1){
                 unset($path[0]);
-                unset($path[1]);
                 $value = _get_value($value->value, implode('.', $path));
             }else
                 $value = $value->value;
@@ -48,6 +53,22 @@ function ipreference($key = null, $default = null, $type = 'auto')
     if (in_array($type, ['auto', 'config']))
         $value = $key ? iconfig('preferences.'.$key, iconfig($key, $default) ) : iconfig('preferences', $default);
     return $value;
+}
+function upreference($key = null, $value = null, $type = 'merge')
+{
+    $model = imodal('Preference');
+    $path = explode('.', $key);
+    $section = $path[0];
+    $name = $path[1];
+    unset($path[0],$path[1]);
+    $rpath = implode('.', $path);
+    if ($item = $model::findBySectionName($section, $name)) {
+        $item_value = $item->value;
+        $item->value = _set_value($item_value, $rpath, $value, false);
+        $item->save();
+        return $item;
+    }
+    return $model::updateOrCreate(['section' => $section, 'name' => $name . "." . $rpath], ['value' => $value]);
 }
 
 function _has_token(){
