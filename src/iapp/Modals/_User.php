@@ -189,7 +189,7 @@ class _User extends Authenticatable
     public function scopeAll()
     {
         $role_scopes = ipreference('core.irole.cache.'.$this->role . '.scopes', ['time' => 0, 'data' => []], 'db');
-        if (!isset($role_scopes['time']) || (isset($role_scopes['time'])  && $role_scopes['time'] < (time() - 86400))) {
+        if (!isset($role_scopes['data']) || (isset($role_scopes['data'])  && count($role_scopes['data']) == 0)) {
             if (in_array($this->role, ipreference('admins'))) {
                 $scopes = iRole::scopes(collect(), imodal('RoleScope'), 1)->pluck('can', 'scope')->toArray();
             } else{

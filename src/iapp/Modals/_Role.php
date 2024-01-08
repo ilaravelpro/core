@@ -12,6 +12,7 @@ namespace iLaravel\Core\iApp\Modals;
 use iLaravel\Core\iApp\Http\Requests\iLaravel as Request;
 
 use iLaravel\Core\iApp\Model;
+use iLaravel\Core\Vendor\iRole\iRole;
 
 class _Role extends Model
 {
@@ -28,6 +29,11 @@ class _Role extends Model
         parent::boot();
         parent::creating(function (self $event) {
             $event->creator_id = auth()->id();
+        });
+        parent::saved(function (self $event) {
+            $roleScopes = $event ? iRole::scopes($event->scopes, imodal('RoleScope')) : [];
+            $scopes = $roleScopes->pluck('can', 'scope')->toArray();
+            upreference('core.irole.cache.'.$event->name . '.scopes', ['time' => time(), 'data' => $scopes]);
         });
     }
 
