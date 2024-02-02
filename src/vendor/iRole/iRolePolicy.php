@@ -91,7 +91,7 @@ class iRolePolicy extends iRole
             if(is_string($item)) {
                 $item = $this->model::findBySerial($item);
             }
-            if(is_string($child) && $this->model::id($child)) {
+            if(is_string($child) && $this->model::id($child) > 0) {
                 $child = $this->model::findBySerial($child);
             }
         }
