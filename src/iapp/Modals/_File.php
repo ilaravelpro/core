@@ -11,7 +11,6 @@ namespace iLaravel\Core\iApp\Modals;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Http\UploadedFile;
 use iLaravel\Core\iApp\Http\Controllers\API\v1\AttachmentController;
-use Image;
 use DB;
 
 class _File extends Eloquent
@@ -125,10 +124,8 @@ class _File extends Eloquent
         $file->url = asset($file_slug);
         $file->dir = public_path($file_slug);
         $file->save();
-        $image = Image::make($original->dir)
-            ->fit($width, $height, function ($constraint) {
-                $constraint->upsize();
-            })
+        $image = \Intervention\Image\ImageManager::gd()->read($original->dir)
+            ->scale($width, $height)
             ->save($file->dir);
         DB::commit();
     }
