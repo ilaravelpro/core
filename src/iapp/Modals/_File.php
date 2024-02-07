@@ -124,7 +124,8 @@ class _File extends Eloquent
         $file->url = asset($file_slug);
         $file->dir = public_path($file_slug);
         $file->save();
-        $image = \Intervention\Image\ImageManager::gd()->read($original->dir)
+        $image_driver = in_array('Imagick', get_loaded_extensions()) || in_array('imagick', get_loaded_extensions()) ? "imagick" : "gd";
+        $image = \Intervention\Image\ImageManager::$image_driver()->read($original->dir)
             ->scale($width, $height)
             ->save($file->dir);
         DB::commit();
