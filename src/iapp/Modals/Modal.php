@@ -130,7 +130,7 @@ trait Modal
             if ($this->{$name."_id"} && $post::find($this->{$name."_id"}))
                 $post::find($this->{$name."_id"})->delete();
             $this->{$name."_id"} = $attachment->id;
-        }else {
+        }elseif ($request->has($name."_delete")){
             if ($this->{$name."_id"} && $post::find($this->{$name."_id"}))
                 $post::find($this->{$name."_id"})->delete();
             $this->{$name."_id"} = null;
