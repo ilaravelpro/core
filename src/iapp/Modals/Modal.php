@@ -212,9 +212,10 @@ trait Modal
         return $file::where('post_id', $this->{$key.'_id'})->get()->keyBy('mode');
     }
     
-    public static $find_names = ['slug'];
+    public static $find_names = [];
 
     public static function findByAny($value){
+        if (!count(static::$find_names)) return false;
         return static::where(function ($q) use($value) {
             foreach (array_values(static::$find_names) as $index => $name) {
                 $q->{$index > 0 ? "orWhere" : "where"}($name, $value);
