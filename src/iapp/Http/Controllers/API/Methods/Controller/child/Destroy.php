@@ -15,6 +15,6 @@ trait Destroy
 {
     public function destroy(Request $request, $parent, $record)
     {
-        return $this->_destroy($request, $this->parentModel::findBySerial($parent), $this->model::findBySerial($record));
+        return $this->_destroy($request, $this->parentModel::findBySerial($parent), $this->model::findBySerial($record)?:$this->model::findByAny($record));
     }
 }

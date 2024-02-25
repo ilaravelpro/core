@@ -15,6 +15,6 @@ trait Show
 {
     public function show(Request $request, $record)
     {
-        return $this->_show($request, $this->model::findBySerial($record));
+        return $this->_show($request, $this->model::findBySerial($record)?:$this->model::findByAny($record));
     }
 }

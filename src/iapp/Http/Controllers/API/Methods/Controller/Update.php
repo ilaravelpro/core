@@ -15,6 +15,6 @@ trait Update
 {
     public function update(Request $request, $record)
     {
-        return $this->_update($request, $this->model::findBySerial($record));
+        return $this->_update($request, $this->model::findBySerial($record)?:$this->model::findByAny($record));
     }
 }
