@@ -173,7 +173,7 @@ class _User extends Authenticatable
 
     public function getFullnameAttribute()
     {
-        return implode(' ',array_filter([$this->name, $this->family], 'strlen')) ? : null;
+        return implode(' ',array_filter([$this->name, $this->family, "(" . _t($this->role) . ")"], 'strlen')) ? : null;
     }
 
     public function getIsAdminAttribute()
