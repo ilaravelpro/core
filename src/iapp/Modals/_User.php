@@ -48,7 +48,7 @@ class _User extends Authenticatable
     public $_email = [];
     public $files = ['avatar'];
 
-    protected $appends = ['fullname'];
+    protected $appends = ['fullname', 'fullnamerole'];
 
     protected $hidden = [
         'password', 'remember_token', 'scopes'
@@ -173,7 +173,13 @@ class _User extends Authenticatable
 
     public function getFullnameAttribute()
     {
-        return implode(' ',array_filter([$this->name, $this->family, "(" . _t($this->role) . ")"], 'strlen')) ? : null;
+        return implode(' ',array_filter([$this->name, $this->family], 'strlen')) ? : null;
+    }
+
+
+    public function getFullnameroleAttribute()
+    {
+        return auth()->check() && auth()->user()->role !== "user" ? (implode(' ',array_filter([$this->fullname, "(" . _t($this->role) . ")"], 'strlen')) ? : null) : $this->fullname;
     }
 
     public function getIsAdminAttribute()

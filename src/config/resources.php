@@ -13,7 +13,7 @@ $resources = [
     ],
     'users' => [
         'data' => [
-            'text' => 'fullname'
+            'text' => 'fullnamerole'
         ],
         'hidden' => [
             'global' => [
