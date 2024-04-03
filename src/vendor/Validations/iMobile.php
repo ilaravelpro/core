@@ -9,7 +9,6 @@
 namespace iLaravel\Core\Vendor\Validations;
 
 class iMobile {
-
     public static function parse($value, $parameters = null)
     {
         $value = array_filter($value, 'strlen');

@@ -4,7 +4,7 @@ namespace iLaravel\Core\Vendor;
 
 class iCurl
 {
-    private static function post($url, $data, $headers = [])
+    private static function post($url, $data, $headers = [], $options = [])
     {
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, $url);
@@ -14,6 +14,7 @@ class iCurl
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
         curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, FALSE);
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt_array($curl, $options);
         $output = curl_exec($curl);
         if (curl_errno($curl)) {
             throw new \Exception(curl_error($curl));
@@ -22,7 +23,7 @@ class iCurl
         return self::json_decode($output, $url);
     }
 
-    private static function get($url, $params = [], $headers = [])
+    private static function get($url, $params = [], $headers = [], $options = [])
     {
         $endpoint = count($params) ? ("{$url}?" . http_build_query($params, '', '&')) : $url;
         $curl = curl_init();
@@ -31,6 +32,7 @@ class iCurl
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
         curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, FALSE);
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt_array($curl, $options);
         $output = curl_exec($curl);
         if (curl_errno($curl)) {
             throw new \Exception(curl_error($curl));
@@ -39,7 +41,7 @@ class iCurl
         return self::json_decode($output, $url);
     }
 
-    private static function other($method, $url, $params = [], $headers = [])
+    private static function other($method, $url, $params = [], $headers = [], $options = [])
     {
         $endpoint = count($params) ? ("{$url}?" . http_build_query($params, '', '&')) : $url;
         $curl = curl_init();
@@ -49,6 +51,7 @@ class iCurl
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
         curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, FALSE);
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt_array($curl, $options);
         $output = curl_exec($curl);
         if (curl_errno($curl)) {
             throw new \Exception(curl_error($curl));
@@ -65,18 +68,22 @@ class iCurl
         return (json_last_error() == JSON_ERROR_NONE) ? $output : $string;
     }
 
-    public static function request($base, $url, $params = [], $headers = [], $method = "GET")
+    public static function request($base, $url, $params = [], $headers = [], $method = "GET", $options = [])
     {
+        $oheaders = [];
+        foreach ($headers as $index => $header) {
+            $oheaders[] = "{$index}: {$header}";
+        }
         $endpoint = "{$base}{$url}";
         switch ($method) {
             case "GET":
-                $result = self::get($endpoint, $params, $headers);
+                $result = self::get($endpoint, $params, $oheaders, $options);
                 break;
             case "POST":
-                $result = self::post($endpoint, $params, $headers);
+                $result = self::post($endpoint, $params, $oheaders, $options);
                 break;
             default:
-                $result = self::other($method, $endpoint, $params, $headers);
+                $result = self::other($method, $endpoint, $params, $oheaders, $options);
                 break;
         }
         return $result;
