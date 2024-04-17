@@ -45,7 +45,7 @@ class ResourceRegistrar extends OriginalRegistrar
     {
         $icontroller = iapicontroller($controller);
         $uri = $this->getResourceUri($name) . '/data';
-        $action = $this->getResourceAction($name, $controller, method_exists($icontroller, 'data') ? 'data' : 'index', $options);
+        $action = $this->getResourceAction($name, $controller, $icontroller && method_exists($icontroller, 'data') ? 'data' : 'index', $options);
 
         return $this->router->get($uri, $action);
     }
