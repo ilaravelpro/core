@@ -21,3 +21,9 @@ function format_datetime($datetime, $format, $attr, $lang = 'en') {
         $datetime =  \Carbon\Carbon::parse($datetime)->format($format);
     return $datetime;
 }
+
+function strtominute(string $str)
+{
+    $time = \Carbon\Carbon::parse(strtotime($str));
+    return ($time->hour > 0 ? $time->hour * 60 : 0) + $time->minute;
+}
