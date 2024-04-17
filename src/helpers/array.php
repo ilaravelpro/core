@@ -142,3 +142,25 @@ function _set_values_text($text, $values)
     $text = str_replace($replace_values, array_values($values), $text);
     return $text;
 }
+
+function array_orderby()
+{
+    $args = func_get_args();
+    $data = array_shift($args);
+    $data = array_filter($data, function ($value) { return $value; });
+    try {
+        foreach ($args as $n => $field) {
+            if (is_string($field)) {
+                $tmp = array();
+                foreach ($data as $key => $row)
+                    $tmp[$key] = $row[$field];
+                $args[$n] = $tmp;
+            }
+        }
+        $args[] = &$data;
+        call_user_func_array('array_multisort', $args);
+        return array_pop($args);
+    }catch (\Throwable $e) {
+        return $args[0];
+    }
+}
