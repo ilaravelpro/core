@@ -233,3 +233,11 @@ function domain_exists($email, $record = 'MX'){
     list($user, $domain) = explode('@', $email);
     return checkdnsrr($domain, $record);
 }
+function _iaup($name, $value, $section = 'app.options') {
+    return upreference("{$section}.{$name}", $value);
+}
+
+function _iaget($name, $default = null, $section = null, $type = 'auto') {
+    if (!$section) $section = 'app.options';
+    return ipreference("{$section}.{$name}", $default, $type);
+}
