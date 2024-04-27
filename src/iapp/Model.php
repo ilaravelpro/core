@@ -10,12 +10,16 @@
 namespace iLaravel\Core\iApp;
 
 
+use iLaravel\Core\iApp\Http\Requests\iLaravel as Request;
+
 class Model extends \Illuminate\Database\Eloquent\Model
 {
     use \iLaravel\Core\iApp\Modals\Modal;
 
     protected $guarded = [];
     public $set_creator = true;
+    public $set_slug = false;
+    public $check_content = false;
 
     protected static function boot()
     {
@@ -23,6 +27,31 @@ class Model extends \Illuminate\Database\Eloquent\Model
         parent::creating(function (self $event) {
             if ($event->set_creator && $event->hasTableColumn('creator_id') && auth()->check())
                 $event->creator_id = auth()->id();
+            if ($event->set_slug && $event->hasTableColumn('slug')) {
+                $slug = to_slug($event->{$event->set_slug});
+                $slugs = static::where('slug', 'like', "$slug%")->get();
+                $event->slug = $slug . ($slugs->count() ? ("-". $slugs->count()) : '');
+            }
+        });
+        parent::updating(function (self $event) {
+            if ($event->set_slug && $event->hasTableColumn('slug')) {
+                $slug = to_slug($event->{$event->set_slug});
+                $slugs = static::where('slug', 'like', "$slug%")->where('id', '!=' , $event->id)->get();
+                $event->slug = $slug . ($slugs->count() ? ("-". $slugs->count()) : '');
+            }
+        });
+        parent::saving(function (self $event){
+            if ($event->{$event->check_content} && $event->hasTableColumn($event->check_content) && (is_array($event->content) || is_object($event->content))) {
+                $content = $event->check_content?:[];
+                $event->saveFilesInContent( $content, $event->check_content, static::reviewFiles($event->getOriginal($event->check_content)?:$content, '', false), Request::createFrom(\request()));
+                $event->{$event->check_content} = json_encode($content);
+            }
         });
     }
+
+    protected function getContentAttribute($value)
+    {
+        return is_json($value) ? json_decode($value, true) : $value;
+    }
+
 }

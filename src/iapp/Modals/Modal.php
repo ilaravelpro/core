@@ -33,7 +33,7 @@ trait Modal
         return $types ?: iconfig('types.global');
     }
 
-    public function getCreatedAtAttribute($value)
+    /*public function getCreatedAtAttribute($value)
     {
         return format_datetime($value, isset($this->datetime) ? $this->datetime : [], 'created_at');
     }
@@ -41,7 +41,7 @@ trait Modal
     public function getUpdatedAtAttribute($value)
     {
         return format_datetime($value, isset($this->datetime) ? $this->datetime : [], 'updated_at');
-    }
+    }*/
 
     public static function resetRecordsId()
     {
