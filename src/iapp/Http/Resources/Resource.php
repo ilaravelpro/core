@@ -11,6 +11,7 @@ namespace iLaravel\Core\iApp\Http\Resources;
 
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
 
 class Resource extends JsonResource
@@ -42,6 +43,13 @@ class Resource extends JsonResource
             $data['id'] = $this->serial;
             $data = insert_into_array($data, 'id', 'id_text', $this->serial_text);
         }
+        $resourceUser = iresourcedata('User')?:ResourceData::class;
+        if (isset($this->creator_id) && $this->creator)
+            $data['creator_id'] = new $resourceUser($this->creator);
+
+        if (isset($this->user_id) && $this->user)
+            $data['user_id'] = new $resourceUser($this->user);
+
         if (isset($data['meta_data']) && $data['meta_data'] && count($data['meta_data'])) {
             foreach ($data['meta_data'] as $index => $meta_datum) {
                 $data = insert_into_array($data, 'status', $index, $meta_datum, false);
@@ -58,13 +66,29 @@ class Resource extends JsonResource
         }
         if (isset($this->resource->with)) {
             foreach ($this->resource->with as $index => $item) {
-                $data[$item] = (new self($this->$item))->toArray($request);
+                if ($this->$item) {
+                    $resourceModal = iresourcedata(class_name($this->$item))?:static::class;
+                    $data[$item] = $this->$item instanceof Collection ? $resourceModal::collection($this->$item) : new $resourceModal($this->$item);
+                }
+            }
+        }
+        if (isset($this->resource->with_resource)) {
+            foreach ($this->resource->with_resource as $index => $item) {
+                $name = is_int($index) ? $item : $index;
+                $resourceName = is_int($index) ? null : $item;
+                if ($this->$name) {
+                    $resourceModal = iresourcedata($resourceName?:class_name($this->$name))?:static::class;
+                    $data[$name] = $this->$name instanceof Collection ? $resourceModal::collection($this->$name) : new $resourceModal($this->$name);
+                }
             }
         }
         if (isset($this->resource->files))
             foreach ($this->resource->files as $item) {
-                if ($this->$item) $data = insert_into_array($data, $item.'_id', $item, File::collection($this->$item));
-                unset($data[$item.'_id']);
+                if (isset($data[$item.'_id'])) {
+                    $file = $this->$item ?: $this->resource->getFile($item);
+                    if ($file) $data = insert_into_array($data, $item.'_id', $item, File::collection($file));
+                    unset($data[$item.'_id']);
+                }
             }
         if (auth()->check() && isset($data['id']) && method_exists($request, 'route') && !request()->has('no_actions') && $request->route()) {
             if (!$this->route_src){

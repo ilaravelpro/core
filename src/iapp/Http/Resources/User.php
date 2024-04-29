@@ -15,15 +15,14 @@ class User extends Resource
     {
         $data = parent::toArray($request);
         $data = insert_into_array($data, 'family', 'fullname', $this->fullname);
-        if (!count($data['mobile'])) unset($data['mobile']);
-        if (!count($data['email'])) unset($data['email']);
-        if (isset($data['email']) && count($data['email']) && $this->email) $data['email'] = $this->email->text;
-        if (isset($data['mobile'])) {
+        if ($this->email) $data['email'] = $this->email->text;
+        else unset($data['email']);
+        if ($this->mobile) {
             $data['mobile'] = [
-                'country' => $data['mobile']['country'],
-                'number' => (isset($data['mobile']['prefix']) ? $data['mobile']['prefix']:''). $data['mobile']['number']
+                'country' => $this->mobile->country,
+                'number' => ($this->mobile->prefix?:''). $this->mobile->number
             ];
-        }
+        }else unset($data['mobile']);
         unset($data['tokens']);
         unset($data['metas']);
         return $data;

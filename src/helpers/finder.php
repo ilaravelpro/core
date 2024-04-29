@@ -19,34 +19,40 @@ function i_class_exists($patch, $class)
     return false;
 }
 
-function imodal($modal)
+function imodal($modal,  $default = null)
 {
-    return class_exists("\\App\\$modal") ? "\\App\\$modal" : i_class_exists("iApp", $modal);
+    return class_exists("\\App\\$modal") ? "\\App\\$modal" : ($default?:i_class_exists("iApp", $modal));
 }
 
-function ipolicy($policy)
+function ipolicy($policy,  $default = null)
 {
-    return class_exists("\\App\\Policies\\$policy") ? "\\App\\Policies\\$policy" : i_class_exists("iApp\\Policies", $policy);
+    return class_exists("\\App\\Policies\\$policy") ? "\\App\\Policies\\$policy" : ($default?:i_class_exists("iApp\\Policies", $policy));
 }
 
-function iresource($resource)
+function iresource($resource,  $default = null)
 {
-    return class_exists("\\App\\Http\\Resources\\$resource") ? "\\App\\Http\\Resources\\$resource" : i_class_exists("iApp\\Http\\Resources", $resource);
+    return class_exists("\\App\\Http\\Resources\\$resource") ? "\\App\\Http\\Resources\\$resource" : ($default?:i_class_exists("iApp\\Http\\Resources", $resource));
 }
 
-function icontroller($controller)
+
+function iresourcedata($resource,  $default = null)
 {
-    return class_exists("\\App\\Http\\Controllers\\$controller") ? "\\App\\Http\\Controllers\\$controller" : i_class_exists("iApp\\Http\\Controllers", $controller);
+    return class_exists("\\App\\Http\\Resources\\{$resource}Data") ? "\\App\\Http\\Resources\\{$resource}Data" : ($default?:i_class_exists("iApp\\Http\\Resources", "{$resource}Data"));
 }
 
-function iwebcontroller($controller)
+function icontroller($controller,  $default = null)
 {
-    return icontroller("WEB\\Controllers\\$controller");
+    return class_exists("\\App\\Http\\Controllers\\$controller") ? "\\App\\Http\\Controllers\\$controller" : ($default?:i_class_exists("iApp\\Http\\Controllers", $controller));
 }
 
-function iapicontroller($controller, $v = 1)
+function iwebcontroller($controller,  $default = null)
 {
-    return $v ? icontroller("API\\v$v\\$controller") : icontroller("API\\$controller");
+    return icontroller("WEB\\Controllers\\$controller", $default);
+}
+
+function iapicontroller($controller, $v = 1,  $default = null)
+{
+    return $v ? icontroller("API\\v$v\\$controller", $default) : icontroller("API\\$controller", $default);
 }
 
 function class_name($class_name, $plural = false, $lower = 0)

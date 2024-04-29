@@ -17,6 +17,7 @@ class Model extends \Illuminate\Database\Eloquent\Model
     use \iLaravel\Core\iApp\Modals\Modal;
 
     protected $guarded = [];
+    public $with_resource = [];
 
     protected static function boot()
     {

@@ -9,6 +9,7 @@
 
 namespace iLaravel\Core\iApp\Http\Requests;
 
+use Carbon\Carbon;
 use iLaravel\Core\Vendor\Validations\iPhone;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Http\FormRequest;
@@ -26,6 +27,7 @@ class iLaravel extends FormRequest
     {
         $data = parent::validationData();
         if (!$this->controller()) return $data;
+        $data = $this->releaseData($data);
         if (method_exists($this->controller(), 'requestData')) {
             $this->controller()->requestData($this, $this->route()->getActionMethod(), $data, ...array_values($this->route()->parameters()));
         }
@@ -36,6 +38,31 @@ class iLaravel extends FormRequest
 
         return $data;
 
+    }
+
+    public function releaseData($data)
+    {
+        foreach ($data as $index => $datum) {
+            if (is_array($datum) &&isset($datum['value'])) $data[$index] = $datum['value'];
+            if (substr($index, -3, 3) === '_id') {
+
+            }else if (substr($index, -5, 5) === '_date' && ($jalali = substr($index, -6, 6) === '_jdate')) {
+                $format = "Y-m-d";
+                $data[$index] = $jalali ?
+                    \Morilog\Jalali\Jalalian::fromFormat($format, str_replace('/', '-', $datum))->toCarbon()->format($format)
+                    : Carbon::createFromFormat($format, str_replace('/', '-', $datum))->format($format);
+            } else if (substr($index, -3, 3) === '_at' && ($jalali = substr($index, -4, 4) === '_jat')) {
+                $two_value = count(explode(' ', $datum)) == 2;
+                $format = "Y-m-d " . ($two_value ? "H:i:s" : "00:00:00");
+                $data[$index] = $jalali ?
+                    \Morilog\Jalali\Jalalian::fromFormat($format, str_replace('/', '-', $datum))->toCarbon()->format($format)
+                    : Carbon::createFromFormat($format, str_replace('/', '-', $datum))->format($format);
+            }  else if (is_array($datum)) $data[$index] = $this->releaseData($datum);
+            else if (is_string($datum) || is_numeric($datum)) {
+                $data[$index] = in_array($datum, ['true', 'false']) ? $datum == "true" : $this->numberial($datum);
+            }
+        }
+        return $data;
     }
 
     public function numberTypes(&$data)
@@ -69,7 +96,7 @@ class iLaravel extends FormRequest
     {
         foreach ($this->parseRules() as $key => $value) {
             foreach ($value as $k => $v) {
-                $valid = explode(':',$k);
+                $valid = explode(':', $k);
                 if ($valid[0] == 'serial' && isset($data[$key]) && $data[$key]) {
                     $model = isset($valid[1]) ? imodal($valid[1]) : imodal(ucfirst($v));
                     if (!class_exists($model)) {
@@ -104,14 +131,15 @@ class iLaravel extends FormRequest
 
     public function controller()
     {
-        if ($this->route()){
-            if($this->route()->controller) {
+        if ($this->route()) {
+            if ($this->route()->controller) {
                 return $this->route()->getController();
-            }elseif (!_has_token() && $this->route()->getAction('controller')){
+            } elseif (!_has_token() && $this->route()->getAction('controller')) {
                 try {
                     $controller = explode('@', $this->route()->getAction('controller'))[0];
                     return new $controller($this);
-                }catch (\Throwable $e){}
+                } catch (\Throwable $e) {
+                }
             }
         }
         return false;
@@ -127,7 +155,7 @@ class iLaravel extends FormRequest
     {
         if ($this->controller() && method_exists($this->controller(), 'validationReplacers')) {
             return $this->controller()->validationReplacers($this, $this->route()->getActionMethod(), ...array_values($this->route()->parameters()));
-        }elseif($this->controller() && $this->controller()->model && method_exists($this->controller()->model, 'validationReplacers')) {
+        } elseif ($this->controller() && $this->controller()->model && method_exists($this->controller()->model, 'validationReplacers')) {
             return $this->controller()->model::getValidationReplacers($this, $this->route()->getActionMethod(), ...array_values($this->route()->parameters()));
         }
         return [];
@@ -141,7 +169,7 @@ class iLaravel extends FormRequest
         ];
         if ($this->controller() && method_exists($this->controller(), 'validationMessages')) {
             $messages = array_merge($messages, $this->controller()->validationMessages($this, $this->route()->getActionMethod(), ...array_values($this->route()->parameters())));
-        }elseif($this->controller() && $this->controller()->model && method_exists($this->controller()->model, 'validationMessages')) {
+        } elseif ($this->controller() && $this->controller()->model && method_exists($this->controller()->model, 'validationMessages')) {
             $messages = array_merge($messages, $this->controller()->model::getValidationMessages($this, $this->route()->getActionMethod(), ...array_values($this->route()->parameters())));
         }
         return $messages;
@@ -153,7 +181,7 @@ class iLaravel extends FormRequest
         if (!$this->controller()) return [];
         if ($this->controller() && method_exists($this->controller(), 'validationAttributes')) {
             return $this->controller()->validationAttributes($this, $this->route()->getActionMethod(), ...array_values($this->route()->parameters()));
-        }elseif($this->controller()->model && method_exists($this->controller()->model, 'validationAttributes')) {
+        } elseif ($this->controller()->model && method_exists($this->controller()->model, 'validationAttributes')) {
             return $this->controller()->model::getValidationAttributes($this, $this->route()->getActionMethod(), ...array_values($this->route()->parameters()));
         }
         return [];
@@ -201,7 +229,7 @@ class iLaravel extends FormRequest
                 $auth = $this->controller()->authorize($action, $args);
                 if ($auth instanceof \Illuminate\Auth\Access\Response)
                     $auth = $auth->allowed();
-            }catch (\Throwable $e){
+            } catch (\Throwable $e) {
                 $auth = false;
             }
         }
@@ -228,10 +256,10 @@ class iLaravel extends FormRequest
         $rules = [];
         if (!$this->controller()) return $rules;
         if (method_exists($this->controller(), 'rules')) {
-            $rules = $this->controller()->rules($this, $this->route()->getActionMethod(), ...array_values($this->route()->parameters())) ? : [];
+            $rules = $this->controller()->rules($this, $this->route()->getActionMethod(), ...array_values($this->route()->parameters())) ?: [];
             $this->controller()->setFillable($this->route()->getActionMethod(), array_keys($rules));
-        }elseif($this->controller()->model && method_exists($this->controller()->model, 'rules')) {
-            $rules = $this->controller()->model::getRules($this, $this->route()->getActionMethod(), ...array_values($this->route()->parameters())) ? : [];
+        } elseif ($this->controller()->model && method_exists($this->controller()->model, 'rules')) {
+            $rules = $this->controller()->model::getRules($this, $this->route()->getActionMethod(), ...array_values($this->route()->parameters())) ?: [];
             $this->controller()->setFillable($this->route()->getActionMethod(), array_keys($rules));
         }
         return $rules;

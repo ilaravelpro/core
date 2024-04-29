@@ -46,6 +46,10 @@ trait Store
             $this->after_store($request, $model, $parent);
         if (method_exists($this, 'after_save'))
             $this->after_save($request, $model, $parent);
+        if (method_exists($model, 'additionalUpdate'))
+            $model->additionalUpdate($request, null, $parent);
+        if (method_exists($model, 'save_locals'))
+            $this->save_locals($request, $model);
         $result = $this->additionalStore($request,$this->resultStore($request, $model, $parent), $parent);
         if (method_exists($this, 'after_stored'))
             $this->after_stored($request, $model, $parent, $result);
