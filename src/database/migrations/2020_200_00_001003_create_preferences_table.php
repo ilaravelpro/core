@@ -26,7 +26,7 @@ class CreatePreferencesTable extends Migration
             $table->foreign('creator_id')->references('id')->on('users');
             $table->string('section')->nullable()->default('core');
             $table->string('name')->nullable();
-            $table->string('value')->nullable();
+            $table->longText('value')->nullable();
             $table->string('type')->nullable();
             $table->timestamps();
             //$table->unique(['section', 'name']);
