@@ -52,7 +52,7 @@ trait Destroy
             $client = new $this->clientController(...func_get_args());
             $client->webDestroy($request, $result, $arg1, $arg2);
         }
-        $this->statusMessage =  $this->class_name() . " removed";
+        $this->statusMessage = [":model :action successfully.", ['model' => $this->class_name(), 'action' => "removed"]];
         return $result;
     }
 }

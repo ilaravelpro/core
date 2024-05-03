@@ -78,7 +78,7 @@ trait Store
             $client = new $this->clientController(...func_get_args());
             $client->webStore($request, $result);
         }
-        $this->statusMessage = $this->class_name() . " created";
+        $this->statusMessage = [":model :action successfully.", ['model' => $this->class_name(), 'action' => "created"]];
         return $result;
     }
 

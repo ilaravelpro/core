@@ -18,7 +18,7 @@ trait Logout
     {
         $user = $this->show($request, auth()->user()->serial);
         $request->user('api')->token()->revoke();
-        $this->statusMessage = 'Logout Success.';
+        $this->statusMessage = 'You have successfully logged out.';
         return $user;
     }
 }

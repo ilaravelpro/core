@@ -118,11 +118,11 @@ trait Update
         }
         if(!empty($original))
         {
-            $this->statusMessage = $this->class_name() . " changed";
+            $this->statusMessage = [":model :action successfully.", ['model' => $this->class_name(), 'action' => "changed"]];
         }
         else
         {
-            $this->statusMessage = "changed";
+            $this->statusMessage = [":model :action successfully.", ['model' => $this->class_name(), 'action' => "changed"]];
         }
         if (method_exists($this, 'after_updated'))
             $this->after_updated($request, $model, $parent, $result);

@@ -42,7 +42,7 @@ trait MeUpdate
             File::imageSize($attachment, 250);
             File::imageSize($attachment, 150);
         }*/
-        $this->statusMessage = "Profile changed";
+        $this->statusMessage = [":model :action successfully.", ['model' => "Profile", 'action' => "updated"]];
         $user->update($update);
         return new $this->resourceClass($user);
     }

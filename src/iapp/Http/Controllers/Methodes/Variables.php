@@ -15,5 +15,5 @@ trait Variables
 {
     protected $fillable = [];
     public static $result;
-    public $statusMessage = ':)';
+    public $statusMessage = 'Your request has been successfully completed.';
 }

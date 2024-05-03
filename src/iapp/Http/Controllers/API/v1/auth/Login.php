@@ -32,7 +32,7 @@ trait Login
             $user->additional(array_merge_recursive($user->additional, [
                 'additional' => ['token' => $token]
             ]));
-            $this->statusMessage = 'Auth Success.';
+            $this->statusMessage = 'You have successfully logged in.';
             return $user;
         } else {
             throw new AuthenticationException('Username or password is not match');

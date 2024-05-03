@@ -51,9 +51,9 @@ class iResponse
                 if ($request->route()->getAction('controller')) {
                     $controller = $request->route()->getController();
                     if (isset($controller->statusMessage)) {
-                        result_message($result, $controller->statusMessage);
+                        result_message($result, ...(is_array($controller->statusMessage) ? $controller->statusMessage : [$controller->statusMessage]));
                     } else {
-                        result_message($result, ':)');
+                        result_message($result, 'Your request has been successfully completed.');
                     }
                 }
                 $response = response()->json(
