@@ -36,25 +36,26 @@ trait RequestFilter
                     $filter = (object) $filterOPT[0]['rule']($filter);
                 else{
                     (new Request((array) $filter))->validate([
-                        'value' => explode('|', (isset($filterOPT[0]['rule']) ? $filterOPT[0]['rule'] : $rule)),
+                        @$filter->cvalue? 'cvalue' : 'value' => explode('|', (isset($filterOPT[0]['rule']) ? $filterOPT[0]['rule'] : $rule)),
                     ]);
                 }
                 if (isset($filterOPT[0]) && !isset($filterOPT[0]['handel']) && isset($filter->value))
+                    $fvalue = @$filter->cvalue??@$filter->value;
                     switch ($ftype) {
                         case 'all':
-                            $this->searchQ(new Request(['q' => $filter->value]), $model, $parent);
-                            $current['q'] = $request->q;
+                            $this->searchQ(new Request(['q' => $fvalue]), $model, $parent);
+                            $current['q'] = $filter->value;
                             break;
                         default:
                             if (method_exists($this, 'query_filter_type'))
-                                $current = $this->query_filter_type($model, $filter, (object)['value' =>  $filter->value, 'type' => $ftype, 'symbol' => $fsymbol], $current, $filters);
-                            if (!isset($current[$ftype]) && $filter->value) {
+                                $current = $this->query_filter_type($model, $filter, (object)['value' => $filter->value, 'cvalue' =>  @$filter->cvalue, 'type' => $ftype, 'symbol' => $fsymbol], $current, $filters);
+                            if (!isset($current[$ftype]) && $fvalue) {
                                 switch ($fsymbol) {
                                     case 'like_any':
-                                        $model->whereRaw("$ftype like '%{$filter->value}%'");
+                                        $model->whereRaw("$ftype like '%{$fvalue}%'");
                                         break;
                                     default:
-                                        $model->whereRaw("$ftype $fsymbol '{$filter->value}'");
+                                        $model->whereRaw("$ftype $fsymbol '{$fvalue}'");
                                         break;
                                 }
                             }
