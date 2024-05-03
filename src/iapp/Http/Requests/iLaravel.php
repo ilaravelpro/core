@@ -50,7 +50,7 @@ class iLaravel extends FormRequest
                 $data[$index] = in_array($datum, ['true', 'false', '0', '1']) ? ($datum == "true" || $datum == "1") : $data[$index];
             }else if (substr($index, -3, 3) === '_id') {
                 try {
-                    $data[$index] = $datum = (new ($this->controller()->model))->{str_replace('_id', '', $index)}()->getRelated()->id($datum);
+                    $data[$index] = $datum = (new ($this->controller()->model))->{str_replace('_id', '', $index)}()->getRelated()->id($datum)?:$datum;
                 }catch (\Throwable $exception) {}
             }else if (substr($index, -5, 5) === '_date' || ($jalali = substr($index, -6, 6) === '_jdate')) {
                 $datum = str_replace('/', '-', $datum);
@@ -73,7 +73,9 @@ class iLaravel extends FormRequest
                     try {
                         $relatedModal = (new ($this->controller()->model))->{str_replace('_id', '', $item['type'])}();
                         $relatedModal = @$relatedModal->model? :$relatedModal->getRelated();
-                        $item['cvalue'] = is_array($item['value']) ? array_map([$relatedModal, 'id'], $item['value']) : $relatedModal::id($item['value']);
+                        $item['cvalue'] = is_array($item['value']) ? array_map(function ($v){
+                            return $relatedModal::id($v)?:$v;
+                        }, $item['value']) : ($relatedModal::id($item['value'])?:$item['value']);
                         if ($index == "filter")$data[$index] = $item;
                         else $data[$index][$ifindex] = $item;
                     }catch (\Throwable $exception) {}
@@ -83,7 +85,9 @@ class iLaravel extends FormRequest
                 try {
                     $relatedModal = (new ($this->controller()->model))->{str_replace('_id', '', $index)}();
                     $relatedModal = @$relatedModal->model? :$relatedModal->getRelated();
-                    $data[$index] = array_map([$relatedModal, 'id'], $data[$index]);
+                    $data[$index] = array_map(function ($v){
+                        return $relatedModal::id($v)?:$v;
+                    }, $data[$index]);
                 }catch (\Throwable $exception) {}
             } else if (is_string($datum) || is_numeric($datum)) {
                 $data[$index] = in_array($datum, ['true', 'false']) ? $datum == "true" : $this->numberial($datum);
@@ -243,6 +247,7 @@ class iLaravel extends FormRequest
         $aAaction[] = $method;
         $action = join('.', $aAaction);
         $action = str_replace('api.', '', $action);
+        $this->action = $action;
         $auth = true;
         if (in_array($action, array_keys(Gate::abilities()))) {
             $middlewares = $this->route()->getAction('middleware');

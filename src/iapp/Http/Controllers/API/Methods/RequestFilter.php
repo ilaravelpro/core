@@ -9,6 +9,7 @@
 
 namespace iLaravel\Core\iApp\Http\Controllers\API\Methods;
 
+use iLaravel\Core\Vendor\iRole\iRole;
 use Illuminate\Http\Request;
 
 trait RequestFilter
@@ -39,7 +40,7 @@ trait RequestFilter
                         @$filter->cvalue? 'cvalue' : 'value' => explode('|', (isset($filterOPT[0]['rule']) ? $filterOPT[0]['rule'] : $rule)),
                     ]);
                 }
-                if (isset($filterOPT[0]) && !isset($filterOPT[0]['handel']) && isset($filter->value))
+                if (isset($filterOPT[0]) && !isset($filterOPT[0]['handel']) && isset($filter->value)) {
                     $fvalue = @$filter->cvalue??@$filter->value;
                     switch ($ftype) {
                         case 'all':
@@ -48,21 +49,31 @@ trait RequestFilter
                             break;
                         default:
                             if (method_exists($this, 'query_filter_type'))
-                                $current = $this->query_filter_type($model, $filter, (object)['value' => $filter->value, 'cvalue' =>  @$filter->cvalue, 'type' => $ftype, 'symbol' => $fsymbol], $current, $filters);
+                                $current = $this->query_filter_type($model, $filter, (object)['value' => @$filter->value, 'cvalue' =>  @$filter->cvalue, 'type' => $ftype, 'symbol' => $fsymbol], $current, $filters);
                             if (!isset($current[$ftype]) && $fvalue) {
                                 switch ($fsymbol) {
                                     case 'like_any':
                                         $model->whereRaw("$ftype like '%{$fvalue}%'");
                                         break;
                                     default:
-                                        $model->whereRaw("$ftype $fsymbol '{$fvalue}'");
+                                        $model->whereRaw("$ftype $fsymbol " . (is_integer($fvalue) ?  $fvalue: "'{$fvalue}'"));
                                         break;
                                 }
                             }
                             break;
                     }
+                }
                 $current[_get_value((array)$filter, 'type')] = _get_value((array)$filter, 'value');
             }
+        if ($this->model::hasTableColumn('parent_id') && $request->no_check_parent != 1) {
+            $parentSet = $request->has('parent') ? (boolean) $request->parent : true;
+            if ((!isset($current['parent_id']) || !$current['parent_id']) && $parentSet){
+                if (auth()->user()->banks->count() && !iRole::has($request->action . '.any'))
+                    $model->whereIn('parent_id', auth()->user()->banks->pluck('id')->toArray());
+                else
+                    $model->where('parent_id', null)->orWhere('parent_id','<=', 0);
+            }
+        }
         return [$filters, $current];
     }
 }
