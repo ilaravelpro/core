@@ -11,6 +11,7 @@ namespace iLaravel\Core\iApp\Http\Controllers\API\Methods;
 
 use iLaravel\Core\Vendor\iRole\iRole;
 use Illuminate\Http\Request;
+use function PHPUnit\Framework\isFalse;
 
 trait RequestFilter
 {
@@ -32,13 +33,14 @@ trait RequestFilter
                 else
                     $fsymbol = '=';
                 $rules = method_exists($this, 'rules') ? $this->rules($request, 'store') : $this->model::getRules($request, 'store');
-                $rule = str_replace(['required'], ['nullable'], _get_value($rules, $ftype, 'nullable|string'));
+                $rule = str_replace(['required'], ['nullable'], _get_value($rules, $ftype) ? (_get_value($rules, $ftype)): 'nullable|string');
                 if (isset($filterOPT[0]['rule']) && is_callable($filterOPT[0]['rule']))
                     $filter = (object) $filterOPT[0]['rule']($filter);
                 else{
-                    (new Request((array) $filter))->validate([
-                        @$filter->cvalue? 'cvalue' : 'value' => explode('|', (isset($filterOPT[0]['rule']) ? $filterOPT[0]['rule'] : $rule)),
-                    ]);
+                    if(isset($filter->cvalue))
+                        (new Request(['filters' => (array) $req_filters]))->validate([
+                            "filters.$index." . (@$filter->cvalue? 'cvalue' : 'value') => explode('|', (isset($filterOPT[0]['rule']) ? $filterOPT[0]['rule'] : $rule)),
+                        ]);
                 }
                 if (isset($filterOPT[0]) && !isset($filterOPT[0]['handel']) && isset($filter->value)) {
                     $fvalue = @$filter->cvalue??@$filter->value;

@@ -25,7 +25,11 @@ class iLaravel extends FormRequest
 
     public function validationData()
     {
-        $data = parent::validationData();
+        return $this->releaseValidationData(parent::validationData());
+    }
+
+    public function releaseValidationData($data)
+    {
         if (!$this->controller()) return $data;
         $data = $this->releaseData($data);
         if (method_exists($this->controller(), 'requestData')) {
@@ -35,9 +39,7 @@ class iLaravel extends FormRequest
         $this->mobileRule($data);
         //$this->serialRule($data);
         $this->replace($data);
-
         return $data;
-
     }
 
     public function releaseData($data)
@@ -73,22 +75,24 @@ class iLaravel extends FormRequest
                     try {
                         $relatedModal = (new ($this->controller()->model))->{str_replace('_id', '', $item['type'])}();
                         $relatedModal = @$relatedModal->model? :$relatedModal->getRelated();
-                        $item['cvalue'] = is_array($item['value']) ? array_map(function ($v){
-                            return $relatedModal::id($v)?:$v;
-                        }, $item['value']) : ($relatedModal::id($item['value'])?:$item['value']);
+                        $item['cvalue'] = is_array($item['value']) ? array_map(function ($v) use($relatedModal){
+                            return $relatedModal::id($v)?:null;
+                        }, $item['value']) : ($relatedModal::id($item['value'])?:null);
                         if ($index == "filter")$data[$index] = $item;
                         else $data[$index][$ifindex] = $item;
-                    }catch (\Throwable $exception) {}
+                    }catch (\Throwable $exception) {
+                    }
                 }
             }  else if (is_array($datum)) {
                 $data[$index] = $this->releaseData($datum);
                 try {
                     $relatedModal = (new ($this->controller()->model))->{str_replace('_id', '', $index)}();
                     $relatedModal = @$relatedModal->model? :$relatedModal->getRelated();
-                    $data[$index] = array_map(function ($v){
+                    $data[$index] = array_map(function ($v) use($relatedModal){
                         return $relatedModal::id($v)?:$v;
                     }, $data[$index]);
-                }catch (\Throwable $exception) {}
+                }catch (\Throwable $exception) {
+                }
             } else if (is_string($datum) || is_numeric($datum)) {
                 $data[$index] = in_array($datum, ['true', 'false']) ? $datum == "true" : $this->numberial($datum);
             }
@@ -276,7 +280,7 @@ class iLaravel extends FormRequest
         $rules = $this->getRules() ?: [];
         if (!$this->controller()) return $rules;
         if (method_exists($this->controller(), 'manipulateData')) {
-            $data = $this->all();
+            $data = $this->validationData();
             $this->controller()->manipulateData($this, $this->route()->getActionMethod(), $data, ...array_values($this->route()->parameters()));
             $this->replace($data);
         }
