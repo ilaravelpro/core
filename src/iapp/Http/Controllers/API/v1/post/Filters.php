@@ -47,7 +47,7 @@ trait Filters
                 'type' => 'text',
             ],
             [
-                'name' => 'parent',
+                'name' => 'parent_id',
                 'title' => _t('parent'),
                 'type' => 'text',
             ],

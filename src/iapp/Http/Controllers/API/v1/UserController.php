@@ -26,6 +26,5 @@ class UserController extends Controller
         User\Store,
         User\Update,
         Destroy,
-        User\RequestData,
         User\Filters;
 }
