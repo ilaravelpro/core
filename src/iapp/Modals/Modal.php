@@ -251,7 +251,7 @@ trait Modal
         parent::deleting(function (self $event){
             if (method_exists($event, 'attachments'))
                 foreach ($event->attachments as $attachment) $attachment->delete();
-            if ($this->files && count($this->files)) {
+            if ($event->files && count($event->files)) {
                 $attachment = imodal('Attachment');
                 foreach ($event->files as  $name) {
                     if ($event->{$name."_id"} && ($file = $attachment::find($event->{$name."_id"}))) $file->delete();
