@@ -39,7 +39,7 @@ class iRoleCheck
     public function has($access, ...$args)
     {
         $admins = ipreference('admins', ['admin']);
-        if (in_array($this->user->role, $admins)) return true;
+        ///if (in_array($this->user->role, $admins)) return true;
         $access = !is_array($access) ? [$access] : $access;
         $scopes = $this->scopes();
         foreach ($access as $key => $value) {
