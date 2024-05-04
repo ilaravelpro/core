@@ -78,20 +78,21 @@ trait RequestFilter
                                         $model->where($this->model::getTableNameDot() . $ftype, "like", "'%{$fvalue}%'");
                                         break;
                                     default:
-                                        if ((substr($ftype, -3, 3) === '_id' || isset($filterOPT[0]['with']) || isset($filterOPT[0]['pivot'])) && isset($filter->model) && $filter->model) {
+                                        if (!@$filter->cvalue && (substr($ftype, -3, 3) === '_id' || isset($filterOPT[0]['with']) || isset($filterOPT[0]['pivot'])) && isset($filter->model) && $filter->model) {
                                             $model->whereHas(str_replace('_id', '', $ftype), function ($q) use($filter, $fvalue) {
                                                 $tableNameDot = isset($filterOPT[0]['pivot']) ? 'pivot.': $filter->model::getTableNameDot();
                                                 foreach ($filter->model::getTableColumns() as $column) {
                                                     if (in_array($column, ['id', 'parent_id']))
-                                                        $q->where($tableNameDot . $column, $fvalue);
+                                                        $q->where($tableNameDot . $column, @$filter->value);
                                                     else
-                                                        $q->orWhere($tableNameDot . $column, 'LIKE', "%$fvalue%");
+                                                        $q->orWhere($tableNameDot . $column, 'LIKE', "%$filter->value%");
                                                 }
                                             });
                                         } elseif (is_array($fvalue))
                                             $model->whereIn($tableNameDot . $ftype, $fvalue);
-                                        else
-                                            $model->where($tableNameDot . $ftype, $fsymbol, is_integer($fvalue) ? $fvalue : "'{$fvalue}'");
+                                        else {
+                                            $model->where($tableNameDot . $ftype, $fsymbol, $fvalue);
+                                        }
                                         break;
                                 }
                             }

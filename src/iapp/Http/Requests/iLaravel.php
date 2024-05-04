@@ -10,6 +10,7 @@
 namespace iLaravel\Core\iApp\Http\Requests;
 
 use Carbon\Carbon;
+use iLaravel\Core\iApp\Model;
 use iLaravel\Core\Vendor\Validations\iPhone;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Http\FormRequest;
@@ -42,17 +43,17 @@ class iLaravel extends FormRequest
         return $data;
     }
 
-    public function releaseData($data)
+    public function releaseData($data, $parent = null)
     {
         foreach ($data as $index => $datum) {
-            if (is_array($datum) &&isset($datum['value']) && !isset($datum['type'])) {
+            if (is_array($datum) &&isset($datum['value']) && isset($datum['text']) && !isset($datum['type'])) {
                 $data[$index] = $datum = $datum['value'];
             }
             if (substr($index, 0, 3) === 'is_' || substr($index, 0, 4) === 'has_') {
                 $data[$index] = in_array($datum, ['true', 'false', '0', '1']) ? ($datum == "true" || $datum == "1") : $data[$index];
             }else if (substr($index, -3, 3) === '_id') {
                 try {
-                    $data[$index] = $datum = (new ($this->controller()->model))->{str_replace('_id', '', $index)}()->getRelated()->id($datum)?:$datum;
+                    $data[$index] = $datum = ($parent ? : new ($this->controller()->model))->{str_replace('_id', '', $index)}()->getRelated()->id($datum)?:$datum;
                 }catch (\Throwable $exception) {}
             }else if (substr($index, -5, 5) === '_date' || ($jalali = substr($index, -6, 6) === '_jdate')) {
                 $datum = str_replace('/', '-', $datum);
@@ -76,8 +77,8 @@ class iLaravel extends FormRequest
                         $relatedModal = (new ($this->controller()->model))->{str_replace('_id', '', $item['type'])}();
                         $relatedModal = @$relatedModal->model? :$relatedModal->getRelated();
                         $item['cvalue'] = is_array($item['value']) ? array_map(function ($v) use($relatedModal){
-                            return $relatedModal::findQ($v);
-                        }, $item['value']) : ($relatedModal::findQ($item['value']));
+                            return $relatedModal::findBySerial($v)?:$relatedModal::findQ($v);
+                        }, $item['value']) : ($relatedModal::findBySerial($item['value'])?:$relatedModal::findQ($item['value']));
                         if ($item['cvalue']) $item['cvalue'] = $item['cvalue']->id;
                         $item['model'] = $relatedModal;
                         if ($index == "filter")$data[$index] = $item;
@@ -86,14 +87,18 @@ class iLaravel extends FormRequest
                     }
                 }
             }  else if (is_array($datum)) {
-                $data[$index] = $this->releaseData($datum);
                 try {
-                    $relatedModal = (new ($this->controller()->model))->{str_replace('_id', '', $index)}();
-                    $relatedModal = @$relatedModal->model? :$relatedModal->getRelated();
+                    $relatedModal = $parent;
+                    if (is_string($index)) {
+                        $relatedModal = (new ($this->controller()->model)(['id' => 0]))->{str_replace('_id', '', $index)}();
+                        $relatedModal = @$relatedModal->model? :$relatedModal->getRelated();
+                    }
+                    $data[$index] = $this->releaseData($datum, $relatedModal);
                     $data[$index] = array_map(function ($v) use($relatedModal){
-                        return $relatedModal::id($v)?:$v;
+                        return is_string($v) ? ($relatedModal::id($v)?:$v) : $v;
                     }, $data[$index]);
                 }catch (\Throwable $exception) {
+                    $data[$index] = $this->releaseData($datum, $parent);
                 }
             } else if (is_string($datum) || is_numeric($datum)) {
                 $data[$index] = in_array($datum, ['true', 'false']) ? $datum == "true" : $this->numberial($datum);
