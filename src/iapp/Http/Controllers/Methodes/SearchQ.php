@@ -1,7 +1,6 @@
 <?php
 
 
-
 /**
  * Author: Amir Hossein Jahani | iAmir.net
  * Last modified: 12/21/20, 10:50 AM
@@ -24,22 +23,24 @@ trait SearchQ
         $model->where(function ($query) use ($q, $id, $parent_id, $first, $table) {
             foreach ($this->model::getTableColumns() as $index => $column) {
                 if ($id && in_array($column, ['id', 'parent']))
-                    $query->where($table.$column, $q);
+                    $query->where($table . $column, $q);
                 elseif (substr($column, -3, 3) === '_id') {
-                    $query->orWhereHas(str_replace('_id', '', $column), function ($query) use( $q, $column) {
-                        $relatedModal = (new ($this->model))->{str_replace('_id', '', $column)}();
-                        $relatedModal = @$relatedModal->model? :$relatedModal->getRelated();
-                        $tableNameDot = $relatedModal::getTableNameDot();
-                        foreach ($relatedModal::getTableColumns() as $column2) {
-                            if (in_array($column2, ['id', 'parent_id']))
-                                $query->where($tableNameDot . $column2, $q);
-                            else
-                                $query->orWhere($tableNameDot . $column2, 'LIKE', "%$q%");
-                        }
-                    });
-                }
-                elseif (!$id && !$parent_id){
-                    $query->orWhere($table.$column, 'LIKE', "%$q%");
+                    if (method_exists($rmodel = (new ($this->model)), $related = str_replace('_id', '', $column))) {
+                        $relatedModal = $rmodel->$related();
+                        $relatedModal = @$relatedModal->model ?: $relatedModal->getRelated();
+                        $query->orWhereHas(str_replace('_id', '', $column), function ($query) use ($q, $column, $relatedModal) {
+                            $tableNameDot = $relatedModal::getTableNameDot();
+                            foreach ($relatedModal::getTableColumns() as $column2) {
+                                if (in_array($column2, ['id', 'parent_id']))
+                                    $query->where($tableNameDot . $column2, $q);
+                                else
+                                    $query->orWhere($tableNameDot . $column2, 'LIKE', "%$q%");
+                            }
+                        });
+                    } else
+                        $query->orWhere($table . $column, $q);
+                } elseif (!$id && !$parent_id) {
+                    $query->orWhere($table . $column, 'LIKE', "%$q%");
                 }
             }
             return $query;
