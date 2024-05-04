@@ -73,6 +73,9 @@ trait Construct
         if (($request->format && is_string($request->format) && in_array($request->format, ['gjson', 'geojson'])) || $request->no_pagination) {
             $this->disablePagination = true;
         }
+        try {
+            if (!isset($this->order_list) || (isset($this->order_list) && !$this->order_list))$this->order_list = $this->model::getTableColumns();
+        }catch (\Throwable $exception) {}
     }
 
 }

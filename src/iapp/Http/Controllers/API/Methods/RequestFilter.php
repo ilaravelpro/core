@@ -15,6 +15,24 @@ use function PHPUnit\Framework\isFalse;
 
 trait RequestFilter
 {
+    public function filters($request, $model, $parent = null, $operators = [])
+    {
+        $filters = [
+            [
+                'name' => 'all',
+                'title' => _t('all'),
+                'type' => 'text',
+            ],
+        ];
+        foreach ($this->model::getTableColumns() as $column) {
+            $filters[] = [
+                'name' => $column,
+                'title' => _t(str_replace('_id', $column)),
+                'type' => 'text',
+            ];
+        }
+        return [$filters, [], $operators];
+    }
     public function requestFilter(Request $request, $model, $parent, $current, $filters, $operators)
     {
         $tableNameDot = $this->model::getTableNameDot();
