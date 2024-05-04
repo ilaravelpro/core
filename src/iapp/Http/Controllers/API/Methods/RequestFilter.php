@@ -9,6 +9,7 @@
 
 namespace iLaravel\Core\iApp\Http\Controllers\API\Methods;
 
+use App\MaterialCode;
 use iLaravel\Core\Vendor\iRole\iRole;
 use Illuminate\Http\Request;
 use function PHPUnit\Framework\isFalse;
@@ -109,6 +110,11 @@ trait RequestFilter
                 else
                     $model->where($tableNameDot . 'parent_id', null)->orWhere($tableNameDot . 'parent_id', '<=', 0);
             }
+        }
+
+        if ($request->excepts && is_array($request->excepts) && count($request->excepts)) {
+            $excepts = array_unique(array_filter(array_map(function ($item) { return $this->model::id($item)?:$item; },$request->excepts), 'is_numeric'));
+            if ($excepts) $model->whereNotIn('id', $excepts);
         }
         return [$filters, $current];
     }
