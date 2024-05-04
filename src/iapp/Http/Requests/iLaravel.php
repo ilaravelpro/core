@@ -76,8 +76,10 @@ class iLaravel extends FormRequest
                         $relatedModal = (new ($this->controller()->model))->{str_replace('_id', '', $item['type'])}();
                         $relatedModal = @$relatedModal->model? :$relatedModal->getRelated();
                         $item['cvalue'] = is_array($item['value']) ? array_map(function ($v) use($relatedModal){
-                            return $relatedModal::id($v)?:null;
-                        }, $item['value']) : ($relatedModal::id($item['value'])?:null);
+                            return $relatedModal::findQ($v);
+                        }, $item['value']) : ($relatedModal::findQ($item['value']));
+                        if ($item['cvalue']) $item['cvalue'] = $item['cvalue']->id;
+                        $item['model'] = $relatedModal;
                         if ($index == "filter")$data[$index] = $item;
                         else $data[$index][$ifindex] = $item;
                     }catch (\Throwable $exception) {

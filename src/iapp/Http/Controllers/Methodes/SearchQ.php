@@ -20,20 +20,28 @@ trait SearchQ
         if ($id = $this->model::id($q)) $q = $id;
         if (!$id && isset($this->parentModel) && $this->parentModel && $parent_id = $this->parentModel::id($q)) $q = $parent_id;
         $first = false;
-        $table = "";
-        try {
-            $table = with(new $this->model)->getTable();
-            $table .= ".";
-        }catch (\Throwable $exception) {
-            $table = "";
-        }
+        $table = $this->model::getTableNameDot();
         $model->where(function ($query) use ($q, $id, $parent_id, $first, $table) {
-            foreach ($this->model::getTableColumns() as $index => $column)
+            foreach ($this->model::getTableColumns() as $index => $column) {
                 if ($id && in_array($column, ['id', 'parent']))
                     $query->where($table.$column, $q);
+                elseif (substr($column, -3, 3) === '_id') {
+                    $query->orWhereHas(str_replace('_id', '', $column), function ($query) use( $q, $column) {
+                        $relatedModal = (new ($this->model))->{str_replace('_id', '', $column)}();
+                        $relatedModal = @$relatedModal->model? :$relatedModal->getRelated();
+                        $tableNameDot = $relatedModal::getTableNameDot();
+                        foreach ($relatedModal::getTableColumns() as $column2) {
+                            if (in_array($column2, ['id', 'parent_id']))
+                                $query->where($tableNameDot . $column2, $q);
+                            else
+                                $query->orWhere($tableNameDot . $column2, 'LIKE', "%$q%");
+                        }
+                    });
+                }
                 elseif (!$id && !$parent_id){
                     $query->orWhere($table.$column, 'LIKE', "%$q%");
                 }
+            }
             return $query;
         });
     }

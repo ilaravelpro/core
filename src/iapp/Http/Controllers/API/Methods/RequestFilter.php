@@ -15,7 +15,9 @@ use function PHPUnit\Framework\isFalse;
 
 trait RequestFilter
 {
-    public function requestFilter(Request $request, $model, $parent, $current, $filters, $operators){
+    public function requestFilter(Request $request, $model, $parent, $current, $filters, $operators)
+    {
+        $tableNameDot = $this->model::getTableNameDot();
         $req_filters = $request->filters && is_array($request->filters) && count($request->filters) ? $request->filters : ($request->filter ? [$request->filter] : []);
         if (count($req_filters))
             foreach ($req_filters as $index => $filter) {
@@ -24,26 +26,26 @@ trait RequestFilter
                 $filterOPT = array_values(array_filter($filters, function ($value) use ($ftype) {
                     return $value['name'] == $ftype;
                 }));
-                if (isset($filter->operator) && $filter->operator){
+                if (isset($filter->operator) && $filter->operator) {
                     $fsymbol = array_filter($operators, function ($value) use ($filter) {
                         return $filter->operator == $value['value'];
                     });
                     $fsymbol = count($fsymbol) > 0 ? array_shift($fsymbol)['symbol'] : $operators[0]['symbol'];
-                }
-                else
+                } else
                     $fsymbol = '=';
                 $rules = method_exists($this, 'rules') ? $this->rules($request, 'store') : $this->model::getRules($request, 'store');
-                $rule = str_replace(['required'], ['nullable'], _get_value($rules, $ftype) ? (_get_value($rules, $ftype)): 'nullable|string');
+                //$rule = str_replace(['required', 'nullable'], 'sometimes', _get_value($rules, $ftype) ? (_get_value($rules, $ftype) . '|string|integer'): 'nullable|string|integer');
+                $rule = _get_value($rules, $ftype);
                 if (isset($filterOPT[0]['rule']) && is_callable($filterOPT[0]['rule']))
-                    $filter = (object) $filterOPT[0]['rule']($filter);
-                else{
-                    if(isset($filter->cvalue))
-                        (new Request(['filters' => (array) $req_filters]))->validate([
-                            "filters.$index." . (@$filter->cvalue? 'cvalue' : 'value') => explode('|', (isset($filterOPT[0]['rule']) ? $filterOPT[0]['rule'] : $rule)),
+                    $filter = (object)$filterOPT[0]['rule']($filter);
+                elseif ($rule) {
+                    if (isset($filter->cvalue))
+                        (new Request(['filters' => (array)$req_filters]))->validate([
+                            "filters.$index." . (@$filter->cvalue ? 'cvalue' : 'value') => explode('|', (isset($filterOPT[0]['rule']) ? $filterOPT[0]['rule'] : $rule)),
                         ]);
                 }
                 if (isset($filterOPT[0]) && !isset($filterOPT[0]['handel']) && isset($filter->value)) {
-                    $fvalue = @$filter->cvalue??@$filter->value;
+                    $fvalue = @$filter->cvalue ?? @$filter->value;
                     switch ($ftype) {
                         case 'all':
                             $this->searchQ(new Request(['q' => $fvalue]), $model, $parent);
@@ -51,14 +53,27 @@ trait RequestFilter
                             break;
                         default:
                             if (method_exists($this, 'query_filter_type'))
-                                $current = $this->query_filter_type($model, $filter, (object)['value' => @$filter->value, 'cvalue' =>  @$filter->cvalue, 'type' => $ftype, 'symbol' => $fsymbol], $current, $filters);
+                                $current = $this->query_filter_type($model, $filter, (object)['value' => @$filter->value, 'cvalue' => @$filter->cvalue, 'type' => $ftype, 'symbol' => $fsymbol], $current, $filters);
                             if (!isset($current[$ftype]) && $fvalue) {
                                 switch ($fsymbol) {
                                     case 'like_any':
-                                        $model->whereRaw("$ftype like '%{$fvalue}%'");
+                                        $model->where($this->model::getTableNameDot() . $ftype, "like", "'%{$fvalue}%'");
                                         break;
                                     default:
-                                        $model->whereRaw("$ftype $fsymbol " . (is_integer($fvalue) ?  $fvalue: "'{$fvalue}'"));
+                                        if ((substr($ftype, -3, 3) === '_id' || isset($filterOPT[0]['with']) || isset($filterOPT[0]['pivot'])) && isset($filter->model) && $filter->model) {
+                                            $model->whereHas(str_replace('_id', '', $ftype), function ($q) use($filter, $fvalue) {
+                                                $tableNameDot = isset($filterOPT[0]['pivot']) ? 'pivot.': $filter->model::getTableNameDot();
+                                                foreach ($filter->model::getTableColumns() as $column) {
+                                                    if (in_array($column, ['id', 'parent_id']))
+                                                        $q->where($tableNameDot . $column, $fvalue);
+                                                    else
+                                                        $q->orWhere($tableNameDot . $column, 'LIKE', "%$fvalue%");
+                                                }
+                                            });
+                                        } elseif (is_array($fvalue))
+                                            $model->whereIn($tableNameDot . $ftype, $fvalue);
+                                        else
+                                            $model->where($tableNameDot . $ftype, $fsymbol, is_integer($fvalue) ? $fvalue : "'{$fvalue}'");
                                         break;
                                 }
                             }
@@ -68,12 +83,12 @@ trait RequestFilter
                 $current[_get_value((array)$filter, 'type')] = _get_value((array)$filter, 'value');
             }
         if ($this->model::hasTableColumn('parent_id') && $request->no_check_parent != 1) {
-            $parentSet = $request->has('parent') ? (boolean) $request->parent : true;
-            if ((!isset($current['parent_id']) || !$current['parent_id']) && $parentSet){
+            $parentSet = $request->has('parent') ? (boolean)$request->parent : true;
+            if ((!isset($current['parent_id']) || !$current['parent_id']) && $parentSet) {
                 if (auth()->user()->banks->count() && !iRole::has($request->action . '.any'))
-                    $model->whereIn('parent_id', auth()->user()->banks->pluck('id')->toArray());
+                    $model->whereIn($tableNameDot . 'parent_id', auth()->user()->banks->pluck('id')->toArray());
                 else
-                    $model->where('parent_id', null)->orWhere('parent_id','<=', 0);
+                    $model->where($tableNameDot . 'parent_id', null)->orWhere($tableNameDot . 'parent_id', '<=', 0);
             }
         }
         return [$filters, $current];

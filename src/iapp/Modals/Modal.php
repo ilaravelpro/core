@@ -259,7 +259,7 @@ trait Modal
             }
         });
     }
-    
+
     public static $find_names = [];
 
     public static function findByAny($value){
@@ -269,6 +269,44 @@ trait Modal
                 $q->{$index > 0 ? "orWhere" : "where"}($name, $value);
             }
         })->first();
+    }
+
+    public static function getTableName(){
+        $table = null;
+        try {
+            $table = with(new static())->getTable();
+        }catch (\Throwable $exception) {}
+        return $table;
+    }
+
+    public static function getTableNameDot(){
+        $table = static::getTableName();
+        $table .= $table ? "." : "";
+        return $table;
+    }
+
+    public static function findQ($value){
+        $table = static::getTableNameDot();
+        return static::where(function ($q) use($value, $table) {
+            foreach (static::getTableColumns() as $index => $column) {
+                if (in_array($column, ['id', 'parent_id']))
+                    $q->where($table.$column, $value);
+                else
+                    $q->orWhere($table.$column, 'LIKE', "%$value%");
+            }
+        })->first();
+    }
+
+    public static function getQ($value){
+        $table = static::getTableNameDot();
+        return static::where(function ($q) use($value, $table) {
+            foreach (static::getTableColumns() as $index => $column) {
+                if (in_array($column, ['id', 'parent_id']))
+                    $q->where($table.$column, $value);
+                else
+                    $q->orWhere($table.$column, 'LIKE', "%$value%");
+            }
+        })->get();
     }
 
     public function __call($method, $parameters)
