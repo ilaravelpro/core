@@ -64,22 +64,50 @@ class Resource extends JsonResource
             if (in_array($value, [[]]) || in_array($key, $hidden) || (is_array($value) && count($value) == 0))
                 unset($data[$key]);
         }
-        if (isset($this->resource->with)) {
-            foreach ($this->resource->with as $index => $item) {
-                if ($this->$item) {
-                    $resourceModal = iresourcedata(class_name($this->$item))?:static::class;
-                    $data[$item] = $this->$item instanceof Collection ? $resourceModal::collection($this->$item) : new $resourceModal($this->$item);
+        if (isset($data['id']) && method_exists($request, 'route') && !request()->has('no_actions') && $request->route()) {
+            if (!$this->route_src){
+                $this->route_src = $request->route()->getAction('as');
+                $aAaction = explode('.', $this->route_src);
+                $this->route_action = end($aAaction);
+                array_pop($aAaction);
+                $this->route_src = str_replace('api.', '', join('.', $aAaction));
+            }
+        }
+        $vaction  = in_array($this->route_action, ['data', 'index']) ? 'index' : 'single';
+        $with_resource = isset($this->resource->with_resource) ? $this->resource->with_resource : [];
+        $with_resource = isset($this->resource->{"with_resource_" . $this->route_action}) ? array_merge($this->resource->{"with_resource_" . $this->route_action}, $with_resource) : $with_resource;
+        $with_resource = isset($this->resource->{"with_resource_" . $vaction}) ? array_merge($this->resource->{"with_resource_" . $vaction}, $with_resource) : $with_resource;
+        foreach ($with_resource as $index => $item) {
+            $name = is_int($index) ? $item : $index;
+            $resourceName = is_int($index) ? null : $item;
+            if ($this->$name) {
+                $resourceModal = iresource($resourceName?:class_name($this->$name))?:static::class;
+                $data[$name] = $this->$name instanceof Collection ? $resourceModal::collection($this->$name) : new $resourceModal($this->$name);
+            }
+        }
+        if (isset($this->resource->with_resource_smart)) {
+            foreach ($this->resource->with_resource_smart as $index => $item) {
+                $name = is_int($index) ? $item : $index;
+                if ($vaction == "index") {
+                    $data["{$name}_count"] = $this->$name->count();
+                }else {
+                    $resourceName = is_int($index) ? null : $item;
+                    if ($this->$name) {
+                        $resourceModal = iresource($resourceName?:class_name($this->$name))?:static::class;
+                        $data[$name] = $this->$name instanceof Collection ? $resourceModal::collection($this->$name) : new $resourceModal($this->$name);
+                    }
                 }
             }
         }
-        if (isset($this->resource->with_resource)) {
-            foreach ($this->resource->with_resource as $index => $item) {
-                $name = is_int($index) ? $item : $index;
-                $resourceName = is_int($index) ? null : $item;
-                if ($this->$name) {
-                    $resourceModal = iresourcedata($resourceName?:class_name($this->$name))?:static::class;
-                    $data[$name] = $this->$name instanceof Collection ? $resourceModal::collection($this->$name) : new $resourceModal($this->$name);
-                }
+        $with_resource_data = isset($this->resource->with_resource_data) ? $this->resource->with_resource_data : [];
+        $with_resource_data = isset($this->resource->{"with_resource_data_" . $this->route_action}) ? array_merge($this->resource->{"with_resource_data_" . $this->route_action}, $with_resource_data) : $with_resource_data;
+        $with_resource_data = isset($this->resource->{"with_resource_data_" . $vaction}) ? array_merge($this->resource->{"with_resource_data_" . $vaction}, $with_resource_data) : $with_resource_data;
+        foreach ($with_resource_data as $index => $item) {
+            $name = is_int($index) ? $item : $index;
+            $resourceName = is_int($index) ? null : $item;
+            if ($this->$name) {
+                $resourceModal = iresourcedata($resourceName?:class_name($this->$name))?:static::class;
+                $data[$name . '_id'] = $this->$name instanceof Collection ? $resourceModal::collection($this->$name) : new $resourceModal($this->$name);
             }
         }
         if (isset($this->resource->files))
@@ -90,14 +118,8 @@ class Resource extends JsonResource
                     unset($data[$item.'_id']);
                 }
             }
-        if (auth()->check() && isset($data['id']) && method_exists($request, 'route') && !request()->has('no_actions') && $request->route()) {
-            if (!$this->route_src){
-                $this->route_src = $request->route()->getAction('as');
-                $aAaction = explode('.', $this->route_src);
-                $this->route_action = end($aAaction);
-                array_pop($aAaction);
-                $this->route_src = str_replace('api.', '', join('.', $aAaction));
-            }
+
+        if (auth()->check() && $this->route_src) {
             $actions = [];
             foreach (iconfig('scopes.' . $this->route_src . '.items', []) as $index => $item) {
                 $item = str_replace(['edit', 'destroy'], ['update', 'delete'], is_integer($index) ? $item : $index);
