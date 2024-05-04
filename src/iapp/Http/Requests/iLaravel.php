@@ -33,6 +33,7 @@ class iLaravel extends FormRequest
     {
         if (!$this->controller()) return $data;
         $data = $this->releaseData($data);
+        $this->replace($data);
         if (method_exists($this->controller(), 'requestData')) {
             $this->controller()->requestData($this, $this->route()->getActionMethod(), $data, ...array_values($this->route()->parameters()));
         }

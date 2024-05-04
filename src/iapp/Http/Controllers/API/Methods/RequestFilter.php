@@ -102,15 +102,6 @@ trait RequestFilter
                 }
                 $current[_get_value((array)$filter, 'type')] = _get_value((array)$filter, 'value');
             }
-        if ($this->model::hasTableColumn('parent_id') && $request->no_check_parent != 1) {
-            $parentSet = $request->has('parent') ? (boolean)$request->parent : true;
-            if ((!isset($current['parent_id']) || !$current['parent_id']) && $parentSet) {
-                if (auth()->user()->banks->count() && !iRole::has($request->action . '.any'))
-                    $model->whereIn($tableNameDot . 'parent_id', auth()->user()->banks->pluck('id')->toArray());
-                else
-                    $model->where($tableNameDot . 'parent_id', null)->orWhere($tableNameDot . 'parent_id', '<=', 0);
-            }
-        }
 
         if ($request->excepts && is_array($request->excepts) && count($request->excepts)) {
             $excepts = array_unique(array_filter(array_map(function ($item) { return $this->model::id($item)?:$item; },$request->excepts), 'is_numeric'));
