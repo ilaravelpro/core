@@ -9,6 +9,7 @@
 
 namespace iLaravel\Core\iApp\Http\Resources;
 
+use App\RentExtension;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Collection;
@@ -17,6 +18,7 @@ use Illuminate\Support\Facades\Gate;
 class Resource extends JsonResource
 {
     public $route_action = null;
+    public $type_action = null;
     public $route_src = null;
     public $c_serial = null;
     public $_local = null;
@@ -25,6 +27,7 @@ class Resource extends JsonResource
     {
         $args = func_get_args();
         $this->_local = isset($args[1]) && $args[1] ? $args[1] : null;
+        $resource->unsetRelations();
         parent::__construct($resource);
     }
 
@@ -64,19 +67,22 @@ class Resource extends JsonResource
             if (in_array($value, [[]]) || in_array($key, $hidden) || (is_array($value) && count($value) == 0))
                 unset($data[$key]);
         }
-        if (isset($data['id']) && method_exists($request, 'route') && !request()->has('no_actions') && $request->route()) {
+        $has_actions = false;
+        if (isset($data['id']) && method_exists($request, 'route') && $request->route() && method_exists($request->route(), 'getController') && $request->route()->getController()->model == imodal(class_name($this->resource))) {
             if (!$this->route_src){
                 $this->route_src = $request->route()->getAction('as');
                 $aAaction = explode('.', $this->route_src);
                 $this->route_action = end($aAaction);
                 array_pop($aAaction);
                 $this->route_src = str_replace('api.', '', join('.', $aAaction));
+                $has_actions = true;
             }
-        }
-        $vaction  = in_array($this->route_action, ['data', 'index']) ? 'index' : 'single';
+            $this->type_action = in_array($this->route_action, ['data', 'index']) ? 'index' : 'single';
+        }else
+            $has_actions = false;
         $with_resource = isset($this->resource->with_resource) ? $this->resource->with_resource : [];
         $with_resource = isset($this->resource->{"with_resource_" . $this->route_action}) ? array_merge($this->resource->{"with_resource_" . $this->route_action}, $with_resource) : $with_resource;
-        $with_resource = isset($this->resource->{"with_resource_" . $vaction}) ? array_merge($this->resource->{"with_resource_" . $vaction}, $with_resource) : $with_resource;
+        if ($this->type_action) $with_resource = isset($this->resource->{"with_resource_" . $this->type_action}) ? array_merge($this->resource->{"with_resource_" . $this->type_action}, $with_resource) : $with_resource;
         foreach ($with_resource as $index => $item) {
             $name = is_int($index) ? $item : $index;
             $resourceName = is_int($index) ? null : $item;
@@ -88,8 +94,8 @@ class Resource extends JsonResource
         if (isset($this->resource->with_resource_smart)) {
             foreach ($this->resource->with_resource_smart as $index => $item) {
                 $name = is_int($index) ? $item : $index;
-                if ($vaction == "index") {
-                    $data["{$name}_count"] = $this->$name->count();
+                if ($this->type_action == "index") {
+                    if ($this->$name) $data["{$name}_count"] = $this->$name()->count();
                 }else {
                     $resourceName = is_int($index) ? null : $item;
                     if ($this->$name) {
@@ -101,12 +107,12 @@ class Resource extends JsonResource
         }
         $with_resource_data = isset($this->resource->with_resource_data) ? $this->resource->with_resource_data : [];
         $with_resource_data = isset($this->resource->{"with_resource_data_" . $this->route_action}) ? array_merge($this->resource->{"with_resource_data_" . $this->route_action}, $with_resource_data) : $with_resource_data;
-        $with_resource_data = isset($this->resource->{"with_resource_data_" . $vaction}) ? array_merge($this->resource->{"with_resource_data_" . $vaction}, $with_resource_data) : $with_resource_data;
+        if ($this->type_action) $with_resource_data = isset($this->resource->{"with_resource_data_" . $this->type_action}) ? array_merge($this->resource->{"with_resource_data_" . $this->type_action}, $with_resource_data) : $with_resource_data;
         foreach ($with_resource_data as $index => $item) {
             $name = is_int($index) ? $item : $index;
             $resourceName = is_int($index) ? null : $item;
             if ($this->$name) {
-                $resourceModal = iresourcedata($resourceName?:class_name($this->$name))?:static::class;
+                $resourceModal = iresourcedata($resourceName?:class_name($this->$name))?:iresourcedata('Resource');
                 $data[$name . '_id'] = $this->$name instanceof Collection ? $resourceModal::collection($this->$name) : new $resourceModal($this->$name);
             }
         }
@@ -119,7 +125,7 @@ class Resource extends JsonResource
                 }
             }
 
-        if (auth()->check() && $this->route_src) {
+        if (auth()->check() &&$has_actions) {
             $actions = [];
             foreach (iconfig('scopes.' . $this->route_src . '.items', []) as $index => $item) {
                 $item = str_replace(['edit', 'destroy'], ['update', 'delete'], is_integer($index) ? $item : $index);
