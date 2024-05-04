@@ -22,7 +22,7 @@ class CreateRoleScopesTable extends Migration
     {
         Schema::create('role_scopes', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedBigInteger('role_id');
+            $table->bigInteger('role_id')->unsigned()->nullable();
             $table->foreign('role_id')->references('id')->on('roles');
 			$table->string('scope');
 			$table->boolean('can');

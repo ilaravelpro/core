@@ -23,10 +23,8 @@ class ChangeUsersTable extends Migration
         Schema::table('users', function (Blueprint $table) {
             $table->dropColumn('email_verified_at');
             $table->dropColumn('email');
-            $table->string('password')->nullable()->change();
             $table->string('name')->nullable()->change();
-
-
+            $table->string('password')->nullable()->change();
             $table->unsignedBigInteger('avatar_id')->nullable()->after('id');
             $table->foreign('avatar_id')->references('id')->on('posts');
 
