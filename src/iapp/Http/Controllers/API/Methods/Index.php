@@ -91,23 +91,24 @@ trait Index
                 array_pop($aAaction);
                 $this->action = str_replace('api.', '', join('.', $aAaction));
             }
-            $anyByUser = function ($model) {
-                return $model->where(function ($query) use ($model) {
+            $anyByUser = function ($model, $user_names = []) {
+                return $model->where(function ($query) use ($model, $user_names) {
                     $idName = null;
                     $table = $model->getModel()->getTable();
-                    if (auth()->user()->role && \Schema::hasColumn($table, auth()->user()->role . '_id'))
-                        $idName = auth()->user()->role."_id";
-                    elseif (\Schema::hasColumn($table, 'user_id'))
-                        $idName = 'user_id';
-                    elseif (\Schema::hasColumn($table, 'creator_id'))
-                        $idName = 'creator_id';
-                    else
+                    $table = $table ? "{$table}." : "";
+                    if (auth()->user()->role)
+                        $user_names[] = auth()->user()->role."_id";
+                    $user_names[] = 'user_id';
+                    $user_names[] = 'creator_id';
+                    $user_names = array_values(array_filter($user_names, function ($idName) {
+                        return in_array($idName, $this->model::getTableColumns());
+                    }));
+                    if (!count($user_names))
                         return $query;
-                    if ($table) {
-                        $idName = "{$table}.{$idName}";
-                    }
-                    if ($idName)
-                        $query->where($idName, auth()->id());
+                    $query->where($table . $user_names[0], auth()->id());
+                    array_shift($user_names);
+                    foreach ($user_names as $user_name)
+                        $query->orWhere($table . $user_name, auth()->id());
                     return $query;
                 });
             };
