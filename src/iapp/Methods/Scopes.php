@@ -33,13 +33,15 @@ class Scopes
             $configScopes['users']['items']['fields']['role'] = Role::all()->pluck('name')->toArray();
         }
         unset($configScopes['global']);
+        global $trans;
+        $trans = [];
         foreach ($configScopes as $key => $section) {
             $positions[$key] = [
                 'title' => _t($section['title']),
                 'name' => $key,
             ];
             foreach ($section['items'] as $skey => $scope) {
-                $positions = static::renderScopes($model, $positions, $parent, $scope,$key, is_array($scope) ? "$key.$skey" : "$key.$scope", 0);
+                list($positions, $trans) = static::renderScopes($model, $positions, $parent, $scope,$key, is_array($scope) ? "$key.$skey" : "$key.$scope", 0);
             }
         }
         return ['data' => $positions];
@@ -47,19 +49,23 @@ class Scopes
 
     public static function renderScopes($model, $positions, $parent, $scope, $key, $skey, $canDef = 0)
     {
+        global $trans;
         if (is_array($scope)) {
             foreach ($scope as $i => $valued)
-                $positions = static::renderScopes($model, $positions, $parent, $valued,$key, is_array($valued) ? "$skey.$i" : "$skey.$valued", $canDef);
+                list($positions, $trans) = static::renderScopes($model, $positions, $parent, $valued,$key, is_array($valued) ? "$skey.$i" : "$skey.$valued", $canDef);
         } else {
             $smodel = $model::where(['role_id' => $parent->id, 'scope' => $skey])->first();
             $positions[$key]['scopes'][] = [
                 'id' => $smodel ? $smodel->serial : null,
                 'parent_id' => $parent->serial,
-                'title' => _t(implode(' ', array_map(function ($key) { return ucfirst($key); }, array_filter(explode('.', $skey), function ($skey) use($key) {return $skey !== $key;})))),
+                'title' => implode(' ', array_map(function ($key){
+                    global $trans;
+                    return isset($trans[$key]) ? $trans[$key] : ($trans[$key] = ucfirst(_t($key)));
+                }, array_filter(explode('.', $skey), function ($skey) use($key) {return $skey !== $key;}))),
                 'scope' =>  $skey,
                 'can' => $smodel ? $smodel->can : 0
             ];
         }
-        return$positions;
+        return[$positions, $trans];
     }
 }
