@@ -80,6 +80,7 @@ class Resource extends JsonResource
             $this->type_action = in_array($this->route_action, ['data', 'index']) ? 'index' : 'single';
         }else
             $has_actions = false;
+
         $with_resource = isset($this->resource->with_resource) ? $this->resource->with_resource : [];
         $with_resource = isset($this->resource->{"with_resource_" . $this->route_action}) ? array_merge($this->resource->{"with_resource_" . $this->route_action}, $with_resource) : $with_resource;
         if ($this->type_action) $with_resource = isset($this->resource->{"with_resource_" . $this->type_action}) ? array_merge($this->resource->{"with_resource_" . $this->type_action}, $with_resource) : $with_resource;
@@ -113,6 +114,17 @@ class Resource extends JsonResource
             $resourceName = is_int($index) ? null : $item;
             if ($this->$name) {
                 $resourceModal = iresourcedata($resourceName?:class_name($this->$name))?:iresourcedata('Resource');
+                $data[$name . '_id'] = $this->$name instanceof Collection ? $resourceModal::collection($this->$name) : new $resourceModal($this->$name);
+            }
+        }
+        $with_resource_data_normal = isset($this->resource->with_resource_data_normal) ? $this->resource->with_resource_data_normal : [];
+        $with_resource_data_normal = isset($this->resource->{"with_resource_data_normal_" . $this->route_action}) ? array_merge($this->resource->{"with_resource_data_normal_" . $this->route_action}, $with_resource_data_normal) : $with_resource_data_normal;
+        if ($this->type_action) $with_resource_data_normal = isset($this->resource->{"with_resource_data_normal_" . $this->type_action}) ? array_merge($this->resource->{"with_resource_data_normal_" . $this->type_action}, $with_resource_data_normal) : $with_resource_data_normal;
+        foreach ($with_resource_data_normal as $index => $item) {
+            $name = is_int($index) ? $item : $index;
+            $resourceName = is_int($index) ? null : $item;
+            if ($this->$name) {
+                $resourceModal = iresource($resourceName?:class_name($this->$name))?:iresource('Resource');
                 $data[$name . '_id'] = $this->$name instanceof Collection ? $resourceModal::collection($this->$name) : new $resourceModal($this->$name);
             }
         }
