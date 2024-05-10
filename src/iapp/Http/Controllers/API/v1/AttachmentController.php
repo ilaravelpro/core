@@ -17,6 +17,11 @@ use iLaravel\Core\iApp\Http\Controllers\API\Methods\Controller\Destroy;
 
 class AttachmentController extends Controller
 {
+    public function filters($request, $model, $parent = null, $operators = [])
+    {
+        return [[],[],[]];
+    }
+
     use
         Index,
         Show,
