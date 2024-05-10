@@ -62,8 +62,8 @@ class Resource extends JsonResource
         if ($this && method_exists($this, 'fields'))
             $data = $this->fields($request, $data);
         foreach ($data as $key => $value){
-            if (substr($key, -3, 3) === '_at' && ipreference('lang') == 'fa' && $data[$key])
-                $data[$key] = jdate($data[$key])->format('Y-m-d H:i:s');
+            if ($value && substr($key, -3, 3) === '_at')
+                $data[$key] = format_datetime($data[$key], isset($this->resource->datetime) ? $this->resource->datetime : [], $key, ipreference('lang'));
             if (in_array($value, [[]]) || in_array($key, $hidden) || (is_array($value) && count($value) == 0))
                 unset($data[$key]);
         }
