@@ -59,7 +59,15 @@ class iRolePolicy extends iRole
 
     public function fields($user, $item = null, ...$args)
     {
-        return $this->single(...array_merge(func_get_args(), ['view']));
+        $fields = [];
+        list($item, $child) = $this->findModal(...func_get_args());
+        foreach (iconfig('scopes.' . $this->prefix . '.items.fields') as $index => $field)
+            if ($index == 'empty') {
+                foreach ($field as $if)
+                    if(!($child?:$item)->$if)$fields[$if] = static::has($this->prefix . '.fields.' . $index . '.' . $if);
+            }else
+                $fields[$field] = static::has($this->prefix . '.fields.' . $field);
+        return $fields;
     }
 
     public function create($user, $item = null, ...$args)
@@ -81,8 +89,7 @@ class iRolePolicy extends iRole
         return $this->single(...array_merge(func_get_args(), ['destroy']));
     }
 
-    public function single($user, $item, $child = null, $action = null, ...$args)
-    {
+    public function findModal($user, $item, $child = null, $action = null, ...$args) {
         if (method_exists($this, 'handelModal')){
             list($item, $child) = $this->handelModal($item, $child);
         }else{
@@ -95,6 +102,12 @@ class iRolePolicy extends iRole
                 $child = $this->model::findBySerial($child);
             }
         }
+        return [$item, $child];
+    }
+
+    public function single($user, $item, $child = null, $action = null, ...$args)
+    {
+        list($item, $child) = $this->findModal(...func_get_args());
         if(isset($this->parentPolicy) && $this->parentPolicy) {
             $parentPolicy = (new $this->parentPolicy())->single($user, $item, null, $action);
             if (!$parentPolicy) return false;
