@@ -40,6 +40,13 @@ class iRole
     public static function scopes($scopes = null , $model = null, $canDef = 0)
     {
         $configScopes = iconfig('scopes', []);
+        $scopes = collect($scopes->map(function ($scope) {
+            return [
+                'id' => $scope->id,
+                'scope' => $scope->scope,
+                'can' => $scope->can,
+            ];
+        })->toArray());
         if (isset($configScopes['users']['items']) && $configScopes['users']['items']) {
             $configScopes['users']['items']['fields']['role'] = Role::all()->pluck('name')->toArray();
         }
@@ -61,11 +68,11 @@ class iRole
             foreach ($sec as $i => $valued)
                 list($scopes, $id) = static::renderScopes($scopes, $model, $id, $valued, is_array($valued) ? "$key.$i" : "$key.$valued", $canDef);
         } elseif (!$scopes->where('scope', $key)->first()) {
-            $item = new $model;
-            $item->id = $id;
-            $item->scope = $key;
-            $item->can = $canDef;
-            $scopes->add($item);
+            $scopes->add([
+                'id' => $id,
+                'scope' => $key,
+                'can' => $canDef,
+            ]);
             $id--;
         }
         return [$scopes, $id];

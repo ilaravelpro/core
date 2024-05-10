@@ -23,18 +23,12 @@ class _Role extends Model
     protected $guarded = [];
 
     protected $hidden = ['scopes'];
-
-    protected static function boot()
+    public function additionalUpdate($request = null, $additional = null, $parent = null)
     {
-        parent::boot();
-        parent::creating(function (self $event) {
-            $event->creator_id = auth()->id();
-        });
-        parent::saved(function (self $event) {
-            $roleScopes = $event ? iRole::scopes($event->scopes, imodal('RoleScope')) : [];
-            $scopes = $roleScopes->pluck('can', 'scope')->toArray();
-            upreference('core.irole.cache.'.$event->name . '.scopes', ['time' => time(), 'data' => $scopes]);
-        });
+        parent::additionalUpdate($request, $additional, $parent);
+        $roleScopes = $this ? iRole::scopes($this->scopes, imodal('RoleScope')) : [];
+        $scopes = $roleScopes->pluck('can', 'scope')->toArray();
+        upreference('core.irole.cache.'.$this->name . '.scopes', ['time' => time(), 'data' => $scopes]);
     }
 
     public function scopes()
