@@ -186,8 +186,8 @@ function _save_child($kid, $items, $model, $set = [], $unset = [], $callback = n
             unset($value[$item]);
         }
         if (isset($value['id'])) {
-            $deletes = array_diff($deletes, [$model::id($value['id'])]);
-            $record = $model::findBySerial($value['id']);
+            $deletes = array_diff($deletes, [is_integer($value['id']) ? $value['id'] : $model::id($value['id'])]);
+            $record = is_integer($value['id']) ?  $model::find($value['id']): $model::findBySerial($value['id']);
             unset($value['id']);
             $record->update($value);
         } else
@@ -199,6 +199,7 @@ function _save_child($kid, $items, $model, $set = [], $unset = [], $callback = n
     $model::destroy($deletes);
     return [$items, $deletes];
 }
+
 
 function extract_links($sourceURL) {
     $content=file_get_contents($sourceURL);
