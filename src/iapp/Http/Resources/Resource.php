@@ -62,10 +62,12 @@ class Resource extends JsonResource
         if ($this && method_exists($this, 'fields'))
             $data = $this->fields($request, $data);
         foreach ($data as $key => $value){
-            if ($value && substr($key, -3, 3) === '_at')
-                $data[$key] = format_datetime($data[$key], isset($this->resource->datetime) ? $this->resource->datetime : [], $key, ipreference('lang'));
-            if (in_array($value, [[]]) || in_array($key, $hidden) || (is_array($value) && count($value) == 0))
-                unset($data[$key]);
+            try {
+                if ($value && substr($key, -3, 3) === '_at')
+                    $data[$key] = format_datetime($data[$key], isset($this->resource->datetime) ? $this->resource->datetime : [], $key, ipreference('lang'));
+                if (in_array($value, [[]]) || in_array($key, $hidden) || (is_array($value) && count($value) == 0))
+                    unset($data[$key]);
+            }catch (\Throwable $exception) {}
         }
         $has_actions = false;
         if (isset($data['id']) && method_exists($request, 'route') && $request->route() && method_exists($request->route(), 'getController') && $request->route()->getController()->model == imodal(class_name($this->resource))) {
