@@ -28,7 +28,7 @@ trait SearchQ
                     if (method_exists($rmodel = (new ($this->model)), $related = str_replace('_id', '', $column))) {
                         $relatedModal = $rmodel->$related();
                         $relatedModal = @$relatedModal->model ?: $relatedModal->getRelated();
-                        $query->orWhereHas(str_replace('_id', '', $column), function ($query) use ($q, $column, $relatedModal) {
+                        $query->whereHas(str_replace('_id', '', $column), function ($query) use ($q, $column, $relatedModal) {
                             $tableNameDot = $relatedModal::getTableNameDot();
                             foreach ($relatedModal::getTableColumns() as $column2) {
                                 if (in_array($column2, ['id', 'parent_id']))
