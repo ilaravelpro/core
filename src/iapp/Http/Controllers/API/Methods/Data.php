@@ -10,7 +10,7 @@
 namespace iLaravel\Core\iApp\Http\Controllers\API\Methods;
 
 use iLaravel\Core\Vendor\iRole\iRole;
-use Illuminate\Http\Request;
+use iLaravel\Core\iApp\Http\Requests\iLaravel as Request;
 
 trait Data
 {

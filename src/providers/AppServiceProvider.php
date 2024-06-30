@@ -11,7 +11,7 @@ namespace iLaravel\Core\Providers;
 
 use Illuminate\Auth\RequestGuard;
 
-use Illuminate\Http\Request;
+use iLaravel\Core\iApp\Http\Requests\iLaravel as Request;
 
 use Illuminate\Foundation\AliasLoader;
 
