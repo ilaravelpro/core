@@ -10,6 +10,7 @@
 namespace iLaravel\Core\iApp\Http\Resources;
 
 use App\RentExtension;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Collection;
@@ -38,7 +39,7 @@ class Resource extends JsonResource
             $this->_local = isset($args[1]) && $args[1] ? $args[1] : $request->local;
         }
         $role = auth()->check() ? auth()->user()->role : 'guest';
-        if (!$this->table && $this->resource) $this->table = method_exists($this->resource, 'getTable') ? $this->resource->getTable() : class_name(request()->route()->getController(), true, 2);
+        if (!$this->table && $this->resource && (is_string($this->resource) || $this->resource instanceof Model)) $this->table = method_exists($this->resource, 'getTable') ? $this->resource->getTable() : class_name(request()->route()->getController(), true, 2);
         $hidden = iconfig('resources.' . $this->table, []) ? $this->table : 'global';
         $hidden = array_merge(iconfig('resources.' . $hidden . '.hidden.' . $role, []), iconfig('resources.' . $hidden . '.hidden.global', []));
         $data = parent::toArray($request);

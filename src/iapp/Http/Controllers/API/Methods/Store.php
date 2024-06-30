@@ -16,9 +16,9 @@ trait Store
     public function _store(Request $request, $parent = null, ...$args)
     {
         if (method_exists($this, 'before_store'))
-            $this->before_store($request, $parent = null, ...$args);
+            $this->before_store($request, $parent, ...$args);
         if (method_exists($this, 'before_save'))
-            $this->before_save($request, $parent = null, ...$args);
+            $this->before_save($request, $parent, ...$args);
         $callback = null;
         if (last($args) instanceof \Closure) {
             $callback = last($args);
