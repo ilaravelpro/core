@@ -21,8 +21,7 @@ trait Update
             $this->before_save($request, $arg1, $arg2, $arg3, $arg4);
         if (!$arg4) $arg4 = 'update';
         $callback = null;
-        if($arg2 instanceof \Closure)
-        {
+        if ($arg2 instanceof \Closure) {
             $callback = $arg2;
             $arg2 = null;
         }
@@ -31,16 +30,20 @@ trait Update
         }
         list($parent, $model) = $this->findArgs($request, $arg1, $arg2);
         $args = [$model];
-        if($parent)
-        {
+        if ($parent) {
             array_unshift($args, $parent);
         }
         if (method_exists($this, 'fields')) {
             $fields = $this->fields($request, $arg4, $parent, ...$args);
-            $except = method_exists($this, 'except') ? $this->except($request, $arg4, ...$args) : [];
+            $exceptAdditional = array_keys(method_exists($this, 'rules') ? $this->rules($request, 'additional', ...$args) : $this->model::getRules($request, 'additional', ...$args));
+            $exceptAdditional = array_map(function ($item) {
+                return explode('.', $item)[0];
+            }, $exceptAdditional);
+            $except = array_merge($exceptAdditional, method_exists($this, 'except') ? $this->except($request, $arg4, ...$args) : []);
             if ($model && isset($model->files) && is_array($model->files) && count($model->files)) $except = array_merge($except, array_map(function ($v) {
                 return "{$v}_file";
             }, $model->files));
+            $except = array_values(array_unique($except));
             foreach ($except as $value) {
                 if (isset($fields[$value])) {
                     unset($fields[$value]);
@@ -54,41 +57,39 @@ trait Update
                     $original[$key] = $model->$key;
                 }
             }
-        }
-        else
-        {
-            $args2 = $parent ? array_merge([$parent], $args): $args;
+        } else {
+            $args2 = $parent ? array_merge([$parent], $args) : $args;
             $rules = method_exists($this, 'rules') ? $this->rules($request, $arg4, ...$args2) : $this->model::getRules($request, $arg4, ...$args2);
             $fields = $this->fillable($arg4) ?: array_keys($rules);
-            $except = method_exists($this, 'except') ? $this->except($request, $arg4, ...$args2) : [];
+            $exceptAdditional = array_keys(method_exists($this, 'rules') ? $this->rules($request, 'additional', ...$args2) : $this->model::getRules($request, 'additional', ...$args2));
+            $exceptAdditional = array_map(function ($item) {
+                return explode('.', $item)[0];
+            }, $exceptAdditional);
+            $except = array_merge($exceptAdditional, method_exists($this, 'except') ? $this->except($request, $arg4, ...$args2) : []);
             if ($model && isset($model->files) && is_array($model->files) && count($model->files)) $except = array_merge($except, array_map(function ($v) {
                 return "{$v}_file";
             }, $model->files));
+            $except = array_values(array_unique($except));
             $changed = [];
             $original = [];
             $requestArray = $request->toArray();
             $fields = $this->handelFields($except, $fields, $requestArray);
             foreach ($fields as $value) {
-                if(_get_value($model->toArray(), $value) != _get_value($request->toArray(), $value))
-                {
+                if (_get_value($model->toArray(), $value) != _get_value($request->toArray(), $value)) {
                     $changed = _set_value($changed, $value, _get_value($requestArray, $value));
                     $original = _set_value($original, $value, _get_value($model->toArray(), $value));
                 }
             }
 
         }
-        if($callback)
-        {
+        if ($callback) {
             array_push($args, $changed);
             array_unshift($args, $request);
             $func_changed = call_user_func_array($callback, $args);
-            if(is_array($func_changed))
-            {
+            if (is_array($func_changed)) {
                 $original = $func_changed;
             }
-        }
-        else
-        {
+        } else {
             $model->update($changed);
         }
         if (method_exists($this, 'after_update'))
@@ -116,12 +117,9 @@ trait Update
             $client = new $this->clientController(...func_get_args());
             $client->webUpdate($request, $result);
         }
-        if(!empty($original))
-        {
+        if (!empty($original)) {
             $this->statusMessage = [":model :action successfully.", ['model' => _t($this->class_name()), 'action' => _t("changed")]];
-        }
-        else
-        {
+        } else {
             $this->statusMessage = [":model :action successfully.", ['model' => _t($this->class_name()), 'action' => _t("changed")]];
         }
         if (method_exists($this, 'after_updated'))

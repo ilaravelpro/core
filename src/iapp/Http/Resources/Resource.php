@@ -28,7 +28,7 @@ class Resource extends JsonResource
     {
         $args = func_get_args();
         $this->_local = isset($args[1]) && $args[1] ? $args[1] : null;
-        $resource->unsetRelations();
+        if (is_callable(@$resource->unsetRelations)) $resource->unsetRelations();
         parent::__construct($resource);
     }
 

@@ -90,12 +90,17 @@ trait Store
         } else {
             $args2 = $parent ? array_merge([$parent], $args): $args;
             $rules = method_exists($this, 'rules') ? $this->rules($request, 'store', ...$args2) : $this->model::getRules($request, 'store', ...$args2);
+            $exceptAdditional = array_keys(method_exists($this, 'rules') ? $this->rules($request, 'additional', ...$args2) : $this->model::getRules($request, 'additional', ...$args2));
+            $exceptAdditional = array_map(function ($item) {
+                return explode('.', $item)[0];
+            }, $exceptAdditional);
             $fields = $this->fillable('store') ?: array_keys($rules);
-            $except = method_exists($this, 'except') ? $this->except($request, 'store', ...$args2) : [];
+            $except = array_merge(method_exists($this, 'except') ? $this->except($request, 'store', ...$args2) : [],method_exists($this, 'except') ? $this->except($request, 'store', ...$args2) : []);
             $model = new $this->model;
             if ($model && isset($model->files) && is_array($model->files) && count($model->files)) $except = array_merge($except, array_map(function ($v) {
                 return "{$v}_file";
             }, $model->files));
+            $except = array_values(array_unique($except));
             $requestArray = $request->toArray();
             $fields = $this->handelFields($except, $fields, $requestArray);
             foreach ($fields as $value) {

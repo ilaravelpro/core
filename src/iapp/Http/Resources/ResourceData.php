@@ -9,6 +9,7 @@
 
 namespace iLaravel\Core\iApp\Http\Resources;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Gate;
@@ -29,7 +30,7 @@ class ResourceData extends JsonResource
             $args = func_get_args();
             $this->_local = isset($args[1]) && $args[1] ? $args[1] : $request->local;
         }
-        if (!isset($this->table)) $this->table = class_name($request->route()->getController(), true, 2);
+        if (!$this->table && $this->resource && (is_string($this->resource) || $this->resource instanceof Model)) $this->table = method_exists($this->resource, 'getTable') ? $this->resource->getTable() : class_name(request()->route()->getController(), true, 2);
         $attr = iconfig('resources.' . $this->table, []) ? $this->table : 'global';
         $attr = array_merge(iconfig('resources.' . $attr . '.data', []), ipreference('resources.' . $attr . '.data.global', []));
         $translate = $this->toLocal($this->_local);
