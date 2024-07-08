@@ -82,7 +82,10 @@ class iLaravel extends FormRequest
                             $item['cvalue'] = is_array($item['value']) ? array_map(function ($v) use($relatedModal){
                                 return $relatedModal::findBySerial($v)?:$relatedModal::findQ($v);
                             }, $item['value']) : ($relatedModal::findBySerial($item['value'])?:$relatedModal::findQ($item['value']));
-                            if ($item['cvalue']) $item['cvalue'] = $item['cvalue']->id;
+                            if ($item['cvalue']){
+                                $item['mvalue'] = $item['cvalue'];
+                                $item['cvalue'] = $item['cvalue']->id;
+                            }
                             $item['model'] = $relatedModal;
                             if ($index == "filter")$data[$index] = $item;
                             else $data[$index][$ifindex] = $item;

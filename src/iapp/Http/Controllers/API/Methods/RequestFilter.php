@@ -11,7 +11,7 @@ namespace iLaravel\Core\iApp\Http\Controllers\API\Methods;
 
 use App\MaterialCode;
 use iLaravel\Core\Vendor\iRole\iRole;
-use iLaravel\Core\iApp\Http\Requests\iLaravel as Request;
+use Illuminate\Http\Request;
 use function PHPUnit\Framework\isFalse;
 
 trait RequestFilter
@@ -28,7 +28,7 @@ trait RequestFilter
         foreach ($this->model::getTableColumns() as $column) {
             $filters[] = [
                 'name' => $column,
-                'title' => _t(str_replace('_id','', $column)),
+                'title' => _t(str_replace('_id', $column)),
                 'type' => 'text',
             ];
         }
@@ -84,7 +84,7 @@ trait RequestFilter
                                                 $tableNameDot = isset($filterOPT[0]['pivot']) ? 'pivot.': $filter->model::getTableNameDot();
                                                 foreach ($filter->model::getTableColumns() as $column) {
                                                     if (in_array($column, ['id', 'parent_id']))
-                                                        $q->where($tableNameDot . $column, @$filter->value);
+                                                        $q->whereIn($tableNameDot . $column, array_merge([@$filter->value], @$filter->kids ? $filter->kids->pluck('id')->toArray() : []));
                                                     else
                                                         $q->orWhere($tableNameDot . $column, 'LIKE', "%$filter->value%");
                                                 }
