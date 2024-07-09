@@ -79,21 +79,18 @@ trait RequestFilter
                                         $model->where($this->model::getTableNameDot() . $ftype, "like", "'%{$fvalue}%'");
                                         break;
                                     default:
+                                        $items = array_merge(is_array($fvalue) ? $fvalue : [$fvalue], @$filter->mvalue && @$filter->mvalue->kids ? $filter->mvalue->kids->pluck('id')->toArray() : []);
                                         if (!@$filter->cvalue && (substr($ftype, -3, 3) === '_id' || isset($filterOPT[0]['with']) || isset($filterOPT[0]['pivot'])) && isset($filter->model) && $filter->model) {
                                             $model->whereHas(str_replace('_id', '', $ftype), function ($q) use($filter, $fvalue) {
                                                 $tableNameDot = isset($filterOPT[0]['pivot']) ? 'pivot.': $filter->model::getTableNameDot();
                                                 foreach ($filter->model::getTableColumns() as $column) {
                                                     if (in_array($column, ['id', 'parent_id']))
-                                                        $q->whereIn($tableNameDot . $column, array_merge([@$filter->value], @$filter->mvalue && @$filter->mvalue->kids ? $filter->mvalue->kids->pluck('id')->toArray() : []));
+                                                        $q->whereIn($tableNameDot . $column, @$filter->value);
                                                     else
                                                         $q->orWhere($tableNameDot . $column, 'LIKE', "%$filter->value%");
                                                 }
                                             });
-                                        } elseif (is_array($fvalue))
-                                            $model->whereIn($tableNameDot . $ftype, $fvalue);
-                                        else {
-                                            $model->where($tableNameDot . $ftype, $fsymbol, $fvalue);
-                                        }
+                                        }else $model->whereIn($tableNameDot . $ftype, $items);
                                         break;
                                 }
                             }

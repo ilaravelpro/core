@@ -28,15 +28,20 @@ trait SearchQ
                     if (method_exists($rmodel = (new ($this->model)), $related = str_replace('_id', '', $column))) {
                         $relatedModal = $rmodel->$related();
                         $relatedModal = @$relatedModal->model ?: $relatedModal->getRelated();
-                        $query->whereHas(str_replace('_id', '', $column), function ($query) use ($q, $column, $relatedModal) {
-                            $tableNameDot = $relatedModal::getTableNameDot();
-                            foreach ($relatedModal::getTableColumns() as $column2) {
-                                if (in_array($column2, ['id', 'parent_id']))
-                                    $query->where($tableNameDot . $column2, $q);
-                                else
-                                    $query->orWhere($tableNameDot . $column2, 'LIKE', "%$q%");
-                            }
-                        });
+                        $item = $relatedModal::findByAny($q);
+                        if ($item) {
+                            if (@$item->kids) {
+                                $query->orWhereIn($table . $column, array_merge([$item->id], @$item->kids ? $item->kids->pluck('id')->toArray() : []));
+                            }else $query->whereHas(str_replace('_id', '', $column), function ($query) use ($q, $column, $item, $relatedModal) {
+                                $tableNameDot = $relatedModal::getTableNameDot();
+                                foreach ($relatedModal::getTableColumns() as $column2) {
+                                    if (in_array($column2, ['id', 'parent_id']) && $item)
+                                        $query->where($tableNameDot . $column2, $item->id);
+                                    else
+                                        $query->orWhere($tableNameDot . $column2, 'LIKE', "%$q%");
+                                }
+                            });
+                        }
                     } else
                         $query->orWhere($table . $column, $q);
                 } elseif (!$id && !$parent_id) {
