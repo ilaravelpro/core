@@ -68,8 +68,10 @@ class iLaravel extends FormRequest
                 } else if (substr($index, -3, 3) === '_at' || ($jalali = substr($index, -4, 4) === '_jat')) {
                     $datum = str_replace('/', '-', $datum);
                     $jalali = @$jalali?: (now()->year - explode('-', $datum)[0] >= 620);
-                    $two_value = count(explode(' ', $datum)) == 2;
-                    $format = "Y-m-d" . ($two_value ? " H:i:s" : "");
+                    $explodeAT = explode(' ', $datum);
+                    $two_value = count($explodeAT) == 2;
+                    $three_value = $two_value ?  count(explode(':', $explodeAT[1])) == 3: false;
+                    $format = "Y-m-d" . ($two_value ? (" H:i" . ($three_value ?  ':s': '')) : "");
                     $format2 = "Y-m-d " . ($two_value ? "H:i:s" : "00:00:00");
                     $data[str_replace('_jat', '_at', $index)] = $jalali ?
                         \Morilog\Jalali\Jalalian::fromFormat($format, $datum)->toCarbon()->format($format2)
