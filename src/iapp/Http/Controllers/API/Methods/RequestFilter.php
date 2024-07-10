@@ -79,7 +79,7 @@ trait RequestFilter
                                         $model->where($this->model::getTableNameDot() . $ftype, "like", "'%{$fvalue}%'");
                                         break;
                                     default:
-                                        $items = array_merge(is_array($fvalue) ? $fvalue : [$fvalue], @$filter->mvalue && @$filter->mvalue->kids ? $filter->mvalue->kids->pluck('id')->toArray() : []);
+                                        $items = array_merge(is_array($fvalue) ? $fvalue : [$fvalue], isset($filterOPT[0]['with_kids']) && @$filter->mvalue && @$filter->mvalue->kids ? $filter->mvalue->kids->pluck('id')->toArray() : []);
                                         if (!@$filter->cvalue && (substr($ftype, -3, 3) === '_id' || isset($filterOPT[0]['with']) || isset($filterOPT[0]['pivot'])) && isset($filter->model) && $filter->model) {
                                             $model->whereHas(str_replace('_id', '', $ftype), function ($q) use($filter, $fvalue) {
                                                 $tableNameDot = isset($filterOPT[0]['pivot']) ? 'pivot.': $filter->model::getTableNameDot();
