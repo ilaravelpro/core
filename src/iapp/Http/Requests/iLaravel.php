@@ -49,7 +49,7 @@ class iLaravel extends FormRequest
         try {
 
             foreach ($data as $index => $datum) {
-                if (is_array($datum) &&isset($datum['value']) && isset($datum['text']) && !isset($datum['type'])) {
+                if (is_array($datum) && isset($datum['value']) && isset($datum['text']) && !isset($datum['type'])) {
                     $data[$index] = $datum = $datum['value'];
                 }
                 if (substr($index, 0, 3) === 'is_' || substr($index, 0, 4) === 'has_') {

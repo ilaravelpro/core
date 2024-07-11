@@ -85,7 +85,7 @@ trait RequestFilter
                                                 $tableNameDot = isset($filterOPT[0]['pivot']) ? 'pivot.': $filter->model::getTableNameDot();
                                                 foreach ($filter->model::getTableColumns() as $column) {
                                                     if (in_array($column, ['id', 'parent_id']))
-                                                        $q->whereIn($tableNameDot . $column, @$filter->value);
+                                                        $q->where($tableNameDot . $column, @$filter->value);
                                                     else
                                                         $q->orWhere($tableNameDot . $column, 'LIKE', "%$filter->value%");
                                                 }
