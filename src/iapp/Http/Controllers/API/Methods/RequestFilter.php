@@ -28,7 +28,7 @@ trait RequestFilter
         foreach ($this->model::getTableColumns() as $column) {
             $filters[] = [
                 'name' => $column,
-                'title' => _t(str_replace('_id', $column)),
+                'title' => _t(str_replace('_id', '', $column)),
                 'type' => 'text',
             ];
         }
