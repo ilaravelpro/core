@@ -62,11 +62,10 @@ class iRolePolicy extends iRole
         $fields = [];
         list($item, $child) = $this->findModal(...func_get_args());
         foreach (iconfig('scopes.' . $this->prefix . '.items.fields') as $index => $field)
-            if ($index == 'empty') {
-                foreach ($field as $if)
-                    if(!($child?:$item)->$if)$fields[$if] = static::has($this->prefix . '.fields.' . $index . '.' . $if);
-            }else
+            if ($index != 'empty')
                 $fields[$field] = static::has($this->prefix . '.fields.' . $field);
+        foreach (iconfig('scopes.' . $this->prefix . '.items.fields.empty') as $index => $if)
+            if(!($child?:$item)->$if)$fields[$if] = static::has($this->prefix . '.fields.' . $index . '.' . $if);
         return $fields;
     }
 
