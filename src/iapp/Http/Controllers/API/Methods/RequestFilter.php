@@ -90,7 +90,11 @@ trait RequestFilter
                                                         $q->orWhere($tableNameDot . $column, 'LIKE', "%$filter->value%");
                                                 }
                                             });
-                                        }else $model->whereIn($tableNameDot . $ftype, $items);
+                                        }elseif(count($items) == 1) {
+                                            $model->where($tableNameDot . $ftype, $fsymbol, $items[0]);
+                                        }else {
+                                            $model->whereIn($tableNameDot . $ftype, $fsymbol, $items);
+                                        }
                                         break;
                                 }
                             }
