@@ -242,8 +242,7 @@ trait Modal
             }
         });
         parent::saving(function (self $event){
-            if ($event->{$event->check_content} && $event->hasTableColumn($event->check_content) && (is_array($event->content) || is_object($event->content))) {
-                $content = $event->check_content?:[];
+            if (($content = @$event->{$event->check_content}) && $event->hasTableColumn($event->check_content) && (is_array($content) || is_object($content))) {
                 $event->saveFilesInContent( $content, $event->check_content, static::reviewFiles($event->getOriginal($event->check_content)?:$content, '', false), Request::createFrom(\request()));
                 $event->{$event->check_content} = json_encode($content);
             }
