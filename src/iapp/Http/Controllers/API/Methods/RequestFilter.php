@@ -60,7 +60,7 @@ trait RequestFilter
                 elseif ($rule) {
                     if (isset($filter->cvalue))
                         (new Request(['filters' => (array)$req_filters]))->validate([
-                            "filters.$index." . (@$filter->cvalue ? 'cvalue' : 'value') => explode('|', (isset($filterOPT[0]['rule']) ? $filterOPT[0]['rule'] : $rule)),
+                            "filters.$index." . 'value' => explode('|', (isset($filterOPT[0]['rule']) ? $filterOPT[0]['rule'] : $rule)),
                         ]);
                 }
                 if (isset($filterOPT[0]) && !isset($filterOPT[0]['handel']) && isset($filter->value)) {
