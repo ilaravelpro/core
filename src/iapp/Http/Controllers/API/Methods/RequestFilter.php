@@ -57,12 +57,12 @@ trait RequestFilter
                 $rule = _get_value($rules, $ftype);
                 if (isset($filterOPT[0]['rule']) && is_callable($filterOPT[0]['rule']))
                     $filter = (object)$filterOPT[0]['rule']($filter);
-                elseif ($rule) {
+                /*elseif ($rule) {
                     if (isset($filter->cvalue))
                         (new Request(['filters' => (array)$req_filters]))->validate([
                             "filters.$index." . 'value' => explode('|', (isset($filterOPT[0]['rule']) ? $filterOPT[0]['rule'] : $rule)),
                         ]);
-                }
+                }*/
                 if (isset($filterOPT[0]) && !isset($filterOPT[0]['handel']) && isset($filter->value)) {
                     $fvalue = @$filter->cvalue ?? @$filter->value;
                     switch ($ftype) {
