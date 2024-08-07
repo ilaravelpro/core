@@ -24,6 +24,7 @@ class CreateFilesTable extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger('post_id');
             $table->foreign('post_id')->references('id')->on('posts');
+            $table->string('name')->nullable();
             $table->string('slug')->unique();
             $table->string('dir')->unique();
             $table->string('url')->unique();

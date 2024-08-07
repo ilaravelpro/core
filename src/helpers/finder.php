@@ -189,7 +189,6 @@ function _save_child($kid, $items, $model, $set = [], $unset = [], $callback = n
             $deletes = array_diff($deletes, [is_integer($value['id']) ? $value['id'] : $model::id($value['id'])]);
             $record = is_integer($value['id']) ?  $model::find($value['id']): $model::findBySerial($value['id']);
             unset($value['id']);
-            unset($value['id_text']);
             $record->update($value);
         } else
             $record = $kid->create(array_merge($value, $set));
@@ -248,4 +247,10 @@ function _iaup($name, $value, $section = 'app.options') {
 function _iaget($name, $default = null, $section = null, $type = 'auto') {
     if (!$section) $section = 'app.options';
     return ipreference("{$section}.{$name}", $default, $type);
+}
+
+function _directory_separator($separator = DIRECTORY_SEPARATOR, ...$args) {
+    $diff_separator =  $separator == '/' ? '\\' : '/';
+    $result = implode($separator, $args);
+    return str_replace($diff_separator, $separator, $result);
 }
