@@ -9,6 +9,7 @@
 
 namespace iLaravel\Core\iApp\Modals;
 
+use iLaravel\Core\iApp\Exceptions\iException;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Http\UploadedFile;
 use iLaravel\Core\iApp\Http\Controllers\API\v1\AttachmentController;
@@ -31,7 +32,20 @@ class _File extends Eloquent
         $attachmentController = new AttachmentController($request);
         $attachmentRequest = new $request;
         $attachmentRequest->files->add(['file' => UploadedFile::createFromBase($request->file($file))]);
+        return $attachmentController->store($attachmentRequest);
+    }
+
+    public static function uploadFromUrl($request, string $url, string $originalName = '', string $mimeType = null, int $error = null, bool $test = false)
+    {
+        if (!$stream = @fopen($url, 'r'))
+            throw new iException('Not found :url', ['url' => $url]);
+        $tempFile = tempnam(sys_get_temp_dir(), 'url-file-');
+        file_put_contents($tempFile, $stream);
+        $attachmentController = new AttachmentController($request);
+        $attachmentRequest = new $request;
+        $attachmentRequest->files->add(['file' => new UploadedFile($tempFile, $originalName, $mimeType, $error, $test)]);
         $attachment = $attachmentController->store($attachmentRequest);
+        unlink($tempFile);
         return $attachment;
     }
 
@@ -56,17 +70,15 @@ class _File extends Eloquent
         $type = $type[0];
 
         $file_name = $post->serial . '_original' . '.' . $temp->extension();
-        $folders = glob(join(DIRECTORY_SEPARATOR, [$disk['root'], 'upload', now()->format('Y/m/d'), 'f_*']));
+        $folders = glob(_directory_separator(DIRECTORY_SEPARATOR, $disk['root'], 'upload', now()->format('Y/m/d'), 'f_*'));
         $last_folder = last($folders);
-        $files_count = count(glob(join(DIRECTORY_SEPARATOR, [$last_folder, '*'])));
+        $files_count = count(glob(_directory_separator(DIRECTORY_SEPARATOR, $last_folder, '*')));
         $folder_int = $post->created_at->format('Y/m/d/') . 'f_' . md5(static::serial((ceil($files_count / 1000) * 1000)));
         $folder_name = 'upload/' . $folder_int;
-        $folder = join(DIRECTORY_SEPARATOR, [$disk['root'], $folder_name]);
-        $file_slug = trim(str_replace(env('APP_URL'), '', join('/', [$disk['url'], $folder_name, $file_name])), '/');
-        $file_slug = str_replace($DIFF_DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR, $file_slug);
-        if (!file_exists($folder)) {
+        $folder = _directory_separator(DIRECTORY_SEPARATOR,  $disk['root'], $folder_name);
+        $file_slug = trim(str_replace(env('APP_URL'), '', _directory_separator('/', $disk['url'], $folder_name, $file_name)), '/');
+        if (!file_exists($folder))
             mkdir($folder, 0777, true);
-        }
         $original_name = $temp->getClientOriginalName();
         $original_name = explode('.', $original_name);
         unset($original_name[count($original_name) - 1]);
@@ -76,14 +88,15 @@ class _File extends Eloquent
                 'post_id' => $post->id,
                 'mode' => 'original',
                 'slug' => $file_slug,
-                'url' => join('/', [$disk['url'], $folder_name, $file_name]),
-                'dir' => join(DIRECTORY_SEPARATOR, [$folder, $file_name]),
+                'url' => _directory_separator('/', $disk['url'], $folder_name, $file_name),
+                'dir' => _directory_separator(DIRECTORY_SEPARATOR, $folder, $file_name),
                 'mime' => $temp->getMimeType(),
                 'exec' => $temp->extension(),
                 'type' => $type,
                 'name' => $original_name,
             ], $data)
         );
+        $post->update(['title' => $original_name]);
         try {
             $temp->move($folder, $file_name);
         } catch (\Exception $e) {
@@ -119,16 +132,15 @@ class _File extends Eloquent
                 'type' => $original->type,
                 'name' => $original->name . " $mode",
             ]);
-            $DIFF_DIRECTORY_SEPARATOR = DIRECTORY_SEPARATOR == '/' ? '\\' : '/';
-            $expload_original = explode(DIRECTORY_SEPARATOR, str_replace($DIFF_DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR, $original->slug));
+            $expload_original = explode(DIRECTORY_SEPARATOR, _directory_separator(DIRECTORY_SEPARATOR, $original->slug));
             $folder_int = $post->created_at->format('Y/m/d/') . $expload_original[count($expload_original) - 2];
             $folder = 'storage/upload/' . $folder_int;
-            $file_slug = str_replace($DIFF_DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR, "$folder/$file_name");
+            $file_slug = _directory_separator('/', "$folder/$file_name");
             if (!file_exists(public_path($folder))) {
                 mkdir(public_path($folder), 0777, true);
             }
             $file->slug = $file_slug;
-            $file->url = str_replace('\\', '/', asset($file_slug));
+            $file->url = _directory_separator('/', asset($file_slug));
             $file->dir = public_path($file_slug);
             $file->save();
             $image_driver = in_array('Imagick', get_loaded_extensions()) || in_array('imagick', get_loaded_extensions()) ? "imagick" : "gd";
