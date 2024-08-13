@@ -31,10 +31,9 @@ class iLaravel extends FormRequest
 
     public function releaseValidationData($data)
     {
-        if (!$this->controller()) return $data;
         $data = $this->releaseData($data);
         $this->replace($data);
-        if (method_exists($this->controller(), 'requestData')) {
+        if ($this->controller() && method_exists($this->controller(), 'requestData')) {
             $this->controller()->requestData($this, $this->route()->getActionMethod(), $data, ...array_values($this->route()->parameters()));
         }
         $this->numberTypes($data);
@@ -72,7 +71,7 @@ class iLaravel extends FormRequest
                         $two_value = count($explodeAT) == 2;
                         $three_value = $two_value ?  count(explode(':', $explodeAT[1])) == 3: false;
                         $format = "Y-m-d" . ($two_value ? (" H:i" . ($three_value ?  ':s': '')) : "");
-                        $format2 = "Y-m-d " . ($two_value ? "H:i:s" : "00:00:00");
+                        $format2 = "Y-m-d " . ($two_value ? "H:i:s" : "01:01:01");
                         $data[str_replace('_jat', '_at', $index)] = $jalali ?
                             \Morilog\Jalali\Jalalian::fromFormat($format, $datum)->toCarbon()->format($format2)
                             : Carbon::createFromFormat($format, $datum)->format($format2);
