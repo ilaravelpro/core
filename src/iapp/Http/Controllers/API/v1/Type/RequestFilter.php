@@ -7,8 +7,7 @@
 
 namespace iLaravel\iPost\iApp\Http\Controllers\API\v1\Type;
 
-
-use Illuminate\Http\Request;
+use iLaravel\Core\iApp\Http\Requests\iLaravel as Request;
 
 trait RequestFilter
 {
