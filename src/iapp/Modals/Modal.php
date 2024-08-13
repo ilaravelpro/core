@@ -242,7 +242,8 @@ trait Modal
             }
         });
         parent::saving(function (self $event){
-            if (($content = @$event->{$event->check_content}) && $event->hasTableColumn($event->check_content) && (is_array($content) || is_object($content))) {
+            if ($event->{$event->check_content} && $event->hasTableColumn($event->check_content) && (is_array($event->content) || is_object($event->content))) {
+                $content = $event->check_content?:[];
                 $event->saveFilesInContent( $content, $event->check_content, static::reviewFiles($event->getOriginal($event->check_content)?:$content, '', false), Request::createFrom(\request()));
                 $event->{$event->check_content} = json_encode($content);
             }
@@ -263,7 +264,7 @@ trait Modal
 
     public static function findByAny($value){
         if (!count(static::$find_names)) return false;
-        return static::where(function ($q) use($value) {
+        return static::where('id', static::id($value))->orWhere(function ($q) use($value) {
             foreach (array_values(static::$find_names) as $index => $name) {
                 $q->{$index > 0 ? "orWhere" : "where"}($name, $value);
             }
