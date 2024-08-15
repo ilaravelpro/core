@@ -271,7 +271,7 @@ class iLaravel extends FormRequest
         if (in_array($action, array_keys(Gate::abilities()))) {
             $middlewares = $this->route()->getAction('middleware');
             if (is_array($middlewares)) $middlewares = array_unique($middlewares);
-            if (in_array('api', is_array($middlewares) && count($middlewares) == 1 ? $middlewares : [$middlewares])) return $auth;
+            if (in_array('api', is_array($middlewares) && count($middlewares) ? $middlewares : [$middlewares])) return $auth;
             if (!auth()->check()) {
                 auth()->login(User::guest());
             }
