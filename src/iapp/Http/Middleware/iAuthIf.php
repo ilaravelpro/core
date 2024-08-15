@@ -5,7 +5,7 @@ namespace iLaravel\Core\iApp\Http\Middleware;
 use Closure;
 use Illuminate\Support\Facades\Auth;
 
-class ApiIfAuthenticated
+class iAuthIf
 {
     /**
      * Handle an incoming request.
@@ -14,7 +14,7 @@ class ApiIfAuthenticated
      * @param  \Closure  $next
      * @return mixed
      */
-    public function handle($request, Closure $next)
+    public function handle($request, Closure $next, ...$guards)
     {
         $has_action_controller = in_array($request->route()->getActionMethod(), @$request->route()->getController()->authIf?:[]);
         $has_action_config = in_array(\Route::currentRouteName(), iconfig('authIf.routes', []));
@@ -24,7 +24,7 @@ class ApiIfAuthenticated
                 ($has_action_controller ? !$has_action_controller : !$has_action_config)
             )
         ) {
-            return app(iAuthenticate::class)->handle($request, $next, 'api');
+            return app(iAuthenticate::class)->handle($request, $next, ...(count($guards) ? $guards : ['api']));
         }
         return $next($request);
     }

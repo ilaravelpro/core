@@ -72,7 +72,7 @@ class AppServiceProvider extends ServiceProvider
 
     public function registerRoutes() {
         $router = $this->app['router'];
-        $router->aliasMiddleware('authIf', \iLaravel\Core\iApp\Http\Middleware\ApiIfAuthenticated::class);
+        $router->aliasMiddleware('authIf', \iLaravel\Core\iApp\Http\Middleware\iAuthIf::class);
         $router->pushMiddlewareToGroup('api', \iLaravel\Core\iApp\Http\Middleware\iResponse::class);
         $router->pushMiddlewareToGroup('web', \iLaravel\Core\iApp\Http\Middleware\iResponse::class);
         $router->aliasMiddleware('auth', \iLaravel\Core\iApp\Http\Middleware\iAuthenticate::class);
