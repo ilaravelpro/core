@@ -16,7 +16,14 @@ class ApiIfAuthenticated
      */
     public function handle($request, Closure $next)
     {
-        if (Auth::guard('api')->check() || (!Auth::guard('api')->check() && !in_array(\Route::currentRouteName(), iconfig('authIf.routes', [])))) {
+        $has_action_controller = in_array($request->route()->getActionMethod(), @$request->route()->getController()->authIf?:[]);
+        $has_action_config = in_array(\Route::currentRouteName(), iconfig('authIf.routes', []));
+        if (Auth::guard('api')->check() ||
+            (
+                !Auth::guard('api')->check() &&
+                ($has_action_controller ? !$has_action_controller : !$has_action_config)
+            )
+        ) {
             return app(iAuthenticate::class)->handle($request, $next, 'api');
         }
         return $next($request);
