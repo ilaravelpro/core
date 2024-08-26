@@ -12,6 +12,7 @@ namespace iLaravel\Core\iApp\Http\Controllers\API\Methods;
 use iLaravel\Core\Vendor\iRole\iRole;
 use iLaravel\Core\iApp\Http\Requests\iLaravel as Request;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 
 trait Index
 {
@@ -72,7 +73,7 @@ trait Index
             $this->searchQ($request, $model, $parent);
             $current_filter['q'] = $request->q;
         }
-        if ((isset($this->statusFilter) ? $this->statusFilter : true) && ($request->has('statusFilter') ? $request->statusFilter : true) && method_exists($model, 'getModel') && \Schema::hasColumn($model->getModel()->getTable(), 'status')){
+        if ((isset($this->statusFilter) ? $this->statusFilter : true) && ($request->has('statusFilter') ? $request->statusFilter : true) && method_exists($model, 'getModel') && \Schema::hasColumn($model->getModel()->getTable(), 'status')) {
             $statuses = iconfig("status.{$model->getModel()->getTable()}", iconfig("status.global"));
             $status = $request->status ? (in_array($request->status, $statuses) ? $request->status : $statuses[0]) : $statuses[0];
             if ($status) {
@@ -80,7 +81,7 @@ trait Index
                     'status' => 'nullable|string',
                 ]);
                 $prefix_table = method_exists($model, 'getModel') ? ($model->getModel()->getTable() . ".") : '';
-                $model->where($prefix_table.'status', "like",$status);
+                $model->where($prefix_table . 'status', "like", $status);
                 $current_filter['status'] = $status;
             }
         }
@@ -97,7 +98,7 @@ trait Index
                     $table = $model->getModel()->getTable();
                     $table = $table ? "{$table}." : "";
                     if (auth()->user()->role)
-                        $user_names[] = auth()->user()->role."_id";
+                        $user_names[] = auth()->user()->role . "_id";
                     $user_names[] = 'user_id';
                     $user_names[] = 'creator_id';
                     $user_names = array_values(array_filter($user_names, function ($idName) {
@@ -112,13 +113,13 @@ trait Index
                     return $query;
                 });
             };
-            $subs = array_filter(iconfig('scopes.' . str_replace('.','_', $this->action) . '.items.view', []), function ($sub) {
-                return iRole::has(str_replace('.','_', $this->action).".view.$sub");
+            $subs = array_filter(iconfig('scopes.' . str_replace('.', '_', $this->action) . '.items.view', []), function ($sub) {
+                return iRole::has(str_replace('.', '_', $this->action) . ".view.$sub");
             });
             if (!count($subs)) $subs = ['anyByUser'];
             foreach ($subs as $sub) {
                 if (function_exists('i_query_index_switch'))
-                    $model = i_query_index_switch($sub, $model,$this->action , $request, $anyByUser, $this);
+                    $model = i_query_index_switch($sub, $model, $this->action, $request, $anyByUser, $this);
                 elseif ($sub == 'anyByUser') {
                     $model = $anyByUser($model);
                 }
@@ -135,6 +136,7 @@ trait Index
     public function paginate($request, $model, $parent = null, $order_list = [], $default = [])
     {
         $order_list = $order_list ?: (isset($this->order_list) ? $this->order_list : ['id']);
+        $table = $model->getModel()->getTable();
         foreach ($order_list as $key => $value) {
             if (gettype($key) == 'integer') {
                 $allowed[$value] = $value;
@@ -142,8 +144,7 @@ trait Index
                 $allowed[$key] = $value;
             }
         }
-
-        $default = $default ? : (isset($this->order_default) ? $this->order_default : (method_exists($model, 'getModel') ? [[$model->getModel()->getKeyName() => $model->getModel()->getTable() . '.' . $model->getModel()->getKeyName(), 'desc']] : []));
+        $default = $default ?: (isset($this->order_default) ? $this->order_default : (method_exists($model, 'getModel') ? [[$model->getModel()->getKeyName() => $model->getModel()->getTable() . '.' . $model->getModel()->getKeyName(), 'desc']] : []));
         $default_order = [];
         foreach ($default as $key => $value) {
             if (gettype(key($value)) == 'integer') {
@@ -165,7 +166,7 @@ trait Index
             $custom_sort = is_array($request->sort) ? $request->sort : [$request->sort];
             foreach ($custom_order as $key => $value) {
                 if (!isset($allowed[$value])) continue;
-                if (isset($custom_sort[$key]) && in_array(strtolower($custom_sort[$key]), ['asc', 'desc'])) {
+                if (isset($custom_sort[$key]) && in_array(strtolower($custom_sort[$key]), ['asc', 'desc', 'random'])) {
                     $order_theory[$value] = $custom_sort[$key];
                 } else {
                     $order_theory[$value] = 'desc';
@@ -179,8 +180,21 @@ trait Index
             return [$model, $allowed, $order_theory, $default_order];
         }
         foreach ($order_theory as $key => $value) {
-            $model->orderBy($model->getModel()->getTable() . '.' . $allowed[$key], $value);
+            if ($value == 'random') {
+                $model->orderByRaw('RAND()' );
+            } else $model->orderBy($table . '.' . $allowed[$key], $value);
         }
+        try {
+            $columns = get_class($model->getModel())::getTableColumns();
+            if ($request->has_fields && is_array($request->has_fields) && count($request->has_fields)) {
+                $has_fields = array_filter($request->has_fields, function ($item) use($columns) {
+                    return in_array($item, $columns);
+                });
+                foreach ($has_fields as $has_field) {
+                    $model->whereNotNull("{$table}.{$has_field}")->where("{$table}.{$has_field}", '!=', '\'\'');
+                }
+            }
+        }catch (\Throwable $exception) {}
         if (isset($this->disablePagination)) {
             $paginate = $model->get();
             //$paginate = new LengthAwarePaginator($paginate, $paginate->count(), $paginate->count());
