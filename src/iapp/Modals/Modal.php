@@ -271,6 +271,22 @@ trait Modal
         })->first();
     }
 
+    public static function getByAny($values){
+        if (!count(static::$find_names)) return false;
+        $ids = remove_empty(array_map(function ($v) {
+            return static::id($v);
+        }, $values));
+        return static::where('id', $ids)->orWhere(function ($q) use($values) {
+            foreach (array_values(static::$find_names) as $index => $name) {
+                $q->{$index > 0 ? "orWhere" : "where"}(function ($q) use($name, $values) {
+                    foreach ($values as $index => $value) {
+                        $q->{$index > 0 ? "orWhere" : "where"}($name, $value);
+                    }
+                });
+            }
+        })->get();
+    }
+
     public static function getTableName(){
         $table = null;
         try {
