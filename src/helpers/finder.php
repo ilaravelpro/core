@@ -181,6 +181,7 @@ function _save_child($kid, $items, $model, $set = [], $unset = [], $callback = n
     $deletes = $kid->pluck('id')->toArray();
     $unseted = [];
     foreach ($items as $index => $value) {
+        $main_value = $value;
         foreach ($unset as $item){
             if (isset($value[$item])) $unseted[$item] = $value[$item];
             unset($value[$item]);
@@ -194,7 +195,7 @@ function _save_child($kid, $items, $model, $set = [], $unset = [], $callback = n
         } else
             $record = $kid->create(array_merge($value, $set));
         if (method_exists($record, 'additionalUpdate'))
-            $record->additionalUpdate(new \iLaravel\Core\iApp\Http\Requests\iLaravel($value));
+            $record->additionalUpdate(new \iLaravel\Core\iApp\Http\Requests\iLaravel($main_value));
         if (is_callable($callback))
             $callback($record, $unseted);
         $items[$index] = $record;
