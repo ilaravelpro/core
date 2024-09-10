@@ -193,6 +193,8 @@ function _save_child($kid, $items, $model, $set = [], $unset = [], $callback = n
             $record->update($value);
         } else
             $record = $kid->create(array_merge($value, $set));
+        if (method_exists($record, 'additionalUpdate'))
+            $record->additionalUpdate(new \iLaravel\Core\iApp\Http\Requests\iLaravel($value));
         if (is_callable($callback))
             $callback($record, $unseted);
         $items[$index] = $record;
