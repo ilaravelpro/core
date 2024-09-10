@@ -85,13 +85,13 @@ trait Index
                 $current_filter['status'] = $status;
             }
         }
-        if (auth()->check() && !in_array(auth()->user()->role, ipreference('admins')) && !$parent) {
-            if (!isset($this->action)) {
-                $this->action = $request->route()->getAction('as');
-                $aAaction = explode('.', $this->action);
-                array_pop($aAaction);
-                $this->action = str_replace('api.', '', join('.', $aAaction));
-            }
+        if (!isset($this->action)) {
+            $this->action = $request->route()->getAction('as');
+            $aAaction = explode('.', $this->action);
+            array_pop($aAaction);
+            $this->action = str_replace('api.', '', join('.', $aAaction));
+        }
+        if (auth()->check()) {
             $anyByUser = function ($model, $user_names = []) {
                 return $model->where(function ($query) use ($model, $user_names) {
                     $idName = null;
@@ -113,15 +113,18 @@ trait Index
                     return $query;
                 });
             };
-            $subs = array_filter(iconfig('scopes.' . str_replace('.', '_', $this->action) . '.items.view', []), function ($sub) {
-                return iRole::has(str_replace('.', '_', $this->action) . ".view.$sub");
-            });
-            if (!count($subs)) $subs = ['anyByUser'];
-            foreach ($subs as $sub) {
-                if (function_exists('i_query_index_switch'))
-                    $model = i_query_index_switch($sub, $model, $this->action, $request, $anyByUser, $this);
-                elseif ($sub == 'anyByUser') {
-                    $model = $anyByUser($model);
+            if ($request->has('is_self') && $request->is_self == 1) {
+                $model = $anyByUser($model);
+            } elseif (!in_array(auth()->user()->role, ipreference('admins')) && !$parent) {
+                $subs = array_filter(iconfig('scopes.' . str_replace('.', '_', $this->action) . '.items.view', []), function ($sub) {
+                    return iRole::has(str_replace('.', '_', $this->action) . ".view.$sub");
+                });
+                if (!count($subs)) $subs = ['anyByUser'];
+                foreach ($subs as $sub) {
+                    if (function_exists('i_query_index_switch'))
+                        $model = i_query_index_switch($sub, $model, $this->action, $request, $anyByUser, $this);
+                    elseif ($sub == 'anyByUser')
+                        $model = $anyByUser($model);
                 }
             }
         }
