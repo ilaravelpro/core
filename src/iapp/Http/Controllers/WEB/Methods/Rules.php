@@ -15,7 +15,7 @@ trait Rules
 {
     public function rules(Request $request, $action)
     {
-        if(method_exists($this->endpoint($request), 'rules'))
+        if($this->endpoint($request) && method_exists($this->endpoint($request), 'rules'))
         {
             return $this->endpoint($request)->rules(...func_get_args());
         }
