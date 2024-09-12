@@ -40,14 +40,14 @@ trait SearchQ
                     if (method_exists($rmodel = $this->model::find(1), $related = str_replace('_id', '', $column))) {
                         $relatedModal = $rmodel->$related();
                         $relatedModal = @$relatedModal->model ?: $relatedModal->getRelated();
-                        $items = $relatedModal::getByAny($q);
+                        $items = $relatedModal::getQ($q);
                         if ($items) {
                             foreach ($items as $item) {
                                 $query->orWhere(function ($query) use($q, $column, $item, $relatedModal){
+                                    $tableNameDot = $relatedModal::getTableNameDot();
                                     if (@$item->kids) {
-                                        $query->orWhereIn($table . $column, array_merge([$item->id], @$item->kids ? $item->kids->pluck('id')->toArray() : []));
-                                    }else $query->whereHas(str_replace('_id', '', $column), function ($query) use ($q, $column, $item, $relatedModal) {
-                                        $tableNameDot = $relatedModal::getTableNameDot();
+                                        $query->orWhereIn($tableNameDot . $column, array_merge([$item->id], @$item->kids ? $item->kids->pluck('id')->toArray() : []));
+                                    }else $query->whereHas(str_replace('_id', '', $column), function ($query) use ($tableNameDot, $q, $column, $item, $relatedModal) {
                                         foreach ($relatedModal::getTableColumns() as $column2) {
                                             if (in_array($column2, ['id', 'parent_id']) && $item)
                                                 $query->where($tableNameDot . $column2, $item->id);

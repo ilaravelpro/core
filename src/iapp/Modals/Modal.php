@@ -314,13 +314,17 @@ trait Modal
     }
 
     public static function getQ($value){
-        $table = static::getTableNameDot();
-        return static::where(function ($q) use($value, $table) {
-            foreach (static::getTableColumns() as $index => $column) {
-                if (in_array($column, ['id', 'parent_id']))
-                    $q->where($table.$column, $value);
-                else
-                    $q->orWhere($table.$column, 'LIKE', "%$value%");
+        $values = is_array($value) ? $value : [$value];
+        $ids = remove_empty(array_map(function ($v) {
+            return static::id($v);
+        }, $values));
+        return static::where('id', $ids)->orWhere(function ($q) use($values) {
+            foreach (static::getTableColumns() as $index => $name) {
+                $q->{$index > 0 ? "orWhere" : "where"}(function ($q) use($name, $values) {
+                    foreach ($values as $index => $value) {
+                        $q->{$index > 0 ? "orWhere" : "where"}($name, 'LIKE', "%$value%");
+                    }
+                });
             }
         })->get();
     }
