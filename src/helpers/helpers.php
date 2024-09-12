@@ -61,7 +61,7 @@ function to_slug($string, $separator = '-')
     return $string;
 }
 
-function redirect_post($url, array $data) {
+function redirect_post($url, array $data, $csrf = false) {
     $hiddenFields = '';
     foreach ($data as $key => $value) {
         $hiddenFields .= sprintf(
@@ -70,7 +70,8 @@ function redirect_post($url, array $data) {
                 htmlentities($value, ENT_QUOTES, 'UTF-8', false)
             )."\n";
     }
-
+    if ($csrf)
+        $hiddenFields = csrf_field()->toHtml();
     $output = '<!DOCTYPE html>
 <html>
 <head>
