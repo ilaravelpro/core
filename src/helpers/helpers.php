@@ -71,7 +71,7 @@ function redirect_post($url, array $data, $csrf = false) {
             )."\n";
     }
     if ($csrf)
-        $hiddenFields = csrf_field()->toHtml();
+        $hiddenFields .= csrf_field()->toHtml();
     $output = '<!DOCTYPE html>
 <html>
 <head>
