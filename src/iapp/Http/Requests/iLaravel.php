@@ -47,69 +47,71 @@ class iLaravel extends FormRequest
     {
         try {
             foreach ($data as $index => $datum) {
-                if (is_array($datum) && isset($datum['value']) && isset($datum['text']) && !isset($datum['type'])) {
-                    $data[$index] = $datum = $datum['value'];
-                }
-                if (substr($index, 0, 3) === 'is_' || substr($index, 0, 4) === 'has_') {
-                    $data[$index] = in_array($datum, ['true', 'false', '0', '1']) ? ($datum == "true" || $datum == "1") : $data[$index];
-                }else if (substr($index, -3, 3) === '_id') {
-                    try {
-                        if (is_string($datum))$data[$index] = $datum = (($parent ? : new ($this->controller()->model))->{str_replace('_id', '', $index)}()->getRelated()->id($datum))?:$datum;
-                    }catch (\Throwable $exception) {}
-                }else if (substr($index, -5, 5) === '_date' || ($jalali = substr($index, -6, 6) === '_jdate')) {
-                    $datum = str_replace('/', '-', $datum);
-                    $jalali = @$jalali?: (now()->year - explode('-', $datum)[0] >= 620);
-                    $format = "Y-m-d";
-                    $data[str_replace('_jdate', '_date', $index)] = $jalali ?
-                        \Morilog\Jalali\Jalalian::fromFormat($format, $datum)->toCarbon()->format($format)
-                        : Carbon::createFromFormat($format, $datum)->format($format);
-                } else if (substr($index, -3, 3) === '_at' || ($jalali = substr($index, -4, 4) === '_jat')) {
-                    if (strlen($datum)) {
+                if ($index !== 'content') {
+                    if (is_array($datum) && isset($datum['value']) && isset($datum['text']) && !isset($datum['type'])) {
+                        $data[$index] = $datum = $datum['value'];
+                    }
+                    if (substr($index, 0, 3) === 'is_' || substr($index, 0, 4) === 'has_') {
+                        $data[$index] = in_array($datum, ['true', 'false', '0', '1']) ? ($datum == "true" || $datum == "1") : $data[$index];
+                    }else if (substr($index, -3, 3) === '_id') {
+                        try {
+                            if (is_string($datum))$data[$index] = $datum = (($parent ? : new ($this->controller()->model))->{str_replace('_id', '', $index)}()->getRelated()->id($datum))?:$datum;
+                        }catch (\Throwable $exception) {}
+                    }else if (substr($index, -5, 5) === '_date' || ($jalali = substr($index, -6, 6) === '_jdate')) {
                         $datum = str_replace('/', '-', $datum);
                         $jalali = @$jalali?: (now()->year - explode('-', $datum)[0] >= 620);
-                        $explodeAT = explode(' ', $datum);
-                        $two_value = count($explodeAT) == 2;
-                        $three_value = $two_value ?  count(explode(':', $explodeAT[1])) == 3: false;
-                        $format = "Y-m-d" . ($two_value ? (" H:i" . ($three_value ?  ':s': '')) : "");
-                        $format2 = "Y-m-d " . ($two_value ? "H:i:s" : "01:01:01");
-                        $data[str_replace('_jat', '_at', $index)] = $jalali ?
-                            \Morilog\Jalali\Jalalian::fromFormat($format, $datum)->toCarbon()->format($format2)
-                            : Carbon::createFromFormat($format, $datum)->format($format2);
-                    }
-                }  else if (in_array($index, ['filter', 'filters'])) {
-                    foreach (($index == "filter" ? [$datum] : $datum) as $ifindex => $item) {
-                        try {
-                            $relatedModal = (new ($this->controller()->model))->{str_replace('_id', '', $item['type'])}();
-                            $relatedModal = @$relatedModal->model? :$relatedModal->getRelated();
-                            $item['cvalue'] = is_array($item['value']) ? array_map(function ($v) use($relatedModal){
-                                return $relatedModal::findBySerial($v)?:$relatedModal::findQ($v);
-                            }, $item['value']) : ($relatedModal::findBySerial($item['value'])?:$relatedModal::findQ($item['value']));
-                            if ($item['cvalue']){
-                                $item['mvalue'] = $item['cvalue'];
-                                $item['cvalue'] = $item['cvalue']->id;
+                        $format = "Y-m-d";
+                        $data[str_replace('_jdate', '_date', $index)] = $jalali ?
+                            \Morilog\Jalali\Jalalian::fromFormat($format, $datum)->toCarbon()->format($format)
+                            : Carbon::createFromFormat($format, $datum)->format($format);
+                    } else if (substr($index, -3, 3) === '_at' || ($jalali = substr($index, -4, 4) === '_jat')) {
+                        if (strlen($datum)) {
+                            $datum = str_replace('/', '-', $datum);
+                            $jalali = @$jalali?: (now()->year - explode('-', $datum)[0] >= 620);
+                            $explodeAT = explode(' ', $datum);
+                            $two_value = count($explodeAT) == 2;
+                            $three_value = $two_value ?  count(explode(':', $explodeAT[1])) == 3: false;
+                            $format = "Y-m-d" . ($two_value ? (" H:i" . ($three_value ?  ':s': '')) : "");
+                            $format2 = "Y-m-d " . ($two_value ? "H:i:s" : "01:01:01");
+                            $data[str_replace('_jat', '_at', $index)] = $jalali ?
+                                \Morilog\Jalali\Jalalian::fromFormat($format, $datum)->toCarbon()->format($format2)
+                                : Carbon::createFromFormat($format, $datum)->format($format2);
+                        }
+                    }  else if (in_array($index, ['filter', 'filters'])) {
+                        foreach (($index == "filter" ? [$datum] : $datum) as $ifindex => $item) {
+                            try {
+                                $relatedModal = (new ($this->controller()->model))->{str_replace('_id', '', $item['type'])}();
+                                $relatedModal = @$relatedModal->model? :$relatedModal->getRelated();
+                                $item['cvalue'] = is_array($item['value']) ? array_map(function ($v) use($relatedModal){
+                                    return $relatedModal::findBySerial($v)?:$relatedModal::findQ($v);
+                                }, $item['value']) : ($relatedModal::findBySerial($item['value'])?:$relatedModal::findQ($item['value']));
+                                if ($item['cvalue']){
+                                    $item['mvalue'] = $item['cvalue'];
+                                    $item['cvalue'] = $item['cvalue']->id;
+                                }
+                                $item['model'] = $relatedModal;
+                                if ($index == "filter")$data[$index] = $item;
+                                else $data[$index][$ifindex] = $item;
+                            }catch (\Throwable $exception) {
                             }
-                            $item['model'] = $relatedModal;
-                            if ($index == "filter")$data[$index] = $item;
-                            else $data[$index][$ifindex] = $item;
+                        }
+                    }  else if (is_array($datum)) {
+                        try {
+                            $relatedModal = $parent;
+                            if (is_string($index)) {
+                                $relatedModal = (new ($this->controller()->model)(['id' => 0]))->{str_replace('_id', '', $index)}();
+                                $relatedModal = @$relatedModal->model? :$relatedModal->getRelated();
+                            }
+                            $data[$index] = $this->releaseData($datum, $relatedModal);
+                            $data[$index] = array_map(function ($v) use($relatedModal){
+                                return is_string($v) ? ($relatedModal::id($v)?:$v) : $v;
+                            }, $data[$index]);
                         }catch (\Throwable $exception) {
+                            $data[$index] = $this->releaseData($datum, $parent);
                         }
+                    } else if (is_string($datum) || is_numeric($datum)) {
+                        $data[$index] = in_array($datum, ['true', 'false']) ? $datum == "true" : $this->numberial($datum);
                     }
-                }  else if (is_array($datum)) {
-                    try {
-                        $relatedModal = $parent;
-                        if (is_string($index)) {
-                            $relatedModal = (new ($this->controller()->model)(['id' => 0]))->{str_replace('_id', '', $index)}();
-                            $relatedModal = @$relatedModal->model? :$relatedModal->getRelated();
-                        }
-                        $data[$index] = $this->releaseData($datum, $relatedModal);
-                        $data[$index] = array_map(function ($v) use($relatedModal){
-                            return is_string($v) ? ($relatedModal::id($v)?:$v) : $v;
-                        }, $data[$index]);
-                    }catch (\Throwable $exception) {
-                        $data[$index] = $this->releaseData($datum, $parent);
-                    }
-                } else if (is_string($datum) || is_numeric($datum)) {
-                    $data[$index] = in_array($datum, ['true', 'false']) ? $datum == "true" : $this->numberial($datum);
                 }
             }
         }catch (\Throwable $exception) {}
