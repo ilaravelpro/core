@@ -19,16 +19,16 @@ trait Index
     public function _index(Request $request)
     {
         list($parent, $model, $order_list, $current_order, $default_order, $filters, $current_filter, $operators) = $this->_queryIndex(...func_get_args());
-        $result = $this->resourceCollectionClass ? new $this->resourceCollectionClass($model) : $this->resourceClass::collection($model);
         $additional = [];
         if ($parent) {
             $parentController = isset($this->parentController) ? $this->parentController : get_class($parent);
-            $additional[$this->class_name($parentController, null, 2)] = new $this->parentResourceCollectionClass($parent);
+            $parent_name = $this->class_name($parentController, null, 2);
+            $additional[$parent_name] = new $this->parentResourceCollectionClass($parent);
             $additional['meta'] = [
-                'parent' => $this->class_name($parentController, null, 2)
+                'parent' => $parent_name
             ];
         }
-
+        $result = $this->resourceCollectionClass ? new $this->resourceCollectionClass($model) : $this->resourceClass::collection($model);
         if (!isset($additional['meta'])) {
             $additional['meta'] = [];
         }
@@ -81,7 +81,7 @@ trait Index
                     'status' => 'nullable|string',
                 ]);
                 $prefix_table = method_exists($model, 'getModel') ? ($model->getModel()->getTable() . ".") : '';
-                $model->where($prefix_table . 'status', "like", $status);
+                $model->where($prefix_table . 'status', $status);
                 $current_filter['status'] = $status;
             }
         }
@@ -128,7 +128,15 @@ trait Index
                 }
             }
         }
-
+        if ($parent)  {
+            $parentController = isset($this->parentController) ? $this->parentController : get_class($parent);
+            $parent_name = $this->class_name($parentController, null, 2);
+            if (method_exists($model, 'getModel') && \Schema::hasColumn($model->getModel()->getTable(), $parent_name . '_id')) {
+                $model->where($parent_name . '_id', $parent->id);
+            }elseif (method_exists($model, 'getModel') && \Schema::hasColumn($model->getModel()->getTable(), 'parent_id')) {
+                $model->where( 'parent_id', $parent->id);
+            }
+        }
         list($model, $order_list, $current_order, $default_order) = $this->paginate($request, $model, $parent);
         if (method_exists($model, 'appends') && $current_filter) {
             $model->appends($request->all(...array_keys($current_filter)));
