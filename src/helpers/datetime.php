@@ -16,7 +16,7 @@ function format_datetime($datetime, $format, $attr, $lang = 'en') {
             $format = request('format');
     $format = is_array($format) && isset($format[$attr]) ? $format[$attr] : 'Y-m-d H:i:s';
     if ($lang == 'fa')
-        $datetime =  jdate($datetime)->format($format);
+        $datetime =  \Morilog\Jalali\Jalalian::fromCarbon(\Carbon\Carbon::parse($datetime)->setTimezone('Asia/Tehran'))->format($format);
     else
         $datetime =  \Carbon\Carbon::parse($datetime)->format($format);
     return $datetime;
