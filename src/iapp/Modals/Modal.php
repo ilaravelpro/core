@@ -95,6 +95,29 @@ trait Modal
         $model = new static();
         return method_exists($model, 'validationMessages') ? $model->validationMessages($request, $action, $item, ...$args) : [];
     }
+    public function validationAttributes($request, $action, $arg, ...$args)
+    {
+        $requestAll = $request->all();
+        foreach ($requestAll as $index => $item) {
+            if (is_array($item)) {
+                $this->validationAttributesCheck($index, $this->validationAttributesTrans($index), $item, $attributes);
+            }else $attributes[$index] = $this->validationAttributesTrans($index);
+        }
+        return $attributes;
+    }
+
+    function validationAttributesTrans($name)
+    {
+        return is_int($name) ? ($name + 1) : _t(ucfirst(str_replace(['-','_', '.', '/'], ' ', $name)));
+    }
+    function validationAttributesCheck($pindex, $title, $data, &$attributes)
+    {
+        foreach ($data as $index => $item) {
+            if (is_array($item)) {
+                $this->validationAttributesCheck("{$pindex}.{$index}", implode('->' ,[$title, $this->validationAttributesTrans($index)]), $item, $attributes);
+            }else $attributes["{$pindex}.{$index}"] = implode('->' ,[$title, $this->validationAttributesTrans($index)]);
+        }
+    }
 
     public static function getValidationReplacers($request, $action, $item = null, ...$args)
     {
