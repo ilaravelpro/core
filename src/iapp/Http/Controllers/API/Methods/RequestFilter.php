@@ -90,7 +90,7 @@ trait RequestFilter
                                         }elseif(count($items) == 1) {
                                             $model->where($tableNameDot . $ftype, $fsymbol, $items[0]);
                                         }else {
-                                            $model->whereIn($tableNameDot . $ftype, $fsymbol, $items);
+                                            $model->whereIn($tableNameDot . $ftype, $items);
                                         }
                                         break;
                                 }
