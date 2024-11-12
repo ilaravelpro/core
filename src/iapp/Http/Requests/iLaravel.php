@@ -218,8 +218,10 @@ class iLaravel extends FormRequest
     public function messages()
     {
         $messages = [
-            'exists_serial' => __('validation.exists'),
-            'serial' => __('validation.exists'),
+            'exists_serial' => _t('The selected Serial ID was not found.'),
+            'serial' => _t('The selected Serial ID is invalid.'),
+            'mobile' => _t('The mobile number entered is invalid.'),
+            'phone' => _t('The phone number entered is invalid.'),
         ];
         if ($this->controller() && method_exists($this->controller(), 'validationMessages')) {
             $messages = array_merge($messages, $this->controller()->validationMessages($this, $this->route()->getActionMethod(), ...array_values($this->route()->parameters())));
