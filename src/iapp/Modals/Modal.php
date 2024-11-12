@@ -97,11 +97,17 @@ trait Modal
     }
     public function validationAttributes($request, $action, $arg, ...$args)
     {
+        $attributes = [];
         $requestAll = $request->all();
+
         foreach ($requestAll as $index => $item) {
             if (is_array($item)) {
                 $this->validationAttributesCheck($index, $this->validationAttributesTrans($index), $item, $attributes);
             }else $attributes[$index] = $this->validationAttributesTrans($index);
+        }
+
+        foreach (static::getTableColumns() as $column) {
+            $attributes[$column] = $this->validationAttributesTrans($column);
         }
         return $attributes;
     }
