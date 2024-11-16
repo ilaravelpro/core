@@ -37,9 +37,11 @@ trait SearchQ
                 if ($ids && in_array($column, ['id', 'parent_id']))
                     $query->whereIn($table . $column, $q);
                 elseif (substr($column, -3, 3) === '_id') {
-                    if (method_exists($rmodel = $this->model::find(1), $related = str_replace('_id', '', $column))) {
-                        $relatedModal = $rmodel->$related();
-                        $relatedModal = @$relatedModal->model ?: $relatedModal->getRelated();
+                    $related = str_replace('_id', '', $column);
+                    $rmethod = $related && method_exists(new $this->model, $related) ? new \ReflectionMethod($this->model, $related) : null;
+                    $relation = $rmethod ? $rmethod->invoke(new $this->model) : null;
+                    if ($relation && $relation instanceof Relation) {
+                        $relatedModal = get_class($relation->getRelated());
                         $items = $relatedModal::getQ($q);
                         if ($items) {
                             foreach ($items as $item) {
