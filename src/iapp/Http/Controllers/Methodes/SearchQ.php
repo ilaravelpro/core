@@ -10,6 +10,7 @@
 namespace iLaravel\Core\iApp\Http\Controllers\Methods;
 
 
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection;
 
 trait SearchQ
@@ -23,16 +24,17 @@ trait SearchQ
             $ids = remove_empty(array_map(function ($v) {
                 return $this->model::id($v);
             }, $q));
-        }catch (\Throwable $exception) {}
+        } catch (\Throwable $exception) {
+        }
         if (!count($ids) && isset($this->parentModel) && $this->parentModel) {
             $parent_ids = remove_empty(array_map(function ($v) {
                 return $this->parentModel::id($v);
             }, $q));
         }
-        $q = $ids?:$parent_ids?:$q;
+        $q = $ids ?: $parent_ids ?: $q;
         $first = false;
         $table = $this->model::getTableNameDot();
-        $model->where(function ($query) use ($q, $ids, $parent_ids, $first, $table) {
+        $model->where(function ($query) use ($q, $ids, $parent_ids, $first, $table, $model) {
             foreach ($this->model::getTableColumns() as $index => $column) {
                 if ($ids && in_array($column, ['id', 'parent_id']))
                     $query->whereIn($table . $column, $q);
@@ -45,29 +47,28 @@ trait SearchQ
                         $items = $relatedModal::getQ($q);
                         if ($items) {
                             foreach ($items as $item) {
-                                $query->orWhere(function ($query) use($q, $column, $item, $relatedModal){
+                                $query->orWhere(function ($query) use ($q, $column, $item, $relatedModal, $table) {
                                     $tableNameDot = $relatedModal::getTableNameDot();
-                                    if (@$item->kids) {
-                                        $query->orWhereIn($tableNameDot . $column, array_merge([$item->id], @$item->kids ? $item->kids->pluck('id')->toArray() : []));
-                                    }else $query->whereHas(str_replace('_id', '', $column), function ($query) use ($tableNameDot, $q, $column, $item, $relatedModal) {
-                                        foreach ($relatedModal::getTableColumns() as $column2) {
-                                            if (in_array($column2, ['id', 'parent_id']) && $item)
-                                                $query->where($tableNameDot . $column2, $item->id);
-                                            else
-                                                $query->orWhere(function ($query) use($tableNameDot, $column2, $q) {
-                                                    foreach ($q as $i => $v) {
-                                                        $query->orWhere($tableNameDot . $column2, 'LIKE', "%$v%");
-                                                    }
-                                                });
-                                        }
-                                    });
+                                    $query->whereHas(str_replace('_id', '', $column),
+                                        function ($query) use ($tableNameDot, $q, $column, $item, $relatedModal) {
+                                            foreach ($relatedModal::getTableColumns() as $column2) {
+                                                if (in_array($column2, ['id', 'parent_id']) && $item)
+                                                    $query->whereIn($tableNameDot . $column2, array_merge([$item->id], @$item->kids ? $item->kids->pluck('id')->toArray() : []));
+                                                else
+                                                    $query->orWhere(function ($query) use ($tableNameDot, $column2, $q) {
+                                                        foreach ($q as $i => $v) {
+                                                            $query->orWhere($tableNameDot . $column2, 'LIKE', "%$v%");
+                                                        }
+                                                    });
+                                            }
+                                        });
                                 });
                             }
                         }
                     } else
                         $query->orWhereIn($table . $column, $q);
                 } elseif (!$ids && !$parent_ids) {
-                    $query->orWhere(function ($query) use($table, $column, $q) {
+                    $query->orWhere(function ($query) use ($table, $column, $q) {
                         foreach ($q as $i => $v) {
                             $query->{$i == 0 ? 'where' : 'orWhere'}($table . $column, 'LIKE', "%$v%");
                         }
