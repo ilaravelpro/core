@@ -36,6 +36,7 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
+        "iamirnet/curl": "*",
         "laravel/socialite": "*",
         "laravel/passport": "*",
         "lcobucci/jwt": "*",
