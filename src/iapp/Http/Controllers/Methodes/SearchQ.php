@@ -45,26 +45,8 @@ trait SearchQ
                     if ($relation && $relation instanceof Relation) {
                         $relatedModal = get_class($relation->getRelated());
                         $items = $relatedModal::getQ($q);
-                        if ($items) {
-                            foreach ($items as $item) {
-                                $query->orWhere(function ($query) use ($q, $column, $item, $relatedModal, $table) {
-                                    $tableNameDot = $relatedModal::getTableNameDot();
-                                    $query->whereHas(str_replace('_id', '', $column),
-                                        function ($query) use ($tableNameDot, $q, $column, $item, $relatedModal) {
-                                            foreach ($relatedModal::getTableColumns() as $column2) {
-                                                if (in_array($column2, ['id', 'parent_id']) && $item)
-                                                    $query->whereIn($tableNameDot . $column2, array_merge([$item->id], @$item->kids ? $item->kids->pluck('id')->toArray() : []));
-                                                else
-                                                    $query->orWhere(function ($query) use ($tableNameDot, $column2, $q) {
-                                                        foreach ($q as $i => $v) {
-                                                            $query->orWhere($tableNameDot . $column2, 'LIKE', "%$v%");
-                                                        }
-                                                    });
-                                            }
-                                        });
-                                });
-                            }
-                        }
+                        if ($items)
+                            $query->orWhereIn($table . $column, $items->pluck('id')->toArray());
                     } else
                         $query->orWhereIn($table . $column, $q);
                 } elseif (!$ids && !$parent_ids) {
