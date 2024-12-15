@@ -199,10 +199,14 @@ class _User extends Authenticatable
             if (in_array($this->role, ipreference('admins'))) {
                 $scopes = iRole::scopes(collect(), imodal('RoleScope'), 1)->pluck('can', 'scope')->toArray();
             } else{
+                $scopes = $this->scopes;
                 $role = imodal('Role');
                 $role = $role::findByName($this->role);
                 $roleScopes = $role ? iRole::scopes($role->scopes, imodal('RoleScope')) : [];
-                $scopes = $this->scopes->merge($roleScopes);
+                foreach ($roleScopes as $index => $roleScope) {
+                    if (!$this->scopes->where('scope', $roleScope['scope'])->first())
+                        $scopes->push($roleScope);
+                }
                 $scopes = $scopes->pluck('can', 'scope')->toArray();
             }
             upreference('core.irole.cache.'.$this->role . '.scopes', ['time' => time(), 'data' => $scopes]);
