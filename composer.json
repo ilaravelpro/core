@@ -18,8 +18,7 @@
         ],
         "psr-4": {
             "App\\": "src/app",
-            "iLaravel\\Core\\": "src/",
-            "iLaravel\\Core\\iApp\\Database\\Query\\": "src/iapp/Database/Query"
+            "iLaravel\\Core\\": "src/"
         },
         "files": [
             "src/helpers/helpers.php"

@@ -64,7 +64,6 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->booting(function () {
             $this->registerMacros();
-            $this->app->bind('Illuminate\Database\Query\Builder', '\iLaravel\Core\iApp\Database\Builder');
             $this->app->bind('Illuminate\Routing\ResourceRegistrar', '\iLaravel\Core\iApp\Http\Registrars\ResourceRegistrar');
             $loader = AliasLoader::getInstance();
             $loader->alias('iRole', \iLaravel\Core\Vendor\iRole\iRole::class);

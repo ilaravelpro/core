@@ -1,11 +1,11 @@
 <?php
 
-namespace iLaravel\Core\iApp\Database\Query;
+namespace iLaravel\Core\iApp\Database\Eloquent;
 
-use Illuminate\Database\Query as QueryBuilder;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Support\Facades\Cache;
 
-class Builder extends QueryBuilder
+class Builder extends EloquentBuilder
 {
     protected $cacheEnabled = true;
     protected $cacheTtl = 60;
