@@ -225,14 +225,6 @@ trait Index
                 $paginate->appends($request->all('order', 'sort'));
             }
         }else $paginate = $model->get();
-        if ($per_page !== false) {
-            if (isset($model->emptyModel) && $model->emptyModel === true)
-                $model->limit(0);
-            $paginate = $model->paginate($per_page);
-            if (join(',', array_keys($order_theory)) != join(',', array_keys($default_order)) || join(',', array_values($order_theory)) != join(',', array_values($default_order))) {
-                $paginate->appends($request->all('order', 'sort'));
-            }
-        }else $paginate = $model->get();
         $cacheKey = $paginate->cacheKey;
         return [$paginate, array_keys($allowed), $order_theory, $default_order, $cacheKey];
     }
