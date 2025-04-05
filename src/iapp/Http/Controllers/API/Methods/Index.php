@@ -12,42 +12,52 @@ namespace iLaravel\Core\iApp\Http\Controllers\API\Methods;
 use iLaravel\Core\Vendor\iRole\iRole;
 use iLaravel\Core\iApp\Http\Requests\iLaravel as Request;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 trait Index
 {
+    public $index_time_cached = 60;
     public function _index(Request $request)
     {
-        list($parent, $model, $order_list, $current_order, $default_order, $filters, $current_filter, $operators) = $this->_queryIndex(...func_get_args());
-        $additional = [];
-        if ($parent) {
-            $parentController = isset($this->parentController) ? $this->parentController : get_class($parent);
-            $parent_name = $this->class_name($parentController, null, 2);
-            $additional[$parent_name] = new $this->parentResourceCollectionClass($parent);
-            $additional['meta'] = [
-                'parent' => $parent_name
+        $time = microtime(true);
+        list($parent, $model, $order_list, $current_order, $default_order, $filters, $current_filter, $operators, $cacheKey) = $this->_queryIndex(...func_get_args());
+        $result = Cache::remember($cacheKey . ':index', now()->addMinutes(@$this->index_time_cached?:60), function () use ($request, $parent, $model, $order_list, $current_order, $default_order, $filters, $current_filter, $operators, $cacheKey) {
+            $additional = [];
+            if ($parent) {
+                $parentController = isset($this->parentController) ? $this->parentController : get_class($parent);
+                $parent_name = $this->class_name($parentController, null, 2);
+                $additional[$parent_name] = new $this->parentResourceCollectionClass($parent);
+                $additional['meta'] = [
+                    'parent' => $parent_name
+                ];
+            }
+            $result = $this->resourceCollectionClass ? new $this->resourceCollectionClass($model) : $this->resourceClass::collection($model);
+
+            if (!isset($additional['meta'])) {
+                $additional['meta'] = [];
+            }
+
+            if (isset($this->disablePagination))
+                $additional['meta']['total'] = $result->count();
+
+            $additional['meta']['orders'] = [
+                'allowed' => $order_list ?: [],
+                'current' => $current_order ?: [],
+                'default' => $default_order,
             ];
-        }
-        $result = $this->resourceCollectionClass ? new $this->resourceCollectionClass($model) : $this->resourceClass::collection($model);
-        if (!isset($additional['meta'])) {
-            $additional['meta'] = [];
-        }
+            $additional['meta']['filters'] = [
+                'allowed' => $filters ?: [],
+                'current' => $current_filter ?: [],
+                'operators' => $operators,
+            ];
 
-        if (isset($this->disablePagination))
-            $additional['meta']['total'] = $result->count();
-
-        $additional['meta']['orders'] = [
-            'allowed' => $order_list ?: [],
-            'current' => $current_order ?: [],
-            'default' => $default_order,
-        ];
-        $additional['meta']['filters'] = [
-            'allowed' => $filters ?: [],
-            'current' => $current_filter ?: [],
-            'operators' => $operators,
-        ];
-
-        $result->additional($additional);
+            $additional['meta']['excute_time'] = '';
+            $result->additional($additional);
+            return  serialize($result->toResponse($request));
+        });
+        $result = unserialize($result);
+        $result->setContent(str_replace('"excute_time":""', '"excute_time":"'.round((microtime(true) - $time), 3).'"', $result->getContent()));
         return $result;
     }
 
@@ -137,11 +147,11 @@ trait Index
                 $model->where( 'parent_id', $parent->id);
             }
         }
-        list($model, $order_list, $current_order, $default_order) = $this->paginate($request, $model, $parent);
-        if (method_exists($model, 'appends') && $current_filter) {
+        list($model, $order_list, $current_order, $default_order, $cacheKey) = $this->paginate($request, $model, $parent);
+        if ($model && method_exists($model, 'appends') && $current_filter) {
             $model->appends($request->all(...array_keys($current_filter)));
         }
-        return [$parent, $model, $order_list, $current_order, $default_order, $filters, $current_filter, $operators];
+        return [$parent, $model, $order_list, $current_order, $default_order, $filters, $current_filter, $operators, $cacheKey];
     }
 
     public function paginate($request, $model, $parent = null, $order_list = [], $default = [])
@@ -206,18 +216,19 @@ trait Index
                 }
             }
         }catch (\Throwable $exception) {}
-        if (isset($this->disablePagination)) {
-            $paginate = $model->get();
-            //$paginate = new LengthAwarePaginator($paginate, $paginate->count(), $paginate->count());
-        } else {
-            if (isset($model->emptyModel) && $model->emptyModel === true) {
-                $model->limit(0);
-            }
-            $paginate = $model->paginate($request->per_page ? $request->per_page : 10);
-            if (join(',', array_keys($order_theory)) != join(',', array_keys($default_order)) || join(',', array_values($order_theory)) != join(',', array_values($default_order))) {
-                $paginate->appends($request->all('order', 'sort'));
-            }
-        }
-        return [$paginate, array_keys($allowed), $order_theory, $default_order];
+        $per_page = isset($this->disablePagination) && $this->disablePagination ? ($request->per_page ? $request->per_page : 10) : false;
+        $cacheKey = "ilaravel:{$model->getModel()->getTable()}:" .  md5($model->toSql() . serialize($model->getBindings())) . '_' . ($per_page == false  ? 'all' : "p_$per_page");
+        $paginate = Cache::remember("{$cacheKey}:q", now()->addMinutes(@$this->index_time_cached?:60), function () use ($request, $model, $per_page, $order_theory, $default_order) {
+            if ($per_page !== false) {
+                if (isset($model->emptyModel) && $model->emptyModel === true)
+                    $model->limit(0);
+                $paginate = $model->paginate($per_page);
+                if (join(',', array_keys($order_theory)) != join(',', array_keys($default_order)) || join(',', array_values($order_theory)) != join(',', array_values($default_order))) {
+                    $paginate->appends($request->all('order', 'sort'));
+                }
+            }else $paginate = $model->get();
+            return serialize($paginate);
+        });
+        return [unserialize($paginate), array_keys($allowed), $order_theory, $default_order, $cacheKey];
     }
 }

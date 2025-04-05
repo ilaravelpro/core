@@ -13,6 +13,7 @@ namespace iLaravel\Core\iApp\Http\Controllers\Methods;
 
 trait Variables
 {
+    public $index_time_cached = 60;
     protected $fillable = [];
     public static $result;
     public $statusMessage = 'Your request has been successfully completed.';

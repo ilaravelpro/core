@@ -12,7 +12,9 @@ use iLaravel\Core\iApp\Attachment;
 use iLaravel\Core\iApp\Http\Requests\iLaravel as Request;
 
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redis;
 
 trait Modal
 {
@@ -289,6 +291,7 @@ trait Modal
                 $event->saveFilesInContent( $content, $event->check_content, static::reviewFiles($event->getOriginal($event->check_content)?:$content, '', false), Request::createFrom(\request()));
                 $event->{$event->check_content} = json_encode($content);
             }
+            $event->resetCacheTable();
         });
         parent::deleting(function (self $event){
             if (method_exists($event, 'attachments'))
@@ -299,6 +302,7 @@ trait Modal
                     if ($event->{$name."_id"} && ($file = $attachment::find($event->{$name."_id"}))) $file->delete();
                 }
             }
+            $event->resetCacheTable();
         });
     }
 
@@ -388,5 +392,11 @@ trait Modal
         $this->saveFiles($this->files, $request);
         $this->save_attachments($additional, $request);
         $this->save();
+    }
+
+    public function resetCacheTable() {
+        $keys = Redis::keys("ilaravel:db:{$this->getTable()}:*");
+        foreach ($keys as $key)
+            Redis::del($key);
     }
 }
