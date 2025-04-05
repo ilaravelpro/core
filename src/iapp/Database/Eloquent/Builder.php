@@ -41,9 +41,9 @@ class Builder extends EloquentBuilder
         if (!$this->cacheEnabled)
             return parent::paginate($perPage, $columns, $pageName, $page);
         $cacheKey = $this->cacheKey ?? $this->generateCacheKey();
-        return unserialize(Cache::remember($cacheKey . ":paginate", $this->cacheTtl, function () use ($cacheKey, $perPage, $columns, $pageName, $page) {
+        return unserialize(Cache::remember($cacheKey . ":paginate:{$perPage}:$page", $this->cacheTtl, function () use ($cacheKey, $perPage, $columns, $pageName, $page) {
             $result = parent::paginate($perPage, $columns, $pageName, $page);
-            $result->cacheKey = $cacheKey . ":paginate";
+            $result->cacheKey = $cacheKey . ":paginate:{$perPage}:$page";
             return serialize($result);
         }));
     }
