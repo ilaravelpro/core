@@ -217,18 +217,23 @@ trait Index
             }
         }catch (\Throwable $exception) {}
         $per_page = isset($this->disablePagination) && $this->disablePagination ? ($request->per_page ? $request->per_page : 10) : false;
-        $cacheKey = "ilaravel:{$model->getModel()->getTable()}:" .  md5($model->toSql() . serialize($model->getBindings())) . '_' . ($per_page == false  ? 'all' : "p_$per_page");
-        $paginate = Cache::remember("{$cacheKey}:q", now()->addMinutes(@$this->index_time_cached?:60), function () use ($request, $model, $per_page, $order_theory, $default_order) {
-            if ($per_page !== false) {
-                if (isset($model->emptyModel) && $model->emptyModel === true)
-                    $model->limit(0);
-                $paginate = $model->paginate($per_page);
-                if (join(',', array_keys($order_theory)) != join(',', array_keys($default_order)) || join(',', array_values($order_theory)) != join(',', array_values($default_order))) {
-                    $paginate->appends($request->all('order', 'sort'));
-                }
-            }else $paginate = $model->get();
-            return serialize($paginate);
-        });
-        return [unserialize($paginate), array_keys($allowed), $order_theory, $default_order, $cacheKey];
+        if ($per_page !== false) {
+            if (isset($model->emptyModel) && $model->emptyModel === true)
+                $model->limit(0);
+            $paginate = $model->paginate($per_page);
+            if (join(',', array_keys($order_theory)) != join(',', array_keys($default_order)) || join(',', array_values($order_theory)) != join(',', array_values($default_order))) {
+                $paginate->appends($request->all('order', 'sort'));
+            }
+        }else $paginate = $model->get();
+        if ($per_page !== false) {
+            if (isset($model->emptyModel) && $model->emptyModel === true)
+                $model->limit(0);
+            $paginate = $model->paginate($per_page);
+            if (join(',', array_keys($order_theory)) != join(',', array_keys($default_order)) || join(',', array_values($order_theory)) != join(',', array_values($default_order))) {
+                $paginate->appends($request->all('order', 'sort'));
+            }
+        }else $paginate = $model->get();
+        $cacheKey = $paginate->cacheKey;
+        return [$paginate, array_keys($allowed), $order_theory, $default_order, $cacheKey];
     }
 }
