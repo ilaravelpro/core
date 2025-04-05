@@ -9,6 +9,7 @@
 
 namespace iLaravel\Core\iApp\Modals;
 use iLaravel\Core\iApp\Attachment;
+use iLaravel\Core\iApp\Database\Eloquent\Builder;
 use iLaravel\Core\iApp\Http\Requests\iLaravel as Request;
 
 use Illuminate\Http\UploadedFile;
@@ -398,5 +399,10 @@ trait Modal
         $keys = Redis::keys("ilaravel:db:{$this->getTable()}:*");
         foreach ($keys as $key)
             Redis::del($key);
+    }
+
+    protected function newEloquentBuilder($query)
+    {
+        return new Builder($query);
     }
 }
