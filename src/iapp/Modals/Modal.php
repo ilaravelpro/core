@@ -171,15 +171,17 @@ trait Modal
     public function saveFile($name, $request, $event = null) {
         $attachment = $this->saveAttachment($name."_file", $request);
         $post = imodal('Attachment');
-        if ($attachment){
-            if ($this->{$name."_id"} && $post::find($this->{$name."_id"}))
-                $post::find($this->{$name."_id"})->delete();
-            $this->{$name."_id"} = $attachment->id;
-        }elseif ($request->has($name."_delete")){
-            if ($this->{$name."_id"} && $post::find($this->{$name."_id"}))
-                $post::find($this->{$name."_id"})->delete();
-            $this->{$name."_id"} = null;
-        }
+        try {
+            if ($attachment){
+                if ($this->{$name."_id"} && $post::find($this->{$name."_id"}))
+                    $post::find($this->{$name."_id"})->delete();
+                $this->{$name."_id"} = $attachment->id;
+            }elseif ($request->{$name."_delete"}){
+                if ($this->{$name."_id"} && $post::find($this->{$name."_id"}))
+                    $post::find($this->{$name."_id"})->delete();
+                $this->{$name."_id"} = null;
+            }
+        }catch (\Throwable $exception) {}
         unset($this->{$name."_file"});
     }
 
