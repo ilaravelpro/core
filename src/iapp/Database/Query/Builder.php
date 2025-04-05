@@ -1,6 +1,6 @@
 <?php
 
-namespace iLaravel\Core\iApp\Database;
+namespace iLaravel\Core\iApp\Database\Query;
 
 use Illuminate\Database\Query as QueryBuilder;
 use Illuminate\Support\Facades\Cache;
