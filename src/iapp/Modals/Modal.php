@@ -401,7 +401,7 @@ trait Modal
             Redis::del($key);
     }
 
-    protected function newEloquentBuilder($query)
+    public function newEloquentBuilder($query)
     {
         return new Builder($query);
     }
