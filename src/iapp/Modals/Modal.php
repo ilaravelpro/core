@@ -292,7 +292,9 @@ trait Modal
                 $event->saveFilesInContent( $content, $event->check_content, static::reviewFiles($event->getOriginal($event->check_content)?:$content, '', false), Request::createFrom(\request()));
                 $event->{$event->check_content} = json_encode($content);
             }
-            $event->resetCacheTable();
+        });
+        parent::saved(function (self $event) {
+             $event->resetCacheTable();
         });
         parent::deleting(function (self $event){
             if (method_exists($event, 'attachments'))
@@ -401,8 +403,8 @@ trait Modal
             Redis::del($key);
     }
 
-    public function newEloquentBuilder($query)
+    /*public function newEloquentBuilder($query)
     {
         return new Builder($query);
-    }
+    }*/
 }
