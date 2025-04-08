@@ -51,18 +51,15 @@ trait Store
         if (method_exists($model, 'save_locals'))
             $this->save_locals($request, $model);
         $result = $this->additionalStore($request,$this->resultStore($request, $model, $parent), $parent);
-
         if (method_exists($this, 'after_stored'))
             $this->after_stored($request, $model, $parent, $result);
         if (method_exists($this, 'after_saved'))
             $this->after_saved($request, $model, $parent, $result);
-
         return $result;
     }
 
     public function resultStore($request, $model, $parent = null)
     {
-        $this->model::resetCacheTableStatic();
         $model = get_class($model)::findOrFail($model->id);
         return new $this->resourceClass($model);
     }

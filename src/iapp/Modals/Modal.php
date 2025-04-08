@@ -398,14 +398,16 @@ trait Modal
     }
 
     public function resetCacheTable() {
-        $keys = Redis::keys("ilaravel:db:{$this->getTable()}:*");
-        foreach ($keys as $key)
-            Redis::del($key);
+        return static::_resetCacheTable($this->getTable());
     }
-    public static function resetCacheTableStatic() {
-        $keys = Redis::keys("ilaravel:db:".static::getTableName().":*");
-        foreach ($keys as $key)
-            Redis::del($key);
+    public static function _resetCacheTable($table = null) {
+        $table = $table?:static::getTableName();
+        if (strpos($table, 'log') === false) {
+            $keys = Redis::keys("ilaravel:db:{$table}:*");
+            foreach ($keys as $key)
+                Redis::del($key);
+        }
+        return false;
     }
 
     /*public function newEloquentBuilder($query)
