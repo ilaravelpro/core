@@ -402,6 +402,11 @@ trait Modal
         foreach ($keys as $key)
             Redis::del($key);
     }
+    public static function resetCacheTableStatic() {
+        $keys = Redis::keys("ilaravel:db:".static::getTableName().":*");
+        foreach ($keys as $key)
+            Redis::del($key);
+    }
 
     /*public function newEloquentBuilder($query)
     {
