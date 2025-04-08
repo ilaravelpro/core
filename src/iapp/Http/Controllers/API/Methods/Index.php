@@ -217,7 +217,7 @@ trait Index
             }
         }catch (\Throwable $exception) {}
         $per_page = isset($this->disablePagination) && $this->disablePagination ? ($request->per_page ? $request->per_page : 10) : false;
-        $cacheKey = "ilaravel:{$model->getModel()->getTable()}:" .  md5($model->toSql() . serialize($model->getBindings())) . '_' . ($per_page == false  ? 'all' : "p_$per_page");
+        $cacheKey = "ilaravel:db:{$model->getModel()->getTable()}:" .  md5($model->toSql() . serialize($model->getBindings())) . '_' . ($per_page == false  ? 'all' : "p_$per_page");
         $paginate = Cache::remember("{$cacheKey}:q", now()->addMinutes(@$this->index_time_cached?:60), function () use ($request, $model, $per_page, $order_theory, $default_order) {
             if ($per_page !== false) {
                 if (isset($model->emptyModel) && $model->emptyModel === true)
