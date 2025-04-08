@@ -101,6 +101,7 @@ trait Update
             $model->additionalUpdate($request, null, $parent);
         if (method_exists($model, 'save_locals'))
             $this->save_locals($request, $model);
+        $this->model::resetCacheTableStatic();
         $result = new $this->resourceClass($model);
         $result->additional([
             'changed' => $original,
