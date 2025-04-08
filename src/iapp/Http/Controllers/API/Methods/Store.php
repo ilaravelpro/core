@@ -62,7 +62,6 @@ trait Store
 
     public function resultStore($request, $model, $parent = null)
     {
-        $this->model::_resetCacheTable();
         $model = get_class($model)::findOrFail($model->id);
         return new $this->resourceClass($model);
     }

@@ -293,9 +293,9 @@ trait Modal
                 $event->{$event->check_content} = json_encode($content);
             }
         });
-        parent::saved(function (self $event) {
+        /*parent::saved(function (self $event) {
              $event->resetCacheTable();
-        });
+        });*/
         parent::deleting(function (self $event){
             if (method_exists($event, 'attachments'))
                 foreach ($event->attachments as $attachment) $attachment->delete();
@@ -305,7 +305,7 @@ trait Modal
                     if ($event->{$name."_id"} && ($file = $attachment::find($event->{$name."_id"}))) $file->delete();
                 }
             }
-            $event->resetCacheTable();
+          //  $event->resetCacheTable();
         });
     }
 
