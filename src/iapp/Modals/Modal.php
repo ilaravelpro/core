@@ -244,7 +244,6 @@ trait Modal
                 }
             }
         }catch (\Throwable $exception) {
-            dd($exception);
         }
         return false;
     }
