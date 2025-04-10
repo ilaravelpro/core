@@ -75,6 +75,7 @@ class _File extends Eloquent
     {
         $temp = $options['temp'];
         $post = $options['post'];
+        $ext =$temp->extension();
         $data = isset($options['data']) ? $options['data'] : [];
         $disk = isset($options['disk']) ? $options['disk'] : null;
         $disk = config('filesystems.disks.' . $disk, config('filesystems.disks.public'));
@@ -88,8 +89,8 @@ class _File extends Eloquent
         $folder = _directory_separator(DIRECTORY_SEPARATOR, $disk['root'], $folder_name);
         if (!file_exists($folder))
             mkdir($folder, 0777, true);
-        $convertToWebP = $type == 'image' ? static::convertToWebP($temp->extension(), $temp, $folder, $file_name) : false;
-        $file_name = $convertToWebP ?: ($folder_name . "." . $temp->extension());
+        $convertToWebP = $type == 'image' ? static::convertToWebP($ext, $temp, $folder, $file_name) : false;
+        $file_name = $convertToWebP ?: ($file_name . "." . $ext);
         $file_slug = trim(str_replace(env('APP_URL'), '', _directory_separator('/', $disk['url'], $folder_name, $file_name)), '/');
         $original_name = $temp->getClientOriginalName();
         $original_name = explode('.', $original_name);
@@ -103,7 +104,7 @@ class _File extends Eloquent
                 'url' => _directory_separator('/', $disk['url'], $folder_name, $file_name),
                 'dir' => _directory_separator(DIRECTORY_SEPARATOR, $folder, $file_name),
                 'mime' => $convertToWebP ? 'image/webp' : $temp->getMimeType(),
-                'exec' => $convertToWebP ? 'webp' : $temp->extension(),
+                'exec' => $convertToWebP ? 'webp' : $ext,
                 'type' => $type,
                 'name' => $original_name,
             ], $data)
@@ -174,18 +175,14 @@ class _File extends Eloquent
     public static function convertToWebP($ext, $temp, $file_dir, $file_name)
     {
         try {
-            $image = static::imageDriver()->read($temp);
-            if ($image->driver()->supports($ext)) {
+            if (!in_array($ext, ['webp', 'svg']) && ($image = static::imageDriver()->read($temp)) && $image->driver()->supports($ext)) {
                 $image = static::resizeImage($image->orient(), 4096);
-                $is_webp = in_array($ext, ['webp', 'svg']);
-                if (!$is_webp)
-                    $image->toWebp(82);
-                $file_name = $file_name . "." . ($is_webp ? $ext : 'webp');
+                $image->toWebp(82);
+                $file_name .= ".webp";
                 $image->save("{$file_dir}/" . $file_name);
                 return $file_name;
             }
-        } catch (\Throwable $exception) {
-        }
+        } catch (\Throwable $exception) {}
         return false;
     }
 

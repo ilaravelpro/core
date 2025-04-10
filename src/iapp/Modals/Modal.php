@@ -231,17 +231,21 @@ trait Modal
             if($fileattachment){
                 \request()->files->remove($name);
                 \request()->request->remove($name);
+                $is_image = preg_match(' /(?:image)/', $fileattachment->getClientMimeType());
+                $is_svg = in_array($fileattachment->extension(), ['svg']);
                 $file = imodal('File');
                 $attachment = $file::upload($request, $name);
                 if ($attachment) {
-                    if (preg_match(' /(?:image)/', $fileattachment->getClientMimeType())){
+                    if (!$is_svg && $is_image){
                         foreach ($sizes as $size)
                             $file::imageSize($attachment, $size);
                     }
                     return $attachment;
                 }
             }
-        }catch (\Throwable $exception) {}
+        }catch (\Throwable $exception) {
+            dd($exception);
+        }
         return false;
     }
 
