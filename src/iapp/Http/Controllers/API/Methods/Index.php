@@ -55,7 +55,7 @@ trait Index
         $result->additional($additional);
 
         //$result = unserialize($result);
-     //   $result->setContent(str_replace('"excute_time":""', '"excute_time":"'.round((microtime(true) - $time), 3).'"', $result->getContent()));
+        //   $result->setContent(str_replace('"excute_time":""', '"excute_time":"'.round((microtime(true) - $time), 3).'"', $result->getContent()));
         return $result;
         return  serialize($result->toResponse($request));
         $result = Cache::remember($cacheKey . ':index', now()->addMinutes(@$this->index_time_cached?:60), function () use ($request, $parent, $model, $order_list, $current_order, $default_order, $filters, $current_filter, $operators, $cacheKey) {
@@ -218,7 +218,7 @@ trait Index
                 }
             }
         }catch (\Throwable $exception) {}
-        $per_page = isset($this->disablePagination) && $this->disablePagination ? ($request->per_page ? $request->per_page : 10) : false;
+        $per_page = isset($this->disablePagination) && $this->disablePagination ? false : ($request->per_page ? $request->per_page : 10);
         $cacheKey = "ilaravel:db:{$model->getModel()->getTable()}:" .  md5($model->toSql() . serialize($model->getBindings())) . '_' . ($per_page == false  ? 'all' : "p_$per_page");
         /*$paginate = Cache::remember("{$cacheKey}:q", now()->addMinutes(@$this->index_time_cached?:60), function () use ($request, $model, $per_page, $order_theory, $default_order) {
             if ($per_page !== false) {

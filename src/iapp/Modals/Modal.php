@@ -305,7 +305,7 @@ trait Modal
                     if ($event->{$name."_id"} && ($file = $attachment::find($event->{$name."_id"}))) $file->delete();
                 }
             }
-          //  $event->resetCacheTable();
+            //  $event->resetCacheTable();
         });
     }
 
