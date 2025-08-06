@@ -17,11 +17,8 @@ use iLaravel\Core\Vendor\Validations\iPhone;
 use iLaravel\Core\Vendor\iRole\iRole;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-
-
 use Illuminate\Support\Facades\Hash;
 use Laravel\Passport\HasApiTokens;
-use Laravel\Passport\Token;
 use Lcobucci\JWT\Encoding\JoseEncoder;
 
 
@@ -253,7 +250,7 @@ class _User extends Authenticatable
 
     public static function findByToken($token)
     {
-        $token = Token::find(static::findTokenID(trim(str_replace('Bearer', '', $token))));
+        $token = \Laravel\Passport\Token::find(static::findTokenID(trim(str_replace('Bearer', '', $token))));
         return $token ? static::find($token->user_id) : false;
     }
 

@@ -49,6 +49,9 @@ class AppServiceProvider extends ServiceProvider
                 i_path('resources') => resource_path('/'),
             ]);
             if (iconfig('database.migrations.include', true)) $this->loadMigrationsFrom(i_path('database/migrations'));
+            $this->commands([
+                \iLaravel\Core\iApp\Console\Commands\RemoveSanctum::class,
+            ]);
         }
         $this->registerRoutes();
         View::addLocation(i_path('resources/views'));

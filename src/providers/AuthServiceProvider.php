@@ -13,7 +13,6 @@ namespace iLaravel\Core\Providers;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Gate;
-use Laravel\Passport\Passport;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -24,17 +23,13 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        // Set Passport route
-        //Passport::routes();
-        Passport::withoutCookieSerialization();
-        // Set expire date
-        Passport::tokensExpireIn(now()->addDays(15));
-        Passport::refreshTokensExpireIn(now()->addDays(30));
-        Passport::personalAccessTokensExpireIn(now()->addMonths(6));
-
-        /*Gate::define('irole', function ($user, $request, $irole, ...$args) {
-            return Gate::allows($irole,  ...$args);
-        });*/
+        if (class_exists(\Laravel\Passport\Passport::class)) {
+            \Laravel\Passport\Passport::withoutCookieSerialization();
+            // Set expire date
+            \Laravel\Passport\Passport::tokensExpireIn(now()->addDays(15));
+            \Laravel\Passport\Passport::refreshTokensExpireIn(now()->addDays(30));
+            \Laravel\Passport\Passport::personalAccessTokensExpireIn(now()->addMonths(6));
+        }
 
         Gate::resource('users', 'iLaravel\Core\iApp\Policies\UserPolicy');
         Gate::resource('users.scopes', 'iLaravel\Core\iApp\Policies\UserScopePolicy');

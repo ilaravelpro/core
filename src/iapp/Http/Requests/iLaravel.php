@@ -17,7 +17,6 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
 use App\User;
 use Illuminate\Support\Str;
-use Laravel\Passport\Token;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class iLaravel extends FormRequest
