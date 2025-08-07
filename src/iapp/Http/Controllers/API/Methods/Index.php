@@ -11,6 +11,7 @@ namespace iLaravel\Core\iApp\Http\Controllers\API\Methods;
 
 use iLaravel\Core\Vendor\iRole\iRole;
 use iLaravel\Core\iApp\Http\Requests\iLaravel as Request;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -159,7 +160,7 @@ trait Index
     public function paginate($request, $model, $parent = null, $order_list = [], $default = [])
     {
         $order_list = $order_list ?: (isset($this->order_list) ? $this->order_list : ['id']);
-        $table = $model->getModel()->getTable();
+        $table = $model instanceof Model ? $model->getModel()->getTable() : null;
         foreach ($order_list as $key => $value) {
             if (gettype($key) == 'integer') {
                 $allowed[$value] = $value;
@@ -200,12 +201,12 @@ trait Index
             $order_theory = $default_order;
         }
         if (!$model instanceof \Illuminate\Database\Eloquent\Builder) {
-            return [$model, $allowed, $order_theory, $default_order];
+            return [$model, array_keys($allowed), $order_theory, $default_order, "test"];
         }
         foreach ($order_theory as $key => $value) {
             if ($value == 'random') {
                 $model->orderByRaw('RAND()' );
-            } else $model->orderBy($table . '.' . $allowed[$key], $value);
+            } else $model->orderBy(($table ? "{$table}." : "") . $allowed[$key], $value);
         }
         try {
             $columns = get_class($model->getModel())::getTableColumns();
@@ -214,7 +215,7 @@ trait Index
                     return in_array($item, $columns);
                 });
                 foreach ($has_fields as $has_field) {
-                    $model->whereNotNull("{$table}.{$has_field}")->where("{$table}.{$has_field}", '!=', '\'\'');
+                    $model->whereNotNull(($table ? "{$table}." : "") . "{$has_field}")->where(($table ? "{$table}." : "") . "{$has_field}", '!=', '\'\'');
                 }
             }
         }catch (\Throwable $exception) {}

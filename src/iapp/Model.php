@@ -10,8 +10,6 @@
 namespace iLaravel\Core\iApp;
 
 
-use iLaravel\Core\iApp\Http\Requests\iLaravel as Request;
-
 class Model extends \Illuminate\Database\Eloquent\Model
 {
     use \iLaravel\Core\iApp\Modals\Modal;

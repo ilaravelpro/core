@@ -71,7 +71,7 @@ class Resource extends JsonResource
             }catch (\Throwable $exception) {}
         }
         $has_actions = false;
-        if (isset($data['id']) && method_exists($request, 'route') && $request->route() && method_exists($request->route(), 'getController') && $request->route()->getController()->model == imodal(class_name($this->resource))) {
+        if ((is_string($this->resource) || $this->resource instanceof Model) && isset($data['id']) && method_exists($request, 'route') && $request->route() && method_exists($request->route(), 'getController') && $request->route()->getController()->model == imodal(class_name($this->resource))) {
             if (!$this->route_src){
                 $this->route_src = $request->route()->getAction('as');
                 $aAaction = explode('.', $this->route_src);
