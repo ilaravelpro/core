@@ -31,16 +31,30 @@ trait Modal
     public $eagerLoad = [];
     public $pivots = [];
 
+    public static function init()
+    {
+        return new static;
+    }
+
     public static function statusList()
     {
-        $status = iconfig('status.' . (new self())->getTable());
-        return $status ?: iconfig('status.global');
+        return static::init()->_statuses();
     }
+
+    public function _statuses()
+    {
+        return iconfig('status.' . $this->getTable()) ?: iconfig('status.global');
+    }
+
 
     public static function typeList()
     {
-        $types = iconfig('types.' . (new self())->getTable());
-        return $types ?: iconfig('types.global');
+        return static::init()->_types();
+    }
+
+    public function _types()
+    {
+        return iconfig('types.' . $this->getTable()) ?: iconfig('types.global');
     }
 
     public static function resetRecordsId()
