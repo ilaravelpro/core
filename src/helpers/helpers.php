@@ -15,6 +15,7 @@ include 'phone.php';
 include 'finder.php';
 include 'measuring.php';
 include 'math.php';
+include 'table.php';
 
 /*if (!function_exists('_t')){
     function _t($trans)
