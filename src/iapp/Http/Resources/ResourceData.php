@@ -17,6 +17,8 @@ use Illuminate\Support\Facades\Gate;
 class ResourceData extends JsonResource
 {
     public $_local = null;
+
+    public $table = null;
     public function __construct($resource)
     {
         $args = func_get_args();
@@ -30,7 +32,10 @@ class ResourceData extends JsonResource
             $args = func_get_args();
             $this->_local = isset($args[1]) && $args[1] ? $args[1] : $request->local;
         }
-        if (!$this->table && $this->resource && (is_string($this->resource) || $this->resource instanceof Model)) $this->table = method_exists($this->resource, 'getTable') ? $this->resource->getTable() : class_name(request()->route()->getController(), true, 2);
+        try {
+            if (!$this->table && $this->resource && (is_string($this->resource) || $this->resource instanceof Model))
+                $this->table = method_exists($this->resource, 'getTable') ? $this->resource->getTable() : class_name(request()->route()->getController(), true, 2);
+        }catch (\Throwable $e) {}
         $attr = iconfig('resources.' . $this->table, []) ? $this->table : 'global';
         $attr = array_merge(iconfig('resources.' . $attr . '.data', []), ipreference('resources.' . $attr . '.data.global', []));
         $translate = $this->toLocal($this->_local);
@@ -39,7 +44,7 @@ class ResourceData extends JsonResource
         elseif(isset($this->title))
             list($key, $text) = ['title', $this->title];
         else
-            list($key, $text) = ['id', isset($this->serial) ? $this->serial : $this->id];
+            list($key, $text) = ['id', isset($this->serial) ? $this->serial : @$this->id];
 
 
         $data['text'] = $translate && $key != 'id' && isset($translate[$key]) && $translate[$key] ? $translate[$key] : $text;
