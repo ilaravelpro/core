@@ -9,7 +9,6 @@
 
 namespace iLaravel\Core\iApp\Http\Controllers\API\Methods;
 
-use iLaravel\Core\Vendor\iRole\iRole;
 use iLaravel\Core\iApp\Http\Requests\iLaravel as Request;
 use Illuminate\Support\Facades\Cache;
 
@@ -17,9 +16,10 @@ trait Data
 {
     public function _data(Request $request)
     {
+        $args = func_get_args();
         $time = microtime(true);
-        list($parent, $model, $order_list, $current_order, $default_order, $filters, $current_filter, $operators, $cacheKey  ) = $this->_queryIndex(...func_get_args());
-        $result = Cache::remember($cacheKey . ':data', now()->addMinutes(@$this->index_time_cached?:60), function () use ($request, $parent, $model, $order_list, $current_order, $default_order, $filters, $current_filter, $operators, $cacheKey) {
+        $result = Cache::remember($this->indexKey($request), $this->index_mts_cached, function () use ($request, $args) {
+            list($parent, $model, $order_list, $current_order, $default_order, $filters, $current_filter, $operators, $cacheKey  ) = $this->_queryIndex(...$args);
             $result = $this->resourceDataCollectionClass ? new $this->resourceDataCollectionClass($model) : $this->resourceDataClass::collection($model);
             $additional = [];
             if ($parent) {
@@ -44,11 +44,11 @@ trait Data
                 'operators' => $operators,
             ];
 
-            $additional['meta']['excute_time'] = '';
+            $additional['meta']['execute_time'] = round((microtime(true) - $time), 3);
             $result->additional($additional);
-            return  $result->toResponse($request);
+            return $result;
         });
-        $result->setContent(str_replace('"excute_time":""', '"excute_time":"'.round((microtime(true) - $time), 3).'"', $result->getContent()));
+        $result->additional["meta"]['execute_time'] = round((microtime(true) - $time), 3);
         return $result;
     }
 }
