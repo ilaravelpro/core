@@ -18,7 +18,7 @@ trait Data
     {
         $args = func_get_args();
         $time = microtime(true);
-        $result = Cache::remember($this->indexKey($request), $this->index_mts_cached, function () use ($request, $args) {
+        $result = Cache::remember($this->indexKey($request), $this->index_mts_cached, function () use ($request, $args, $time) {
             list($parent, $model, $order_list, $current_order, $default_order, $filters, $current_filter, $operators, $cacheKey  ) = $this->_queryIndex(...$args);
             $result = $this->resourceDataCollectionClass ? new $this->resourceDataCollectionClass($model) : $this->resourceDataClass::collection($model);
             $additional = [];
