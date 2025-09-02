@@ -20,7 +20,11 @@ trait Index
 {
     public function indexKey($request)
     {
-        return hash_hmac("sha256", serialize(["uri" => $request->route()?->uri(), "page" => $request->page ?? 0, "per_page" => $request->per_page ?? 20, "q" => $request->q ?? "", "order" => $request->order ?? "", "sort" => $request->sort ?? "", "status" => $request->statusFilter ?? "default", "statusFilter" => $request->statusFilter ?? false, "format" => $request->format ?? "json", "is_self" => $request->is_self ?? false, "no_pagination" => $request->no_pagination ?? true, "has_fields" => $request->has_fields ?? []]), auth()->id() ?? "any");
+
+        $params = with($request?:\request())->all();
+        unset($params['app_version']);
+        $params["uri"] = $request->path();
+        return hash_hmac("sha256", serialize($params), auth()->id() ?? "any");
     }
 
     public function _index(Request $request)
@@ -60,6 +64,7 @@ trait Index
 
             $additional['meta']['execute_time'] = round((microtime(true) - $time), 3);
             $result->additional($additional);
+            return $result;
         });
         $result->additional["meta"]['execute_time'] = round((microtime(true) - $time), 3);
         return $result;
