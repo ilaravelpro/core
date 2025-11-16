@@ -13,6 +13,8 @@ use Illuminate\Auth\RequestGuard;
 
 use iLaravel\Core\iApp\Http\Requests\iLaravel as Request;
 
+use Illuminate\Container\Container;
+use Illuminate\Database\Schema\Builder;
 use Illuminate\Foundation\AliasLoader;
 
 use Illuminate\Routing\Router;
@@ -60,6 +62,81 @@ class AppServiceProvider extends ServiceProvider
             return new \iLaravel\Core\iApp\Http\Validators\iLaravel($translator, $data, $rules, $messages);
         });
         Schema::defaultStringLength(191);
+
+        Builder::macro('blueprint', function($blueprint)
+        {
+            $this->resolver = function ($connection, $table, $callback) use ($blueprint) {
+                return Container::getInstance()->make($blueprint, compact('connection', 'table', 'callback'));
+            };
+            return $this;
+        });
+
+        Schema::macro('smartCreate', function (string $tableName, \Closure $definition, $blueprintClass = null) {
+            $blueprintClass = $blueprintClass?:\Illuminate\Database\Schema\Blueprint::class;
+            if (Schema::hasTable($tableName)) {
+                $blueprint = new ($blueprintClass)(Schema::getConnection(), $tableName);
+                $definition($blueprint);
+                $existingColumns = Schema::getColumnListing($tableName);
+                $existingIndexes = Schema::getIndexes($tableName);
+                $existingIndexesNames = array_merge(...array_column($existingIndexes, 'columns'));
+                $lastCol = in_array("status", $existingColumns) ? "status" : (in_array("created_at", $existingColumns) ? "created_at" : last($existingColumns));
+                Schema::table($tableName, function ($table) use ($blueprint, $existingColumns, $existingIndexes, $existingIndexesNames, $tableName, $lastCol) {
+                    $commands = $blueprint->getCommands();
+                    foreach ($columns = $blueprint->getColumns() as $index => $column) {
+                        if (($name = $column->get('name')) && (($is_new = !in_array($name, $existingColumns)) ||
+                                (class_exists(\Doctrine\DBAL\Types\Type::class) && Schema::getColumnType($tableName, $name) !== $column->get('type')))) {
+                            $params = array_filter($column->getAttributes(), fn($k) => !in_array($k, ["type", "name"])
+                                && !(in_array($k, ["unique", "index", "primary"]) && in_array($name, $existingIndexesNames)), ARRAY_FILTER_USE_KEY);
+
+                            if (in_array($column->get('type'), ["char", "string"]) && empty($params["length"])) $params["length"] = 191;
+                            if ($is_new) $table->addColumn($column->get('type'), $column->get('name'), $params)
+                                ->{empty($existingColumns[$index]) && $index < array_key_last($columns) ? "before" : "after"}(@$existingColumns[$index]?:$lastCol);
+                            else
+                                $table->addColumn($column->get('type'), $column->get('name'), $params)->change();
+
+                        }
+                    }
+                    foreach ($commands as $command) {
+                        $commandName = $command->get('name');
+                        if (in_array($commandName, ['index', 'unique', 'foreign', 'primary', 'dropIndex', 'dropUnique', 'dropForeign', 'dropPrimary'])) {
+                            if (strpos($commandName, 'drop') === 0) {
+                                try {
+                                    $table->{$commandName}(...$command->getAttributes());
+                                } catch (\Throwable $e) {}
+                            } else {
+                                $attributes = $command->getAttributes();
+                                $indexName = $attributes[0] ?? null;
+                                $columns = is_array(@$attributes[0]) ? $attributes[0] : (@$attributes['columns']?: []);
+                                if (!$indexName && $columns)
+                                    $indexName = $tableName . '_' . implode('_', $columns) . '_' . $commandName;
+                                $exists = false;
+                                foreach ($existingIndexes as $idx) {
+                                    if (($indexName && $idx['name'] === $indexName) ||
+                                        (array_diff($idx['columns'], $columns) === [] && $idx['type'] === $commandName)) {
+                                        $exists = true;
+                                        break;
+                                    }
+                                }
+
+                                if (!$exists) {
+                                    try {
+                                        $table->{$commandName}(...$attributes);
+                                    } catch (\Throwable $e) {}
+                                }
+                            }
+                        } else {
+                            try {
+                                $table->{$commandName}(...$command->getAttributes());
+                            } catch (\Throwable $e) {}
+                        }
+                    }
+                });
+            }else
+                Schema::blueprint($blueprintClass)->create($tableName, $definition);
+        });
+        $this->app->singleton('i_types', function(){
+            return imodal('Type')::all();
+        });
 
     }
 
