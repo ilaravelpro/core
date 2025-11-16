@@ -64,9 +64,8 @@ trait Index
 
             $additional['meta']['execute_time'] = round((microtime(true) - $time), 3);
             $result->additional($additional);
-            return $result;
+            return $result->toResponse($request);
         });
-        $result->additional["meta"]['execute_time'] = round((microtime(true) - $time), 3);
         return $result;
     }
 
