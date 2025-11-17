@@ -21,7 +21,7 @@ trait Data
         $result = Cache::remember($this->indexKey($request), $this->index_mts_cached, function () use ($request, $args, $time) {
             return $this->_resultIndex($args, $time, function ($model) {
                 return $this->resourceDataCollectionClass ? new $this->resourceDataCollectionClass($model) : $this->resourceDataClass::collection($model);
-            });
+            })->toResponse($request);
         });
         return $result;
     }
