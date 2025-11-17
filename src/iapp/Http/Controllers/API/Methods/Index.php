@@ -20,7 +20,6 @@ trait Index
 {
     public function indexKey($request)
     {
-
         $params = with($request?:\request())->all();
         unset($params['app_version']);
         $params["uri"] = $request->path();
@@ -32,40 +31,47 @@ trait Index
         $args = func_get_args();
         $time = microtime(true);
         $result = Cache::remember($this->indexKey($request), $this->index_mts_cached, function () use ($time, $request, $args) {
-            list($parent, $model, $order_list, $current_order, $default_order, $filters, $current_filter, $operators, $cacheKey) = $this->_queryIndex(...$args);
-            $additional = [];
-            if ($parent) {
-                $parentController = isset($this->parentController) ? $this->parentController : get_class($parent);
-                $parent_name = $this->class_name($parentController, null, 2);
-                $additional[$parent_name] = new $this->parentResourceCollectionClass($parent);
-                $additional['meta'] = [
-                    'parent' => $parent_name
-                ];
-            }
-            $result = $this->resourceCollectionClass ? new $this->resourceCollectionClass($model) : $this->resourceClass::collection($model);
-
-            if (!isset($additional['meta'])) {
-                $additional['meta'] = [];
-            }
-
-            if (isset($this->disablePagination))
-                $additional['meta']['total'] = $result->count();
-
-            $additional['meta']['orders'] = [
-                'allowed' => $order_list ?: [],
-                'current' => $current_order ?: [],
-                'default' => $default_order,
-            ];
-            $additional['meta']['filters'] = [
-                'allowed' => $filters ?: [],
-                'current' => $current_filter ?: [],
-                'operators' => $operators,
-            ];
-
-            $additional['meta']['execute_time'] = round((microtime(true) - $time), 3);
-            $result->additional($additional);
-            return $result->toResponse($request);
+            return $this->_resultIndex($args, $time, function ($model) {
+                return $this->resourceCollectionClass ? new $this->resourceCollectionClass($model) : $this->resourceClass::collection($model);
+            });
         });
+        return $result;
+    }
+
+    public function _resultIndex($args, $time, $callback)
+    {
+        list($parent, $model, $order_list, $current_order, $default_order, $filters, $current_filter, $operators, $cacheKey) = $this->_queryIndex(...$args);
+        $result = $callback($model);
+        $additional = [];
+        if ($parent) {
+            $parentController = isset($this->parentController) ? $this->parentController : get_class($parent);
+            $parent_name = $this->class_name($parentController, null, 2);
+            $additional[$parent_name] = new $this->parentResourceCollectionClass($parent);
+            $additional['meta'] = [
+                'parent' => $parent_name
+            ];
+        }
+
+        if (!isset($additional['meta'])) {
+            $additional['meta'] = [];
+        }
+
+        if (isset($this->disablePagination))
+            $additional['meta']['total'] = $result->count();
+
+        $additional['meta']['orders'] = [
+            'allowed' => $order_list ?: [],
+            'current' => $current_order ?: [],
+            'default' => $default_order,
+        ];
+        $additional['meta']['filters'] = [
+            'allowed' => $filters ?: [],
+            'current' => $current_filter ?: [],
+            'operators' => $operators,
+        ];
+
+        $additional['meta']['execute_time'] = round((microtime(true) - $time), 3);
+        $result->additional($additional);
         return $result;
     }
 
