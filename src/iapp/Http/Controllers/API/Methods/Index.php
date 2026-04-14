@@ -137,6 +137,9 @@ trait Index
                     return $query;
                 });
             };
+            $anyByAgent = function ($model) {
+                return $this->model::hasTableColumn("agent_id") ? $model->where("agent_id", auth()->id()) : $model;
+            };
             if ($request->has('is_self') && $request->is_self == 1) {
                 $model = $anyByUser($model);
             } elseif (!in_array(auth()->user()->role, ipreference('admins')) && !$parent) {
@@ -146,9 +149,11 @@ trait Index
                 if (!count($subs)) $subs = ['anyByUser'];
                 foreach ($subs as $sub) {
                     if (function_exists('i_query_index_switch'))
-                        $model = i_query_index_switch($sub, $model, $this->action, $request, $anyByUser, $this);
+                        $model = i_query_index_switch($sub, $model, $this->action, $request, $anyByUser, $anyByAgent, $this);
                     elseif ($sub == 'anyByUser')
                         $model = $anyByUser($model);
+                    elseif ($sub == 'anyByAgent')
+                        $model = $anyByAgent($model);
                 }
             }
         }
