@@ -97,7 +97,7 @@ trait Index
             $this->searchQ($request, $model, $parent);
             $current_filter['q'] = $request->q;
         }
-        if ((isset($this->statusFilter) ? $this->statusFilter : true) && ($request->has('statusFilter') ? $request->statusFilter : true) && method_exists($model, 'getModel') && \Schema::hasColumn($model->getModel()->getTable(), 'status')) {
+        if ($request->status !== "all" && (isset($this->statusFilter) ? $this->statusFilter : true) && ($request->has('statusFilter') ? $request->statusFilter : true) && method_exists($model, 'getModel') && \Schema::hasColumn($model->getModel()->getTable(), 'status')) {
             $statuses = iconfig("status.{$model->getModel()->getTable()}", iconfig("status.global"));
             $status = $request->status ? (in_array($request->status, $statuses) ? $request->status : $statuses[0]) : $statuses[0];
             if ($status) {
@@ -116,8 +116,8 @@ trait Index
             $this->action = str_replace('api.', '', join('.', $aAaction));
         }
         if (auth()->check()) {
-            $anyByUser = function ($model, $user_names = []) {
-                return $model->where(function ($query) use ($model, $user_names) {
+            $anyByUser = function ($model, $user_names = [], $type = "where") {
+                return $model->$type(function ($query) use ($model, $user_names) {
                     $idName = null;
                     $table = $model->getModel()->getTable();
                     $table = $table ? "{$table}." : "";
@@ -137,8 +137,18 @@ trait Index
                     return $query;
                 });
             };
-            $anyByAgent = function ($model) {
-                return $this->model::hasTableColumn("agent_id") ? $model->where("agent_id", auth()->id()) : $model;
+            $anyByAgent = function ($model, $users_table = "users", $type = "where") {
+                return $model->$type(function ($query) use ($model, $users_table) {
+                    $table = $model->getModel()->getTable();
+                    $tablen = $table ? "{$table}." : "";
+                    if ($table == $users_table)
+                        $query->where("{$tablen}agent_id", auth()->id());
+                    if ($this->model::hasTableColumn("creator_id"))
+                        $query->{$table == $users_table ? "orWhereHas" : "whereHas"}("creator", function ($q) {
+                            $q->where("agent_id", auth()->id());
+                        });
+                    return $query;
+                });
             };
             if ($request->has('is_self') && $request->is_self == 1) {
                 $model = $anyByUser($model);
@@ -147,13 +157,15 @@ trait Index
                     return iRole::has(str_replace('.', '_', $this->action) . ".view.$sub");
                 });
                 if (!count($subs)) $subs = ['anyByUser'];
-                foreach ($subs as $sub) {
+                foreach ($subs as $index => $sub) {
+                    $type_where = count($subs) > 1 && $index > 0 ? "orWhere" : "where";
                     if (function_exists('i_query_index_switch'))
-                        $model = i_query_index_switch($sub, $model, $this->action, $request, $anyByUser, $anyByAgent, $this);
+                        $model = i_query_index_switch($subs, $index, $sub, $type_where, $model, $this->action, $request, $anyByUser, $anyByAgent, $this);
                     elseif ($sub == 'anyByUser')
-                        $model = $anyByUser($model);
-                    elseif ($sub == 'anyByAgent')
-                        $model = $anyByAgent($model);
+                        $model = $anyByUser($model, [], $type_where);
+                    elseif ($sub == 'anyByAgent') {
+                        $model = $anyByAgent($model, "users", $type_where);
+                    }
                 }
             }
         }
