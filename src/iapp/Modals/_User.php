@@ -10,6 +10,7 @@
 namespace iLaravel\Core\iApp\Modals;
 
 use App\User;
+use iLaravel\Core\iApp\Exceptions\iException;
 use iLaravel\Core\iApp\Http\Requests\iLaravel as Request;
 use iLaravel\Core\iApp\Role;
 use iLaravel\Core\iApp\UserMeta;
@@ -97,22 +98,22 @@ class _User extends Authenticatable
                     $mobile = "98". ltrim($mobile, '0');
                 }
                 $mobile = iPhone::parse($mobile);
-                $mobile = is_array($mobile) ? $mobile : $this->mobile->toArray();
-                unset($mobile['full']);
-                if ($mobile) {
-                    if ($mobileModel = $this->mobile()->first()) {
-                        foreach ($mobile as $index => $item)
-                            $mobileModel->$index = $item;
-                        $mobileModel->verified_at = $verified_at;
-                        $mobileModel->save();
-                    } else {
-                        $this->mobile()->create(array_merge(
-                            [
-                                'model' => 'User',
-                                'model_id' => $this->id,
-                                'key' => 'mobile',
-                                'verified_at' => $verified_at,
-                            ], $mobile));
+                if (is_array($mobile)) {
+                    if (!($this->mobile->number == @$mobile["number"] && $this->mobile->prefix == @$mobile["prefix"] && $this->mobile->code == @$mobile["code"])) {
+                        unset($mobile['full']);
+                        if (!empty($mobile)) {
+                            $phones = imodal("Phone")->where("number", @$mobile["number"])->where("prefix", @$mobile["prefix"])->where("code", @$mobile["code"])->get();
+                            if ($phones->count()) {
+                                throw new iException("The registered mobile number has already been used for someone.");
+                            }else {
+                                $this->mobile()->updateOrCreate(["key" => "mobile", "model" => "User", "model_id" => $this->id], [
+                                    "number" => @$mobile["number"],
+                                    "prefix" => @$mobile["prefix"],
+                                    "code" => @$mobile["code"],
+                                    "verified_at" => $verified_at,
+                                ]);
+                            }
+                        }
                     }
                 }
             }
