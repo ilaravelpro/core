@@ -19,6 +19,7 @@ use iLaravel\Core\Vendor\iRole\iRole;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
 use Laravel\Passport\HasApiTokens;
 use Lcobucci\JWT\Encoding\JoseEncoder;
 
@@ -92,32 +93,30 @@ class _User extends Authenticatable
     }
 
     public function saveMobile($mobile, $verified_at = null) {
-        try {
-            if ($mobile && isset($mobile) && (is_string($mobile) || (is_array($mobile) && count($mobile)))) {
-                if (is_string($mobile) && strlen($mobile) <= 11) {
-                    $mobile = "98". ltrim($mobile, '0');
-                }
-                $mobile = iPhone::parse($mobile);
-                if (is_array($mobile)) {
-                    if (!($this->mobile->number == @$mobile["number"] && $this->mobile->prefix == @$mobile["prefix"] && $this->mobile->code == @$mobile["code"])) {
-                        unset($mobile['full']);
-                        if (!empty($mobile)) {
-                            $phones = imodal("Phone")->where("number", @$mobile["number"])->where("prefix", @$mobile["prefix"])->where("code", @$mobile["code"])->get();
-                            if ($phones->count()) {
-                                throw new iException("The registered mobile number has already been used for someone.");
-                            }else {
-                                $this->mobile()->updateOrCreate(["key" => "mobile", "model" => "User", "model_id" => $this->id], [
-                                    "number" => @$mobile["number"],
-                                    "prefix" => @$mobile["prefix"],
-                                    "code" => @$mobile["code"],
-                                    "verified_at" => $verified_at,
-                                ]);
-                            }
+        if ($mobile && isset($mobile) && (is_string($mobile) || (is_array($mobile) && count($mobile)))) {
+            if (is_string($mobile) && strlen($mobile) <= 11) {
+                $mobile = "98". ltrim($mobile, '0');
+            }
+            $mobile = iPhone::parse($mobile);
+            if (is_array($mobile)) {
+                if (!(@$this->mobile->number == @$mobile["number"] && @$this->mobile->prefix == @$mobile["prefix"] && @$this->mobile->country == @$mobile["country"])) {
+                    unset($mobile['full']);
+                    if (!empty($mobile)) {
+                        $phones = imodal("Phone")::where("number", @$mobile["number"])->where("prefix", @$mobile["prefix"])->where("country", @$mobile["country"])->get();
+                        if ($phones->count()) {
+                            throw ValidationException::withMessages(["mobile"=>_t("The registered mobile number has already been used for someone.")]);
+                        }else {
+                            $this->mobile()->updateOrCreate(["key" => "mobile", "model" => "User", "model_id" => $this->id], [
+                                "number" => @$mobile["number"],
+                                "prefix" => @$mobile["prefix"],
+                                "country" => @$mobile["country"],
+                                "verified_at" => $verified_at,
+                            ]);
                         }
                     }
                 }
             }
-        }catch (\Throwable $exception) {}
+        }
         return $this;
     }
 
